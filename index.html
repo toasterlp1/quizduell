@@ -123,17 +123,17 @@ body{
 <body>
 <div id="gate">
   <div class="gate-card">
-    <h1>QUIZ <span class="bolt">⚡</span> DUELL</h1>
+    <h1>QUIZ<span class="bolt">/</span>DUELL</h1>
     <p>Du streamst das Board über Discord. Die Spieler öffnen nur den Buzzer auf dem Handy.</p>
     <div class="gate-roles">
-      <a href="?view=host">🎛️ Host / Spielleitung<small>Board, Punkte, Antworten, Reihenfolge</small></a>
-      <a href="?view=buzz">🔴 Buzzer (Handy)<small>Name eingeben & buzzern</small></a>
+      <a href="?view=host">Host / Spielleitung</a>
+      <a href="?view=buzz">Buzzer (Handy)</a>
     </div>
   </div>
 </div>
 <div id="boardView" style="display:none">
   <div class="topbar">
-    <div class="logo"><span class="mark">⚡</span> QUIZ DUELL</div>
+    <div class="logo">QUIZ<span style="color:var(--bolt);margin:0 2px">/</span>DUELL</div>
     <div class="topright">
       <span class="round-tag" id="roundTag">Runde 1</span>
       <div class="turn-pill"><span class="star">★</span> <span>Am Zug:</span> <span class="turn-name" id="turnName">—</span> <span class="star">★</span></div>
@@ -145,7 +145,7 @@ body{
   <div class="scorebar" id="scorebar"></div>
 </div>
 <div id="buzzView" class="buzz-screen" style="display:none">
-  <div class="logo" style="font-size:30px"><span class="mark">⚡</span> QUIZ DUELL</div>
+  <div class="logo" style="font-size:30px">QUIZ<span style="color:var(--bolt);margin:0 2px">/</span>DUELL</div>
   <div id="buzzSetup" class="buzz-name-setup">
     <label style="color:var(--ink-dim);font-size:14px;display:block;margin-bottom:8px">Gib deinen Namen ein</label>
     <input id="buzzNameInput" maxlength="16" placeholder="Dein Name" autocomplete="off"/>
@@ -177,8 +177,8 @@ body{
         <button class="btn btn-wrong" id="btnWrong">✗ Falsch</button>
       </div>
       <div class="qbtns">
-        <button class="btn" id="btnOpenBuzz">🔓 Buzzer freigeben (Steal)</button>
-        <button class="btn btn-close" id="btnClose">Frage schließen → nächster Spieler</button>
+        <button class="btn" id="btnOpenBuzz">Buzzer freigeben (Steal)</button>
+        <button class="btn btn-close" id="btnClose">Frage schliessen → nächster Spieler</button>
       </div>
       <div class="hint" id="ovHint"></div>
     </div>
@@ -198,16 +198,13 @@ body{
   <select id="catSelect"></select>
   <div id="questionEditor" style="margin-top:12px"></div>
   <h2 style="font-size:17px;margin-top:24px">Spiel</h2>
-  <button class="btn" id="resetBoard" style="margin-top:8px;width:100%">🔄 Board zurücksetzen (Felder offen)</button>
+  <button class="btn" id="resetBoard" style="margin-top:8px;width:100%">Board zurücksetzen (Felder offen)</button>
   <button class="btn btn-wrong" id="resetScores" style="margin-top:8px;width:100%">Punkte auf 0</button>
   <button class="btn btn-wrong" id="kickAll" style="margin-top:8px;width:100%">Alle Spieler entfernen</button>
 </div>
 <div id="toast"></div>
 <script>
-/* ===== FRAGEN-DATENBANK (hier bearbeiten für eigene Fragen) ===== */
-/* Fragen-Datenbank. Wird in index.html eingebettet.
-   Struktur: round1 / round2, je 6 Kategorien mit 5 Fragen (Werte aufsteigend).
-   Flaggen nutzen Emoji-Flaggen (kein Download). */
+/* ===== FRAGEN-DATENBANK – hier eigene Fragen eintragen ===== */
 const QUIZ_CONTENT = {
   round1: {
     label: "Runde 1",
@@ -216,31 +213,31 @@ const QUIZ_CONTENT = {
       {
         name: "ZURÜCK IN DIE SCHULE",
         q: [
-          { q: "Wie viele Seiten hat ein Würfel?", a: "6" },
-          { q: "Was ist das chemische Symbol für Gold?", a: "Au" },
-          { q: "Wie nennt man das größte Organ des menschlichen Körpers?", a: "Die Haut" },
-          { q: "Welcher Satz beschreibt a² + b² = c² im rechtwinkligen Dreieck?", a: "Satz des Pythagoras" },
-          { q: "Wie lautet die Quadratwurzel aus 144?", a: "12" }
+          { q: "Wie viele Ecken hat ein Sechseck?", a: "6" },
+          { q: "Was ergibt 7 mal 8?", a: "56" },
+          { q: "Welches chemische Element hat das Symbol Fe?", a: "Eisen" },
+          { q: "Wie nennt man Wörter mit gleicher Bedeutung?", a: "Synonyme" },
+          { q: "Wie lautet die Ableitung von x³?", a: "3x²" }
         ]
       },
       {
         name: "WER ODER WAS",
         q: [
           { q: "Wer malte die Mona Lisa?", a: "Leonardo da Vinci" },
-          { q: "Was ist die Hauptstadt-Währung der USA?", a: "US-Dollar" },
-          { q: "Wer schrieb die Theorie der Relativität?", a: "Albert Einstein" },
-          { q: "Was ist der höchste Berg der Erde?", a: "Mount Everest" },
-          { q: "Wer komponierte die 9. Sinfonie mit der 'Ode an die Freude'?", a: "Ludwig van Beethoven" }
+          { q: "Welcher Planet ist der Sonne am nächsten?", a: "Merkur" },
+          { q: "Wer schrieb das Drama Faust?", a: "Johann Wolfgang von Goethe" },
+          { q: "Welcher Stoff transportiert Sauerstoff im Blut?", a: "Hämoglobin" },
+          { q: "Wer formulierte die drei Gesetze der Planetenbewegung?", a: "Johannes Kepler" }
         ]
       },
       {
         name: "SERIEN & FILME",
         q: [
           { q: "In welchem Film sagt eine Figur 'Möge die Macht mit dir sein'?", a: "Star Wars" },
-          { q: "Wie heißt die Kaffeebar-Serie mit Ross, Rachel und Monica?", a: "Friends" },
-          { q: "Welcher Schauspieler spielt Iron Man im MCU?", a: "Robert Downey Jr." },
-          { q: "In welcher Serie regieren Drachen und das Haus Targaryen?", a: "Game of Thrones" },
-          { q: "Welcher Regisseur drehte 'Inception' und 'Interstellar'?", a: "Christopher Nolan" }
+          { q: "Welcher Schauspieler verkörpert Iron Man?", a: "Robert Downey Jr." },
+          { q: "Welcher Regisseur drehte Inception und Interstellar?", a: "Christopher Nolan" },
+          { q: "Wie heisst das fiktive Land in Black Panther?", a: "Wakanda" },
+          { q: "Welcher Film gewann 2020 als erster nicht-englischsprachiger den Oscar als bester Film?", a: "Parasite" }
         ]
       },
       {
@@ -248,29 +245,29 @@ const QUIZ_CONTENT = {
         q: [
           { q: "Welches Land hat diese Flagge?", flag: "🇯🇵", a: "Japan" },
           { q: "Welches Land hat diese Flagge?", flag: "🇧🇷", a: "Brasilien" },
-          { q: "Welches Land hat diese Flagge?", flag: "🇿🇦", a: "Südafrika" },
-          { q: "Welches Land hat diese Flagge?", flag: "🇰🇷", a: "Südkorea" },
-          { q: "Welches Land hat diese Flagge?", flag: "🇵🇹", a: "Portugal" }
+          { q: "Welches Land hat diese Flagge?", flag: "🇵🇹", a: "Portugal" },
+          { q: "Welches Land hat diese Flagge?", flag: "🇲🇽", a: "Mexiko" },
+          { q: "Welches Land hat diese Flagge?", flag: "🇮🇩", a: "Indonesien" }
         ]
       },
       {
         name: "ESSEN & TRINKEN",
         q: [
-          { q: "Aus welchem Land kommt die Pizza ursprünglich?", a: "Italien" },
-          { q: "Welche Frucht wird zu Wein vergoren?", a: "Trauben / Weintrauben" },
-          { q: "Wie heißt die japanische Speise aus rohem Fisch und Reis?", a: "Sushi" },
-          { q: "Welches Gewürz ist das teuerste der Welt (pro Gramm)?", a: "Safran" },
-          { q: "Aus welcher Pflanze wird Schokolade hergestellt?", a: "Kakao(bohne)" }
+          { q: "Aus welchem Land stammt die Pizza ursprünglich?", a: "Italien" },
+          { q: "Welches Gewürz ist pro Gramm das teuerste der Welt?", a: "Safran" },
+          { q: "Aus welcher Bohne wird Schokolade hergestellt?", a: "Kakaobohne" },
+          { q: "Wie heisst der japanische Meerrettich, der zu Sushi gereicht wird?", a: "Wasabi" },
+          { q: "Welche Edelfäule veredelt die Trauben für Sauternes-Weine?", a: "Botrytis (Edelfäule)" }
         ]
       },
       {
         name: "BRANDS",
         q: [
-          { q: "Welche Marke hat den Slogan 'Just Do It'?", a: "Nike" },
-          { q: "Welcher Marke gehört der angebissene Apfel als Logo?", a: "Apple" },
+          { q: "Welche Marke wirbt mit 'Just Do It'?", a: "Nike" },
           { q: "Welche Automarke hat vier verschlungene Ringe als Logo?", a: "Audi" },
-          { q: "Welche Fast-Food-Kette hat die goldenen Bögen ('M')?", a: "McDonald's" },
-          { q: "Welche Marke steckt hinter PlayStation?", a: "Sony" }
+          { q: "Welcher Konzern steht hinter PlayStation?", a: "Sony" },
+          { q: "Welche Marke nutzt einen geschwungenen Haken als Logo und gehört zu Nike nicht?", a: "Puma" },
+          { q: "Welcher Konzern besitzt die Marken Gucci, Balenciaga und Saint Laurent?", a: "Kering" }
         ]
       }
     ]
@@ -282,31 +279,31 @@ const QUIZ_CONTENT = {
       {
         name: "HAUPTSTÄDTE",
         q: [
-          { q: "Wie heißt die Hauptstadt von Frankreich?", a: "Paris" },
-          { q: "Wie heißt die Hauptstadt von Australien?", a: "Canberra" },
-          { q: "Wie heißt die Hauptstadt von Kanada?", a: "Ottawa" },
-          { q: "Wie heißt die Hauptstadt von Ägypten?", a: "Kairo" },
-          { q: "Wie heißt die Hauptstadt von Kasachstan?", a: "Astana" }
+          { q: "Wie heisst die Hauptstadt von Frankreich?", a: "Paris" },
+          { q: "Wie heisst die Hauptstadt von Kanada?", a: "Ottawa" },
+          { q: "Wie heisst die Hauptstadt von Australien?", a: "Canberra" },
+          { q: "Wie heisst die Hauptstadt von Kasachstan?", a: "Astana" },
+          { q: "Wie heisst die Hauptstadt von Bhutan?", a: "Thimphu" }
         ]
       },
       {
         name: "ANIME",
         q: [
-          { q: "In welchem Anime will Monkey D. Luffy König der Piraten werden?", a: "One Piece" },
-          { q: "Wie heißt der Anime mit dem Notizbuch, das tötet?", a: "Death Note" },
-          { q: "Welcher Anime handelt von Titanen hinter riesigen Mauern?", a: "Attack on Titan / Shingeki no Kyojin" },
-          { q: "In welchem Anime kämpft Tanjiro gegen Dämonen?", a: "Demon Slayer / Kimetsu no Yaiba" },
-          { q: "Welches Studio produzierte 'Spirited Away' und 'Mein Nachbar Totoro'?", a: "Studio Ghibli" }
+          { q: "In welcher Serie will ein Junge mit Strohhut König der Piraten werden?", a: "One Piece" },
+          { q: "In welcher Serie tötet ein Notizbuch jeden, dessen Name hineingeschrieben wird?", a: "Death Note" },
+          { q: "In welcher Serie kämpfen Menschen hinter riesigen Mauern gegen menschenfressende Riesen?", a: "Attack on Titan" },
+          { q: "Welches Studio produzierte Chihiros Reise ins Zauberland?", a: "Studio Ghibli" },
+          { q: "Wie heisst die Technik in Naruto, mit der ein Schattendoppelgänger erzeugt wird?", a: "Schattendoppelgänger-Technik (Kage Bunshin)" }
         ]
       },
       {
         name: "GEOGRAPHIE & HERKUNFT",
         q: [
           { q: "Auf welchem Kontinent liegt Ägypten?", a: "Afrika" },
-          { q: "Welcher ist der längste Fluss der Welt?", a: "Nil (oder Amazonas, je nach Messung)" },
           { q: "Welches Land hat die meisten Einwohner der Welt?", a: "Indien" },
-          { q: "Durch welche Stadt verläuft die Grenze zwischen Europa und Asien?", a: "Istanbul" },
-          { q: "Welche Wüste ist die größte heiße Wüste der Erde?", a: "Sahara" }
+          { q: "Durch welche Meerenge sind Europa und Asien bei Istanbul getrennt?", a: "Bosporus" },
+          { q: "Welcher See ist der tiefste der Erde?", a: "Baikalsee" },
+          { q: "Welches Binnenland ist das höchstgelegene der Welt (höchster Mittelwert)?", a: "Bhutan oder Lesotho (Lesotho)" }
         ]
       },
       {
@@ -315,28 +312,28 @@ const QUIZ_CONTENT = {
           { q: "In welchem Jahr fiel die Berliner Mauer?", a: "1989" },
           { q: "Wer war der erste Mensch auf dem Mond?", a: "Neil Armstrong" },
           { q: "In welchem Jahr begann der Erste Weltkrieg?", a: "1914" },
-          { q: "Welches Schiff sank 1912 auf seiner Jungfernfahrt?", a: "Titanic" },
-          { q: "Welches Reich wurde von Julius Cäsar geführt?", a: "Römisches Reich" }
+          { q: "Welcher Friedensvertrag beendete 1648 den Dreissigjährigen Krieg?", a: "Westfälischer Friede" },
+          { q: "In welchem Jahr wurde die Schweizerische Eidgenossenschaft als Bundesstaat gegründet?", a: "1848" }
         ]
       },
       {
         name: "TIERWELT",
         q: [
-          { q: "Welches ist das größte Tier der Welt?", a: "Blauwal" },
+          { q: "Welches ist das grösste Tier der Welt?", a: "Blauwal" },
           { q: "Wie viele Herzen hat ein Oktopus?", a: "3" },
-          { q: "Welches Tier ist das schnellste Landtier?", a: "Gepard" },
-          { q: "Welches Säugetier kann fliegen?", a: "Fledermaus" },
-          { q: "Wie nennt man eine Gruppe von Löwen?", a: "Rudel" }
+          { q: "Welches Säugetier kann aktiv fliegen?", a: "Fledermaus" },
+          { q: "Welches Tier hat den grössten Anteil an REM-Schlaf und kann mit einer Gehirnhälfte schlafen?", a: "Delfin" },
+          { q: "Welches einzige Säugetier legt Eier und gibt Milch über die Haut ab?", a: "Schnabeltier (auch Ameisenigel zählt)" }
         ]
       },
       {
         name: "ABKÜRZUNGEN",
         q: [
-          { q: "Wofür steht die Abkürzung 'USB'?", a: "Universal Serial Bus" },
-          { q: "Wofür steht 'LOL' im Chat?", a: "Laughing Out Loud" },
-          { q: "Wofür steht die Abkürzung 'NASA'?", a: "National Aeronautics and Space Administration" },
-          { q: "Wofür steht 'GIF' (Bildformat)?", a: "Graphics Interchange Format" },
-          { q: "Wofür steht 'DNA' (englisch)?", a: "Deoxyribonucleic Acid" }
+          { q: "Wofür steht USB?", a: "Universal Serial Bus" },
+          { q: "Wofür steht NASA?", a: "National Aeronautics and Space Administration" },
+          { q: "Wofür steht GIF beim Bildformat?", a: "Graphics Interchange Format" },
+          { q: "Wofür steht HTTP?", a: "Hypertext Transfer Protocol" },
+          { q: "Wofür steht LASER?", a: "Light Amplification by Stimulated Emission of Radiation" }
         ]
       }
     ]
@@ -483,14 +480,14 @@ function renderOverlay(){
     $("#ovPhase").innerHTML=`<span class="main">Hauptrunde</span> · richtig +${val} / falsch −${half}`;
     $("#ovWhoNow").innerHTML=`Antwortet: <b>${main?esc(main.name):"—"}</b>`;
     $("#ovBuzz").innerHTML="";$("#btnOpenBuzz").disabled=false;
-    $("#ovHint").textContent="Richtig → Punkte & Frage schließen. Falsch → Buzzer freigeben, damit andere stehlen können.";
+    $("#ovHint").textContent="Richtig → Punkte & Frage schliessen. Falsch → Buzzer freigeben, damit andere stehlen können.";
   }else{
     const ord=state.buzz.order.filter(id=>!state.buzz.graded.includes(id));
     const current=ord.length?state.players.find(p=>p.id===ord[0]):null;
     $("#ovPhase").innerHTML=`<span class="steal">Steal-Runde</span> · richtig +${half} / falsch −${quarter}`;
-    if(state.buzz.open&&!current){$("#ovWhoNow").innerHTML="";$("#ovBuzz").innerHTML="🟢 Buzzer offen – wer zuerst drückt, ist dran…";}
-    else if(current){$("#ovWhoNow").innerHTML=`Am Buzzer: <b>${esc(current.name)}</b>`;$("#ovBuzz").innerHTML=`🔴 <span class="who">${esc(current.name)}</span> hat gebuzzert – bewerten!`;}
-    else{$("#ovWhoNow").innerHTML="";$("#ovBuzz").innerHTML="Buzzer gesperrt. Freigeben oder Frage schließen.";}
+    if(state.buzz.open&&!current){$("#ovWhoNow").innerHTML="";$("#ovBuzz").innerHTML="Buzzer offen, wer zuerst drückt ist dran";}
+    else if(current){$("#ovWhoNow").innerHTML=`Am Buzzer: <b>${esc(current.name)}</b>`;$("#ovBuzz").innerHTML=` <span class="who">${esc(current.name)}</span> hat gebuzzert – bewerten!`;}
+    else{$("#ovWhoNow").innerHTML="";$("#ovBuzz").innerHTML="Buzzer gesperrt. Freigeben oder Frage schliessen.";}
     $("#btnOpenBuzz").disabled=false;
     $("#ovHint").textContent="Jeder Steal-Spieler bekommt +½ / −¼. Bei falsch buzzert der nächste. Niemand bekommt den vollen Minus-Wert.";
   }
@@ -552,10 +549,10 @@ function renderBuzz(){
   const rank=state.buzz.order.indexOf(myId),graded=state.buzz.graded.includes(myId);
   const ungraded=state.buzz.order.filter(id=>!state.buzz.graded.includes(id));
   if(turnPlayer()&&turnPlayer().id===myId){btn.disabled=true;btn.textContent="—";info.textContent="Stehlen ist für die anderen.";return;}
-  if(rank>-1&&!graded&&ungraded[0]===myId){btn.disabled=true;btn.textContent="✓";info.innerHTML='<span class="buzz-first">Du bist dran! 🔥</span>';}
+  if(rank>-1&&!graded&&ungraded[0]===myId){btn.disabled=true;btn.textContent="✓";info.innerHTML='<span class="buzz-first">Du bist dran! </span>';}
   else if(rank>-1&&!graded){btn.disabled=true;btn.textContent=(ungraded.indexOf(myId)+1)+".";info.innerHTML=`<span class="buzz-locked">Warte – Platz ${ungraded.indexOf(myId)+1}</span>`;}
   else if(graded){btn.disabled=true;btn.textContent="✗";info.textContent="Du bist raus bei dieser Frage.";}
-  else if(state.buzz.open){btn.disabled=false;btn.textContent="BUZZ";info.innerHTML='🟢 <b style="color:#16a34a">Jetzt buzzern!</b>';}
+  else if(state.buzz.open){btn.disabled=false;btn.textContent="BUZZ";info.innerHTML=' <b style="color:#16a34a">Jetzt buzzern!</b>';}
   else{btn.disabled=true;btn.textContent="…";info.textContent="Buzzer gesperrt.";}
 }
 function setupBuzz(){
@@ -585,7 +582,7 @@ function renderEditor(){
   state.order.forEach((pid,idx)=>{
     const p=state.players.find(x=>x.id===pid);if(!p)return;
     const row=document.createElement("div");row.className="order-row";
-    row.innerHTML=`<span class="nm">${idx+1}. ${esc(p.name)}</span><button data-up>▲</button><button data-down>▼</button><button data-del>🗑</button>`;
+    row.innerHTML=`<span class="nm">${idx+1}. ${esc(p.name)}</span><button data-up>▲</button><button data-down>▼</button><button data-del></button>`;
     row.querySelector("[data-up]").onclick=()=>{if(idx>0){[state.order[idx-1],state.order[idx]]=[state.order[idx],state.order[idx-1]];commit();renderEditor();}};
     row.querySelector("[data-down]").onclick=()=>{if(idx<state.order.length-1){[state.order[idx+1],state.order[idx]]=[state.order[idx],state.order[idx+1]];commit();renderEditor();}};
     row.querySelector("[data-del]").onclick=()=>{state.players=state.players.filter(x=>x.id!==pid);state.order=state.order.filter(x=>x!==pid);if(state.turnIndex>=state.order.length)state.turnIndex=0;commit();renderEditor();};
