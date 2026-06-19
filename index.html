@@ -6,30 +6,14 @@
 <title>Quiz Duell</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-/* ============================================================
-   QUIZ DUELL  —  Design-Tokens
-   Stimmung: dunkle Arena, elektrisches Blitz-Rot auf Stahlblau.
-   Display-Font: kantig-kondensiert (Oswald). Body: Inter.
-   ============================================================ */
 @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap');
-
 :root{
-  --bg-0:#0a0e17;          /* tiefster Hintergrund */
-  --bg-1:#111726;          /* Panels */
-  --bg-2:#1a2236;          /* erhöhte Flächen */
-  --steel-1:#1e3a8a;       /* Stahlblau dunkel (gespielte Felder rand) */
-  --steel-2:#2b5bd4;       /* Stahlblau aktiv */
-  --steel-glow:#3b82f6;    /* blaues Leuchten */
-  --bolt:#e01e2b;          /* Blitz-Rot */
-  --bolt-2:#ff3b46;        /* helles Rot */
-  --gold:#f5b942;          /* Akzent für Punkte/Turn */
-  --ink:#eef2fb;           /* Haupttext */
-  --ink-dim:#8a97b4;       /* gedämpft */
-  --line:rgba(120,140,190,.16);
-  --radius:14px;
-  --shadow:0 10px 40px rgba(0,0,0,.5);
+  --bg-0:#0a0e17;--bg-1:#111726;--bg-2:#1a2236;
+  --steel-1:#1e3a8a;--steel-2:#2b5bd4;--steel-glow:#3b82f6;
+  --bolt:#e01e2b;--bolt-2:#ff3b46;--gold:#f5b942;
+  --ink:#eef2fb;--ink-dim:#8a97b4;--line:rgba(120,140,190,.16);
+  --radius:14px;--shadow:0 10px 40px rgba(0,0,0,.5);
 }
-
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
 body{
@@ -38,738 +22,619 @@ body{
     radial-gradient(1200px 700px at 50% -10%, rgba(43,91,212,.18), transparent 60%),
     radial-gradient(900px 500px at 90% 110%, rgba(224,30,43,.10), transparent 60%),
     var(--bg-0);
-  color:var(--ink);
-  min-height:100vh;
-  -webkit-font-smoothing:antialiased;
-  overflow-x:hidden;
+  color:var(--ink);min-height:100vh;-webkit-font-smoothing:antialiased;overflow-x:hidden;
 }
 .display-font{font-family:'Oswald',sans-serif;letter-spacing:.5px}
-
-/* ---------- Loader / Gate ---------- */
-#gate{
-  position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;
-  background:var(--bg-0);
-}
-.gate-card{
-  background:var(--bg-1);border:1px solid var(--line);border-radius:var(--radius);
-  padding:36px;max-width:440px;width:92%;box-shadow:var(--shadow);text-align:center;
-}
+#gate{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;background:var(--bg-0)}
+.gate-card{background:var(--bg-1);border:1px solid var(--line);border-radius:var(--radius);padding:36px;max-width:440px;width:92%;box-shadow:var(--shadow);text-align:center}
 .gate-card h1{font-family:'Oswald';font-size:34px;font-weight:700;margin-bottom:6px}
 .gate-card .bolt{color:var(--bolt)}
 .gate-card p{color:var(--ink-dim);font-size:14px;margin-bottom:22px;line-height:1.5}
 .gate-roles{display:grid;gap:10px}
-.gate-roles a{
-  display:block;text-decoration:none;padding:14px;border-radius:10px;
-  background:var(--bg-2);border:1px solid var(--line);color:var(--ink);
-  font-weight:600;transition:.15s;
-}
+.gate-roles a{display:block;text-decoration:none;padding:14px;border-radius:10px;background:var(--bg-2);border:1px solid var(--line);color:var(--ink);font-weight:600;transition:.15s}
 .gate-roles a:hover{border-color:var(--steel-glow);transform:translateY(-1px)}
 .gate-roles a small{display:block;color:var(--ink-dim);font-weight:400;font-size:12px;margin-top:3px}
-
-/* ============================================================
-   TOP BAR (Host + Display)
-   ============================================================ */
-.topbar{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:14px 22px;border-bottom:1px solid var(--line);
-  background:linear-gradient(180deg, rgba(26,34,54,.6), transparent);
-}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 22px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,rgba(26,34,54,.6),transparent);flex-wrap:wrap;gap:10px}
 .logo{display:flex;align-items:center;gap:12px;font-family:'Oswald';font-weight:700;font-size:26px}
-.logo .mark{
-  width:38px;height:38px;display:grid;place-items:center;border-radius:9px;
-  background:linear-gradient(135deg,var(--bolt),var(--bolt-2));
-  box-shadow:0 0 22px rgba(224,30,43,.5);font-size:20px;
-}
-.turn-pill{
-  display:flex;align-items:center;gap:10px;padding:9px 18px;border-radius:999px;
-  background:linear-gradient(90deg, rgba(224,30,43,.15), rgba(43,91,212,.15));
-  border:1px solid var(--line);font-family:'Oswald';font-weight:600;font-size:18px;
-}
+.logo .mark{width:38px;height:38px;display:grid;place-items:center;border-radius:9px;background:linear-gradient(135deg,var(--bolt),var(--bolt-2));box-shadow:0 0 22px rgba(224,30,43,.5);font-size:20px}
+.topright{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.turn-pill{display:flex;align-items:center;gap:10px;padding:9px 18px;border-radius:999px;background:linear-gradient(90deg,rgba(224,30,43,.15),rgba(43,91,212,.15));border:1px solid var(--line);font-family:'Oswald';font-weight:600;font-size:18px}
 .turn-pill .star{color:var(--gold)}
 .turn-name{color:var(--gold)}
-
-/* ============================================================
-   BOARD GRID
-   ============================================================ */
+.round-tag{font-family:'Oswald';font-weight:600;font-size:13px;color:var(--ink-dim);padding:6px 12px;border:1px solid var(--line);border-radius:999px}
 .board-wrap{padding:22px;max-width:1500px;margin:0 auto}
-.board{
-  display:grid;gap:12px;
-  grid-template-columns:repeat(var(--cols,6),1fr);
-}
-.cat-head{
-  background:linear-gradient(180deg,var(--bolt),#a3121c);
-  border-radius:12px;padding:18px 10px;text-align:center;
-  font-family:'Oswald';font-weight:700;font-size:16px;text-transform:uppercase;
-  letter-spacing:.5px;color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.18);
-  min-height:64px;display:grid;place-items:center;
-}
-.cell{
-  background:linear-gradient(180deg,var(--steel-2),var(--steel-1));
-  border:none;border-radius:12px;padding:24px 10px;cursor:pointer;
-  font-family:'Oswald';font-weight:700;font-size:30px;font-style:italic;color:#dce7ff;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.15), var(--shadow);
-  transition:.15s;text-align:center;
-}
+.board{display:grid;gap:12px;grid-template-columns:repeat(var(--cols,6),1fr)}
+.cat-head{background:linear-gradient(180deg,var(--bolt),#a3121c);border-radius:12px;padding:18px 10px;text-align:center;font-family:'Oswald';font-weight:700;font-size:15px;text-transform:uppercase;letter-spacing:.5px;color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.18);min-height:64px;display:grid;place-items:center}
+.cell{background:linear-gradient(180deg,var(--steel-2),var(--steel-1));border:none;border-radius:12px;padding:24px 10px;cursor:pointer;font-family:'Oswald';font-weight:700;font-size:30px;font-style:italic;color:#dce7ff;box-shadow:inset 0 1px 0 rgba(255,255,255,.15),var(--shadow);transition:.15s;text-align:center}
 .cell:hover:not(.used){transform:translateY(-2px);box-shadow:0 0 24px rgba(59,130,246,.45)}
-.cell.used{
-  background:var(--bg-1);color:#2c3650;cursor:default;
-  box-shadow:none;border:1px solid var(--line);
-}
+.cell.used{background:var(--bg-1);color:#2c3650;cursor:default;box-shadow:none;border:1px solid var(--line)}
 .cell:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
-
-/* ============================================================
-   SCOREBOARD (Spieler-Leiste unten)
-   ============================================================ */
-.scorebar{
-  display:flex;gap:10px;flex-wrap:wrap;justify-content:center;
-  padding:16px 22px 28px;
-}
-.player{
-  position:relative;background:var(--bg-1);border:1px solid var(--line);
-  border-radius:12px;padding:12px 18px;min-width:150px;text-align:center;
-  transition:.2s;
-}
+.scorebar{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;padding:16px 22px 28px}
+.player{position:relative;background:var(--bg-1);border:1px solid var(--line);border-radius:12px;padding:12px 18px;min-width:150px;text-align:center;transition:.2s}
 .player.active{border-color:var(--gold);box-shadow:0 0 18px rgba(245,185,66,.3)}
-.player.buzzed{border-color:var(--bolt-2);box-shadow:0 0 22px rgba(255,59,70,.55);
-  animation:buzzpulse .8s ease infinite}
+.player.buzzed{border-color:var(--bolt-2);box-shadow:0 0 22px rgba(255,59,70,.55);animation:buzzpulse .8s ease infinite}
 @keyframes buzzpulse{50%{box-shadow:0 0 34px rgba(255,59,70,.85)}}
-.player .pname{font-family:'Oswald';font-weight:600;font-size:16px;color:var(--ink);
-  text-transform:uppercase;letter-spacing:.4px;cursor:text}
+.player .pname{font-family:'Oswald';font-weight:600;font-size:16px;color:var(--ink);text-transform:uppercase;letter-spacing:.4px}
 .player .pscore{font-family:'Oswald';font-weight:700;font-size:26px;color:var(--gold);margin-top:2px}
-.player .ctrls{display:flex;gap:6px;justify-content:center;margin-top:8px}
-.player .ctrls button{
-  border:1px solid var(--line);background:var(--bg-2);color:var(--ink);
-  border-radius:7px;width:30px;height:28px;cursor:pointer;font-weight:700;font-size:13px;
-}
+.player .ctrls{display:flex;gap:6px;justify-content:center;margin-top:8px;flex-wrap:wrap}
+.player .ctrls button{border:1px solid var(--line);background:var(--bg-2);color:var(--ink);border-radius:7px;min-width:30px;height:28px;cursor:pointer;font-weight:700;font-size:13px;padding:0 6px}
 .player .ctrls button:hover{border-color:var(--steel-glow)}
-.player .buzz-rank{
-  position:absolute;top:-10px;left:-10px;width:26px;height:26px;border-radius:50%;
-  background:var(--bolt);color:#fff;font-family:'Oswald';font-weight:700;
-  display:grid;place-items:center;font-size:14px;box-shadow:0 0 14px rgba(224,30,43,.7)
-}
-
-/* ============================================================
-   QUESTION OVERLAY
-   ============================================================ */
-.overlay{
-  position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;
-  background:rgba(5,8,14,.86);backdrop-filter:blur(6px);padding:24px;
-}
+.player .buzz-rank{position:absolute;top:-10px;left:-10px;width:26px;height:26px;border-radius:50%;background:var(--bolt);color:#fff;font-family:'Oswald';font-weight:700;display:grid;place-items:center;font-size:14px;box-shadow:0 0 14px rgba(224,30,43,.7)}
+.player.empty{opacity:.4;border-style:dashed}
+.overlay{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;background:rgba(5,8,14,.86);backdrop-filter:blur(6px);padding:24px}
 .overlay.open{display:flex}
-.qcard{
-  background:linear-gradient(180deg,var(--bg-2),var(--bg-1));
-  border:1px solid var(--line);border-radius:20px;padding:40px;
-  max-width:880px;width:100%;box-shadow:var(--shadow);text-align:center;position:relative;
-}
-.qcat{font-family:'Oswald';color:var(--bolt-2);text-transform:uppercase;letter-spacing:1px;
-  font-size:15px;font-weight:600}
+.qcard{background:linear-gradient(180deg,var(--bg-2),var(--bg-1));border:1px solid var(--line);border-radius:20px;padding:40px;max-width:880px;width:100%;box-shadow:var(--shadow);text-align:center;position:relative;max-height:92vh;overflow-y:auto}
+.qcat{font-family:'Oswald';color:var(--bolt-2);text-transform:uppercase;letter-spacing:1px;font-size:15px;font-weight:600}
 .qval{font-family:'Oswald';color:var(--gold);font-size:18px;font-weight:700;margin-top:2px}
-.qtext{font-size:30px;font-weight:600;line-height:1.35;margin:26px 0;font-family:'Oswald'}
-.qanswer{
-  margin:20px auto;max-width:640px;padding:18px;border-radius:12px;
-  background:rgba(245,185,66,.08);border:1px dashed rgba(245,185,66,.4);
-  font-size:22px;color:var(--gold);font-weight:600;display:none;font-family:'Oswald'
-}
+.qflag{font-size:90px;line-height:1.1;margin:14px 0}
+.qtext{font-size:30px;font-weight:600;line-height:1.35;margin:22px 0;font-family:'Oswald'}
+.qanswer{margin:20px auto;max-width:640px;padding:18px;border-radius:12px;background:rgba(245,185,66,.08);border:1px dashed rgba(245,185,66,.4);font-size:22px;color:var(--gold);font-weight:600;display:none;font-family:'Oswald'}
 .qanswer.show{display:block}
-.buzz-status{
-  margin:16px 0;min-height:30px;font-family:'Oswald';font-size:22px;font-weight:600;
-}
+.phase-label{margin:10px 0;font-family:'Oswald';font-size:16px;font-weight:600;color:var(--ink-dim)}
+.phase-label .main{color:var(--gold)}
+.phase-label .steal{color:var(--bolt-2)}
+.buzz-status{margin:12px 0;min-height:26px;font-family:'Oswald';font-size:20px;font-weight:600}
 .buzz-status .who{color:var(--bolt-2)}
-.qbtns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:20px}
-.btn{
-  font-family:'Inter';font-weight:600;font-size:15px;padding:12px 22px;border-radius:10px;
-  border:1px solid var(--line);background:var(--bg-2);color:var(--ink);cursor:pointer;transition:.15s
-}
+.qbtns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:18px}
+.btn{font-family:'Inter';font-weight:600;font-size:15px;padding:12px 22px;border-radius:10px;border:1px solid var(--line);background:var(--bg-2);color:var(--ink);cursor:pointer;transition:.15s}
 .btn:hover{border-color:var(--steel-glow);transform:translateY(-1px)}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
 .btn-reveal{border-color:rgba(245,185,66,.5);color:var(--gold)}
 .btn-correct{background:linear-gradient(135deg,#16a34a,#15803d);border:none;color:#fff}
 .btn-wrong{background:linear-gradient(135deg,#b91c1c,#7f1d1d);border:none;color:#fff}
 .btn-close{background:transparent}
-.assign-row{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin:14px 0}
-.assign-row .chip{
-  padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:var(--bg-2);
-  cursor:pointer;font-weight:600;font-size:13px;color:var(--ink)
-}
-.assign-row .chip.sel{border-color:var(--gold);color:var(--gold)}
-.hint{color:var(--ink-dim);font-size:12px;margin-top:6px}
-
-/* ============================================================
-   BUZZER VIEW (Handy)
-   ============================================================ */
-.buzz-screen{
-  min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:24px;gap:24px;text-align:center;
-}
+.hint{color:var(--ink-dim);font-size:12px;margin-top:8px;line-height:1.5}
+.who-now{margin:6px 0 2px;font-family:'Oswald';font-size:24px;font-weight:700}
+.who-now b{color:var(--gold)}
+.buzz-screen{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:22px;text-align:center}
 .buzz-name-setup{width:100%;max-width:360px}
-.buzz-name-setup input{
-  width:100%;padding:16px;border-radius:12px;border:1px solid var(--line);
-  background:var(--bg-1);color:var(--ink);font-size:18px;text-align:center;margin-bottom:12px
-}
-.buzz-btn{
-  width:min(78vw,340px);height:min(78vw,340px);border-radius:50%;border:none;cursor:pointer;
-  background:radial-gradient(circle at 38% 32%, var(--bolt-2), var(--bolt) 55%, #7f0f17);
-  color:#fff;font-family:'Oswald';font-weight:700;font-size:48px;letter-spacing:2px;
-  box-shadow:0 0 0 10px rgba(224,30,43,.15), 0 18px 50px rgba(224,30,43,.45),
-    inset 0 6px 20px rgba(255,255,255,.25);
-  transition:.08s;touch-action:manipulation;
-}
+.buzz-name-setup input{width:100%;padding:16px;border-radius:12px;border:1px solid var(--line);background:var(--bg-1);color:var(--ink);font-size:18px;text-align:center;margin-bottom:12px}
+.buzz-btn{width:min(78vw,340px);height:min(78vw,340px);border-radius:50%;border:none;cursor:pointer;background:radial-gradient(circle at 38% 32%,var(--bolt-2),var(--bolt) 55%,#7f0f17);color:#fff;font-family:'Oswald';font-weight:700;font-size:48px;letter-spacing:2px;box-shadow:0 0 0 10px rgba(224,30,43,.15),0 18px 50px rgba(224,30,43,.45),inset 0 6px 20px rgba(255,255,255,.25);transition:.08s;touch-action:manipulation}
 .buzz-btn:active{transform:scale(.95)}
-.buzz-btn:disabled{
-  background:var(--bg-2);color:#46506b;box-shadow:none;cursor:not-allowed
-}
+.buzz-btn:disabled{background:var(--bg-2);color:#46506b;box-shadow:none;cursor:not-allowed}
 .buzz-meta{font-family:'Oswald';font-size:20px;color:var(--ink-dim)}
 .buzz-meta b{color:var(--gold)}
 .buzz-locked{color:var(--bolt-2);font-weight:700}
 .buzz-first{color:#16a34a;font-weight:700;font-size:26px}
-
-/* ---------- Toast ---------- */
-#toast{
-  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(120%);
-  background:var(--bg-2);border:1px solid var(--line);border-radius:10px;
-  padding:12px 20px;font-weight:600;z-index:200;transition:.3s;box-shadow:var(--shadow)
-}
+.buzz-question{background:var(--bg-1);border:1px solid var(--line);border-radius:16px;padding:22px;max-width:520px;width:100%;font-family:'Oswald';font-size:22px;font-weight:600;line-height:1.35}
+.buzz-question .bqcat{color:var(--bolt-2);font-size:13px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.buzz-question .bqflag{font-size:72px;margin:6px 0}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(120%);background:var(--bg-2);border:1px solid var(--line);border-radius:10px;padding:12px 20px;font-weight:600;z-index:200;transition:.3s;box-shadow:var(--shadow)}
 #toast.show{transform:translateX(-50%) translateY(0)}
-
-/* ---------- Settings drawer ---------- */
-.toolbtn{
-  background:var(--bg-2);border:1px solid var(--line);color:var(--ink);border-radius:9px;
-  padding:9px 14px;cursor:pointer;font-weight:600;font-size:13px;margin-left:8px
-}
+.toolbtn{background:var(--bg-2);border:1px solid var(--line);color:var(--ink);border-radius:9px;padding:9px 14px;cursor:pointer;font-weight:600;font-size:13px}
 .toolbtn:hover{border-color:var(--steel-glow)}
-.drawer{
-  position:fixed;top:0;right:0;height:100vh;width:min(440px,92vw);z-index:60;
-  background:var(--bg-1);border-left:1px solid var(--line);box-shadow:var(--shadow);
-  transform:translateX(100%);transition:.25s;overflow-y:auto;padding:22px
-}
+.drawer{position:fixed;top:0;right:0;height:100vh;width:min(460px,94vw);z-index:60;background:var(--bg-1);border-left:1px solid var(--line);box-shadow:var(--shadow);transform:translateX(100%);transition:.25s;overflow-y:auto;padding:22px}
 .drawer.open{transform:translateX(0)}
 .drawer h2{font-family:'Oswald';font-size:22px;margin-bottom:4px}
 .drawer .sub{color:var(--ink-dim);font-size:13px;margin-bottom:18px}
 .drawer label{display:block;font-size:13px;color:var(--ink-dim);margin:14px 0 5px;font-weight:600}
-.drawer input,.drawer textarea,.drawer select{
-  width:100%;padding:10px;border-radius:8px;border:1px solid var(--line);
-  background:var(--bg-2);color:var(--ink);font-family:inherit;font-size:14px
-}
-.drawer textarea{min-height:70px;resize:vertical}
-.drawer .closeX{position:absolute;top:16px;right:18px;background:none;border:none;color:var(--ink-dim);
-  font-size:24px;cursor:pointer}
+.drawer input,.drawer textarea,.drawer select{width:100%;padding:10px;border-radius:8px;border:1px solid var(--line);background:var(--bg-2);color:var(--ink);font-family:inherit;font-size:14px}
+.drawer textarea{min-height:60px;resize:vertical}
+.drawer .closeX{position:absolute;top:16px;right:18px;background:none;border:none;color:var(--ink-dim);font-size:24px;cursor:pointer}
 .q-edit{background:var(--bg-2);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px}
 .q-edit .qhead{display:flex;justify-content:space-between;font-family:'Oswald';font-size:13px;color:var(--gold);margin-bottom:6px}
-
-@media (max-width:760px){
-  .board{gap:6px}
-  .cell{font-size:20px;padding:14px 4px}
-  .cat-head{font-size:11px;padding:10px 4px;min-height:48px}
-  .topbar{flex-direction:column;gap:10px}
-}
+.order-row{display:flex;align-items:center;gap:6px;background:var(--bg-2);border:1px solid var(--line);border-radius:8px;padding:8px;margin-bottom:6px}
+.order-row .nm{flex:1;font-weight:600}
+.order-row button{border:1px solid var(--line);background:var(--bg-1);color:var(--ink);border-radius:6px;width:30px;height:28px;cursor:pointer}
+@media (max-width:760px){.board{gap:6px}.cell{font-size:20px;padding:14px 4px}.cat-head{font-size:10px;padding:10px 4px;min-height:48px}.topbar{flex-direction:column}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
-
-<!-- ============ ROLE GATE ============ -->
 <div id="gate">
   <div class="gate-card">
     <h1>QUIZ <span class="bolt">⚡</span> DUELL</h1>
-    <p>Wähle deine Ansicht. Host steuert das Spiel, Buzzer ist für die Spieler-Handys, Anzeige ist für den Stream/zweiten Bildschirm.</p>
+    <p>Du streamst das Board über Discord. Die Spieler öffnen nur den Buzzer auf dem Handy.</p>
     <div class="gate-roles">
-      <a href="?view=host">🎛️ Host / Spielleitung<small>Board steuern, Punkte vergeben, Antworten sehen</small></a>
-      <a href="?view=display">📺 Anzeige (Stream)<small>Nur ansehen – kein Eingriff</small></a>
-      <a href="?view=buzz">🔴 Buzzer (Handy)<small>Großer Knopf zum Buzzern</small></a>
+      <a href="?view=host">🎛️ Host / Spielleitung<small>Board, Punkte, Antworten, Reihenfolge</small></a>
+      <a href="?view=buzz">🔴 Buzzer (Handy)<small>Name eingeben & buzzern</small></a>
     </div>
   </div>
 </div>
-
-<!-- ============ HOST / DISPLAY ============ -->
 <div id="boardView" style="display:none">
   <div class="topbar">
     <div class="logo"><span class="mark">⚡</span> QUIZ DUELL</div>
-    <div style="display:flex;align-items:center">
-      <div class="turn-pill"><span class="star">★</span> <span id="turnLabel">Am Zug:</span> <span class="turn-name" id="turnName">—</span> <span class="star">★</span></div>
-      <button class="toolbtn" id="openSettings">⚙️ Einstellungen</button>
+    <div class="topright">
+      <span class="round-tag" id="roundTag">Runde 1</span>
+      <div class="turn-pill"><span class="star">★</span> <span>Am Zug:</span> <span class="turn-name" id="turnName">—</span> <span class="star">★</span></div>
+      <button class="toolbtn" id="nextRoundBtn">Runde 2 ▶</button>
+      <button class="toolbtn" id="openSettings">⚙️</button>
     </div>
   </div>
-
-  <div class="board-wrap">
-    <div class="board" id="board"></div>
-  </div>
-
+  <div class="board-wrap"><div class="board" id="board"></div></div>
   <div class="scorebar" id="scorebar"></div>
 </div>
-
-<!-- ============ BUZZER (Handy) ============ -->
 <div id="buzzView" class="buzz-screen" style="display:none">
   <div class="logo" style="font-size:30px"><span class="mark">⚡</span> QUIZ DUELL</div>
   <div id="buzzSetup" class="buzz-name-setup">
-    <label style="color:var(--ink-dim);font-size:14px;display:block;margin-bottom:8px">Wähle deinen Namen</label>
-    <select id="buzzNameSelect"></select>
-    <div class="hint">Die Namen legt der Host in den Einstellungen fest.</div>
+    <label style="color:var(--ink-dim);font-size:14px;display:block;margin-bottom:8px">Gib deinen Namen ein</label>
+    <input id="buzzNameInput" maxlength="16" placeholder="Dein Name" autocomplete="off"/>
+    <button class="btn btn-correct" id="buzzJoin" style="width:100%">Beitreten</button>
+    <div class="hint">Dein Name erscheint beim Host auf dem Board.</div>
   </div>
-  <div id="buzzPlay" style="display:none;flex-direction:column;align-items:center;gap:24px">
-    <div class="buzz-meta">Du bist: <b id="buzzMyName">—</b></div>
+  <div id="buzzPlay" style="display:none;flex-direction:column;align-items:center;gap:20px">
+    <div class="buzz-meta">Du: <b id="buzzMyName">—</b></div>
+    <div class="buzz-question" id="buzzQuestion" style="display:none"></div>
     <button class="buzz-btn" id="buzzBtn">BUZZ</button>
-    <div class="buzz-meta" id="buzzInfo">Warte auf Freigabe…</div>
-    <button class="btn btn-close" id="buzzChange" style="margin-top:8px">Name ändern</button>
+    <div class="buzz-meta" id="buzzInfo">Warte auf den Host…</div>
+    <button class="btn btn-close" id="buzzChange" style="margin-top:4px">Name ändern</button>
   </div>
 </div>
-
-<!-- ============ QUESTION OVERLAY ============ -->
 <div class="overlay" id="overlay">
   <div class="qcard">
     <div class="qcat" id="ovCat">KATEGORIE</div>
     <div class="qval" id="ovVal">100</div>
+    <div class="qflag" id="ovFlag" style="display:none"></div>
     <div class="qtext" id="ovText">Frage…</div>
-
+    <div class="phase-label" id="ovPhase"></div>
+    <div class="who-now" id="ovWhoNow"></div>
     <div class="buzz-status" id="ovBuzz"></div>
-
     <div class="qanswer" id="ovAnswer"></div>
-
-    <!-- nur Host -->
     <div id="hostControls">
-      <div class="hint">Wer hat richtig/falsch geantwortet? Punkte gehen an den gewählten Spieler.</div>
-      <div class="assign-row" id="ovAssign"></div>
       <div class="qbtns">
         <button class="btn btn-reveal" id="btnReveal">Antwort aufdecken</button>
-        <button class="btn btn-correct" id="btnCorrect">✓ Richtig (+Punkte)</button>
-        <button class="btn btn-wrong" id="btnWrong">✗ Falsch (−Punkte)</button>
-        <button class="btn" id="btnResetBuzz">↺ Buzzer freigeben</button>
-        <button class="btn btn-close" id="btnClose">Schließen (Feld erledigt)</button>
+        <button class="btn btn-correct" id="btnCorrect">✓ Richtig</button>
+        <button class="btn btn-wrong" id="btnWrong">✗ Falsch</button>
       </div>
+      <div class="qbtns">
+        <button class="btn" id="btnOpenBuzz">🔓 Buzzer freigeben (Steal)</button>
+        <button class="btn btn-close" id="btnClose">Frage schließen → nächster Spieler</button>
+      </div>
+      <div class="hint" id="ovHint"></div>
     </div>
   </div>
 </div>
-
-<!-- ============ SETTINGS DRAWER ============ -->
 <div class="drawer" id="drawer">
   <button class="closeX" id="closeDrawer">×</button>
   <h2>Einstellungen</h2>
-  <div class="sub">Spielername & Fragen – wird sofort für alle gespeichert.</div>
-
-  <h2 style="font-size:17px;margin-top:10px">Spieler</h2>
-  <div id="playerEditor"></div>
-  <button class="btn" id="addPlayer" style="margin-top:8px">+ Spieler hinzufügen</button>
-
-  <h2 style="font-size:17px;margin-top:24px">Fragen</h2>
-  <label>Kategorie wählen</label>
+  <div class="sub">Reihenfolge & Fragen. Wird sofort für alle gespeichert.</div>
+  <h2 style="font-size:17px">Spieler-Reihenfolge</h2>
+  <div class="sub">Die Reihenfolge bestimmt, wer nach jeder Frage dran ist.</div>
+  <div id="orderEditor"></div>
+  <h2 style="font-size:17px;margin-top:24px">Fragen bearbeiten</h2>
+  <label>Runde</label>
+  <select id="roundSelect"><option value="round1">Runde 1</option><option value="round2">Runde 2 (doppelt)</option></select>
+  <label>Kategorie</label>
   <select id="catSelect"></select>
   <div id="questionEditor" style="margin-top:12px"></div>
-
   <h2 style="font-size:17px;margin-top:24px">Spiel</h2>
-  <button class="btn" id="resetGame" style="margin-top:8px">🔄 Board zurücksetzen (alle Felder offen)</button>
-  <button class="btn btn-wrong" id="resetScores" style="margin-top:8px">Punkte auf 0</button>
+  <button class="btn" id="resetBoard" style="margin-top:8px;width:100%">🔄 Board zurücksetzen (Felder offen)</button>
+  <button class="btn btn-wrong" id="resetScores" style="margin-top:8px;width:100%">Punkte auf 0</button>
+  <button class="btn btn-wrong" id="kickAll" style="margin-top:8px;width:100%">Alle Spieler entfernen</button>
 </div>
-
 <div id="toast"></div>
-
 <script>
-/* =====================================================================
-   KONFIG  —  HIER deine Supabase-Daten eintragen
-   ===================================================================== */
-const SUPABASE_URL = "https://dazabcxqplkvcyeiesgd.supabase.co";   // ✓ schon drin
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhemFiY3hxcGxrdmN5ZWllc2dkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4NTQ0NzksImV4cCI6MjA5NzQzMDQ3OX0.N3Dca8Quii4M8nFYLHjzBslby_tBUCyH1-WnPfYW01Y";
-
-/* Standard-Inhalt beim allerersten Start (wird dann in DB gespeichert) */
-const DEFAULT_CATEGORIES = ["WER STREAMT DENN DA?","STIMMEN","SERIEN & FILME","SONGS & LYRICS","BRANDS","WORTSALAT"];
-const VALUES = [100,200,300,500];
-const DEFAULT_PLAYERS = ["Spieler 1","Spieler 2","Spieler 3","Spieler 4"];
-
-/* =====================================================================
-   SETUP
-   ===================================================================== */
-const params = new URLSearchParams(location.search);
-const VIEW = params.get("view"); // host | display | buzz | null
-const GAME_ID = params.get("game") || "main";   // erlaubt mehrere Spiele
-let sb = null;
-let usingSupabase = SUPABASE_URL.startsWith("http");
-
-if(usingSupabase){
-  sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-}
-
-/* ---- lokaler Spielzustand (gespiegelt aus DB) ---- */
-let state = {
-  categories: DEFAULT_CATEGORIES.slice(),
-  players: [],          // {id,name,score}
-  questions: {},        // key "cat|value" -> {q,a,used,answeredBy}
-  turn: null,           // player id am Zug
-  buzz: { open:false, order:[], cellKey:null }  // order = [playerId,...]
+/* ===== FRAGEN-DATENBANK (hier bearbeiten für eigene Fragen) ===== */
+/* Fragen-Datenbank. Wird in index.html eingebettet.
+   Struktur: round1 / round2, je 6 Kategorien mit 5 Fragen (Werte aufsteigend).
+   Flaggen nutzen Emoji-Flaggen (kein Download). */
+const QUIZ_CONTENT = {
+  round1: {
+    label: "Runde 1",
+    values: [100, 200, 300, 400, 500],
+    categories: [
+      {
+        name: "ZURÜCK IN DIE SCHULE",
+        q: [
+          { q: "Wie viele Seiten hat ein Würfel?", a: "6" },
+          { q: "Was ist das chemische Symbol für Gold?", a: "Au" },
+          { q: "Wie nennt man das größte Organ des menschlichen Körpers?", a: "Die Haut" },
+          { q: "Welcher Satz beschreibt a² + b² = c² im rechtwinkligen Dreieck?", a: "Satz des Pythagoras" },
+          { q: "Wie lautet die Quadratwurzel aus 144?", a: "12" }
+        ]
+      },
+      {
+        name: "WER ODER WAS",
+        q: [
+          { q: "Wer malte die Mona Lisa?", a: "Leonardo da Vinci" },
+          { q: "Was ist die Hauptstadt-Währung der USA?", a: "US-Dollar" },
+          { q: "Wer schrieb die Theorie der Relativität?", a: "Albert Einstein" },
+          { q: "Was ist der höchste Berg der Erde?", a: "Mount Everest" },
+          { q: "Wer komponierte die 9. Sinfonie mit der 'Ode an die Freude'?", a: "Ludwig van Beethoven" }
+        ]
+      },
+      {
+        name: "SERIEN & FILME",
+        q: [
+          { q: "In welchem Film sagt eine Figur 'Möge die Macht mit dir sein'?", a: "Star Wars" },
+          { q: "Wie heißt die Kaffeebar-Serie mit Ross, Rachel und Monica?", a: "Friends" },
+          { q: "Welcher Schauspieler spielt Iron Man im MCU?", a: "Robert Downey Jr." },
+          { q: "In welcher Serie regieren Drachen und das Haus Targaryen?", a: "Game of Thrones" },
+          { q: "Welcher Regisseur drehte 'Inception' und 'Interstellar'?", a: "Christopher Nolan" }
+        ]
+      },
+      {
+        name: "FLAGGEN",
+        q: [
+          { q: "Welches Land hat diese Flagge?", flag: "🇯🇵", a: "Japan" },
+          { q: "Welches Land hat diese Flagge?", flag: "🇧🇷", a: "Brasilien" },
+          { q: "Welches Land hat diese Flagge?", flag: "🇿🇦", a: "Südafrika" },
+          { q: "Welches Land hat diese Flagge?", flag: "🇰🇷", a: "Südkorea" },
+          { q: "Welches Land hat diese Flagge?", flag: "🇵🇹", a: "Portugal" }
+        ]
+      },
+      {
+        name: "ESSEN & TRINKEN",
+        q: [
+          { q: "Aus welchem Land kommt die Pizza ursprünglich?", a: "Italien" },
+          { q: "Welche Frucht wird zu Wein vergoren?", a: "Trauben / Weintrauben" },
+          { q: "Wie heißt die japanische Speise aus rohem Fisch und Reis?", a: "Sushi" },
+          { q: "Welches Gewürz ist das teuerste der Welt (pro Gramm)?", a: "Safran" },
+          { q: "Aus welcher Pflanze wird Schokolade hergestellt?", a: "Kakao(bohne)" }
+        ]
+      },
+      {
+        name: "BRANDS",
+        q: [
+          { q: "Welche Marke hat den Slogan 'Just Do It'?", a: "Nike" },
+          { q: "Welcher Marke gehört der angebissene Apfel als Logo?", a: "Apple" },
+          { q: "Welche Automarke hat vier verschlungene Ringe als Logo?", a: "Audi" },
+          { q: "Welche Fast-Food-Kette hat die goldenen Bögen ('M')?", a: "McDonald's" },
+          { q: "Welche Marke steckt hinter PlayStation?", a: "Sony" }
+        ]
+      }
+    ]
+  },
+  round2: {
+    label: "Runde 2 – Doppelte Punkte",
+    values: [200, 400, 600, 800, 1000],
+    categories: [
+      {
+        name: "HAUPTSTÄDTE",
+        q: [
+          { q: "Wie heißt die Hauptstadt von Frankreich?", a: "Paris" },
+          { q: "Wie heißt die Hauptstadt von Australien?", a: "Canberra" },
+          { q: "Wie heißt die Hauptstadt von Kanada?", a: "Ottawa" },
+          { q: "Wie heißt die Hauptstadt von Ägypten?", a: "Kairo" },
+          { q: "Wie heißt die Hauptstadt von Kasachstan?", a: "Astana" }
+        ]
+      },
+      {
+        name: "ANIME",
+        q: [
+          { q: "In welchem Anime will Monkey D. Luffy König der Piraten werden?", a: "One Piece" },
+          { q: "Wie heißt der Anime mit dem Notizbuch, das tötet?", a: "Death Note" },
+          { q: "Welcher Anime handelt von Titanen hinter riesigen Mauern?", a: "Attack on Titan / Shingeki no Kyojin" },
+          { q: "In welchem Anime kämpft Tanjiro gegen Dämonen?", a: "Demon Slayer / Kimetsu no Yaiba" },
+          { q: "Welches Studio produzierte 'Spirited Away' und 'Mein Nachbar Totoro'?", a: "Studio Ghibli" }
+        ]
+      },
+      {
+        name: "GEOGRAPHIE & HERKUNFT",
+        q: [
+          { q: "Auf welchem Kontinent liegt Ägypten?", a: "Afrika" },
+          { q: "Welcher ist der längste Fluss der Welt?", a: "Nil (oder Amazonas, je nach Messung)" },
+          { q: "Welches Land hat die meisten Einwohner der Welt?", a: "Indien" },
+          { q: "Durch welche Stadt verläuft die Grenze zwischen Europa und Asien?", a: "Istanbul" },
+          { q: "Welche Wüste ist die größte heiße Wüste der Erde?", a: "Sahara" }
+        ]
+      },
+      {
+        name: "EREIGNISSE & GESCHICHTE",
+        q: [
+          { q: "In welchem Jahr fiel die Berliner Mauer?", a: "1989" },
+          { q: "Wer war der erste Mensch auf dem Mond?", a: "Neil Armstrong" },
+          { q: "In welchem Jahr begann der Erste Weltkrieg?", a: "1914" },
+          { q: "Welches Schiff sank 1912 auf seiner Jungfernfahrt?", a: "Titanic" },
+          { q: "Welches Reich wurde von Julius Cäsar geführt?", a: "Römisches Reich" }
+        ]
+      },
+      {
+        name: "TIERWELT",
+        q: [
+          { q: "Welches ist das größte Tier der Welt?", a: "Blauwal" },
+          { q: "Wie viele Herzen hat ein Oktopus?", a: "3" },
+          { q: "Welches Tier ist das schnellste Landtier?", a: "Gepard" },
+          { q: "Welches Säugetier kann fliegen?", a: "Fledermaus" },
+          { q: "Wie nennt man eine Gruppe von Löwen?", a: "Rudel" }
+        ]
+      },
+      {
+        name: "ABKÜRZUNGEN",
+        q: [
+          { q: "Wofür steht die Abkürzung 'USB'?", a: "Universal Serial Bus" },
+          { q: "Wofür steht 'LOL' im Chat?", a: "Laughing Out Loud" },
+          { q: "Wofür steht die Abkürzung 'NASA'?", a: "National Aeronautics and Space Administration" },
+          { q: "Wofür steht 'GIF' (Bildformat)?", a: "Graphics Interchange Format" },
+          { q: "Wofür steht 'DNA' (englisch)?", a: "Deoxyribonucleic Acid" }
+        ]
+      }
+    ]
+  }
 };
 
-/* ---------- Helpers ---------- */
-const $ = s=>document.querySelector(s);
-const $$ = s=>[...document.querySelectorAll(s)];
-function toast(msg){const t=$("#toast");t.textContent=msg;t.classList.add("show");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("show"),2200);}
-function key(cat,val){return cat+"|"+val;}
-function uid(){return Math.random().toString(36).slice(2,9);}
+/* ============ KONFIG ============ */
+const SUPABASE_URL = "https://dazabcxqplkvcyeiesgd.supabase.co"; // ✓ schon drin
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhemFiY3hxcGxrdmN5ZWllc2dkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4NTQ0NzksImV4cCI6MjA5NzQzMDQ3OX0.N3Dca8Quii4M8nFYLHjzBslby_tBUCyH1-WnPfYW01Y";
 
-/* =====================================================================
-   PERSISTENZ
-   - Supabase: eine Zeile in Tabelle `quiz_state` (id = GAME_ID, data jsonb)
-   - Fallback: localStorage (nur ein Gerät)
-   ===================================================================== */
+const params=new URLSearchParams(location.search);
+const VIEW=params.get("view");
+const GAME_ID=params.get("game")||"main";
+let usingSupabase=SUPABASE_URL.startsWith("http")&&!SUPABASE_ANON_KEY.startsWith("HIER_");
+let sb=usingSupabase?supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY):null;
+
+let state={
+  round:"round1",players:[],order:[],turnIndex:0,
+  used:{round1:{},round2:{}},open:null,
+  buzz:{phase:"main",open:false,order:[],graded:[]}
+};
+
+const $=s=>document.querySelector(s);
+function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("show"),2200);}
+function uid(){return Math.random().toString(36).slice(2,9);}
+function esc(s){return(s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+function ckey(cat,qi){return cat+"|"+qi;}
+
 async function loadState(){
   if(usingSupabase){
-    const {data,error} = await sb.from("quiz_state").select("data").eq("id",GAME_ID).maybeSingle();
-    if(error){console.warn(error);}
-    if(data && data.data){ state = data.data; ensureDefaults(); return; }
-    // neu anlegen
-    ensureDefaults(); await saveState();
-  } else {
-    const raw = localStorage.getItem("quizduell_"+GAME_ID);
-    if(raw){ state = JSON.parse(raw); }
-    ensureDefaults();
+    const {data}=await sb.from("quiz_state").select("data").eq("id",GAME_ID).maybeSingle();
+    if(data&&data.data){state=data.data;fixState();return;}
+    fixState();await saveState();
+  }else{
+    const raw=localStorage.getItem("quizduell2_"+GAME_ID);
+    if(raw)state=JSON.parse(raw);
+    fixState();
   }
 }
-function ensureDefaults(){
-  if(!state.categories || !state.categories.length) state.categories = DEFAULT_CATEGORIES.slice();
-  if(!state.players || !state.players.length){
-    state.players = DEFAULT_PLAYERS.map(n=>({id:uid(),name:n,score:0}));
-  }
-  if(!state.questions) state.questions = {};
-  state.categories.forEach(cat=>VALUES.forEach(v=>{
-    const k=key(cat,v);
-    if(!state.questions[k]) state.questions[k]={q:"",a:"",used:false};
-  }));
-  if(!state.buzz) state.buzz={open:false,order:[],cellKey:null};
-  if(!state.turn && state.players[0]) state.turn=state.players[0].id;
+function fixState(){
+  if(!state.used)state.used={round1:{},round2:{}};
+  if(!state.used.round1)state.used.round1={};
+  if(!state.used.round2)state.used.round2={};
+  if(!state.players)state.players=[];
+  if(!state.order)state.order=[];
+  if(typeof state.turnIndex!=="number")state.turnIndex=0;
+  if(!state.buzz)state.buzz={phase:"main",open:false,order:[],graded:[]};
+  if(!state.buzz.graded)state.buzz.graded=[];
+  if(!state.round)state.round="round1";
+  state.order=state.order.filter(id=>state.players.some(p=>p.id===id));
+  state.players.forEach(p=>{if(!state.order.includes(p.id))state.order.push(p.id);});
+  if(state.turnIndex>=state.order.length)state.turnIndex=0;
 }
 let saveTimer=null;
 async function saveState(){
-  if(usingSupabase){
-    const {error}=await sb.from("quiz_state").upsert({id:GAME_ID,data:state});
-    if(error)console.warn("save",error);
-  } else {
-    localStorage.setItem("quizduell_"+GAME_ID, JSON.stringify(state));
-  }
+  if(usingSupabase){const {error}=await sb.from("quiz_state").upsert({id:GAME_ID,data:state});if(error)console.warn("save",error);}
+  else localStorage.setItem("quizduell2_"+GAME_ID,JSON.stringify(state));
 }
-/* gedrosseltes Speichern + sofort rendern */
-function commit(){ renderAll(); clearTimeout(saveTimer); saveTimer=setTimeout(saveState,150); }
+function commit(){renderAll();clearTimeout(saveTimer);saveTimer=setTimeout(saveState,120);}
 
-/* =====================================================================
-   REALTIME  — alle Clients hören auf Änderungen der state-Zeile
-   ===================================================================== */
 function subscribeRealtime(){
-  if(!usingSupabase) return;
+  if(!usingSupabase)return;
   sb.channel("quiz_"+GAME_ID)
-    .on("postgres_changes",
-      {event:"*",schema:"public",table:"quiz_state",filter:"id=eq."+GAME_ID},
-      payload=>{
-        if(payload.new && payload.new.data){
-          state = payload.new.data;
-          ensureDefaults();
-          renderAll();
-        }
-      })
+    .on("postgres_changes",{event:"*",schema:"public",table:"quiz_state",filter:"id=eq."+GAME_ID},
+      p=>{if(p.new&&p.new.data){state=p.new.data;fixState();renderAll();}})
     .subscribe();
 }
 
-/* =====================================================================
-   RENDER
-   ===================================================================== */
+function roundData(){return QUIZ_CONTENT[state.round];}
+function turnPlayer(){const id=state.order[state.turnIndex];return state.players.find(p=>p.id===id)||null;}
+function advanceTurn(){if(state.order.length)state.turnIndex=(state.turnIndex+1)%state.order.length;}
+
 function renderAll(){
-  if(VIEW==="buzz"){ renderBuzz(); return; }
-  renderBoard(); renderScores(); renderTurn();
-  if($("#overlay").classList.contains("open")) renderOverlay();
+  if(VIEW==="buzz"){renderBuzz();return;}
+  renderTop();renderBoard();renderScores();
+  if($("#overlay").classList.contains("open"))renderOverlay();
 }
-
-function renderTurn(){
-  const p=state.players.find(p=>p.id===state.turn);
-  $("#turnName").textContent = p?p.name.toUpperCase():"—";
+function renderTop(){
+  $("#roundTag").textContent=roundData().label;
+  const p=turnPlayer();
+  $("#turnName").textContent=p?p.name.toUpperCase():"—";
+  $("#nextRoundBtn").textContent=state.round==="round1"?"Runde 2 ▶":"◀ Runde 1";
 }
-
 function renderBoard(){
-  const board=$("#board");
-  board.style.setProperty("--cols",state.categories.length);
-  board.innerHTML="";
-  state.categories.forEach(cat=>{
-    const h=document.createElement("div");
-    h.className="cat-head display-font";h.textContent=cat;board.appendChild(h);
-  });
-  VALUES.forEach(v=>{
-    state.categories.forEach(cat=>{
-      const k=key(cat,v), qd=state.questions[k];
-      const c=document.createElement("button");
-      c.className="cell display-font"+(qd.used?" used":"");
-      c.textContent=v;
-      if(!qd.used && VIEW==="host"){
-        c.onclick=()=>openQuestion(cat,v);
-      } else if(qd.used){
-        c.disabled=true;
-      } else {
-        c.onclick=()=>toast("Nur der Host kann Felder öffnen.");
-      }
-      board.appendChild(c);
+  const rd=roundData(),board=$("#board");
+  board.style.setProperty("--cols",rd.categories.length);board.innerHTML="";
+  rd.categories.forEach(c=>{const h=document.createElement("div");h.className="cat-head display-font";h.textContent=c.name;board.appendChild(h);});
+  rd.values.forEach((val,qi)=>{
+    rd.categories.forEach(c=>{
+      const k=ckey(c.name,qi),isUsed=state.used[state.round][k];
+      const cell=document.createElement("button");
+      cell.className="cell display-font"+(isUsed?" used":"");
+      cell.textContent=val;
+      if(isUsed)cell.disabled=true;else cell.onclick=()=>openQuestion(c.name,qi);
+      board.appendChild(cell);
     });
   });
 }
-
 function renderScores(){
   const bar=$("#scorebar");bar.innerHTML="";
-  state.players.forEach(p=>{
-    const div=document.createElement("div");
+  if(!state.order.length){bar.innerHTML='<div class="player empty"><div class="pname">Noch keine Spieler</div><div class="hint">Spieler öffnen den Buzzer-Link</div></div>';return;}
+  state.order.forEach((pid,idx)=>{
+    const p=state.players.find(x=>x.id===pid);if(!p)return;
     let cls="player";
-    if(p.id===state.turn)cls+=" active";
-    const rank=state.buzz.order.indexOf(p.id);
-    if(rank>-1)cls+=" buzzed";
-    div.className=cls;
-    div.innerHTML=
-      (rank>-1?`<div class="buzz-rank">${rank+1}</div>`:"")+
-      `<div class="pname">${esc(p.name)}</div>
-       <div class="pscore">${p.score}</div>`;
-    if(VIEW==="host"){
-      const ctr=document.createElement("div");ctr.className="ctrls";
-      ctr.innerHTML=`<button data-d="-100">−</button><button data-d="100">+</button><button data-turn>★</button>`;
-      ctr.querySelectorAll("[data-d]").forEach(b=>b.onclick=()=>{p.score+=+b.dataset.d;commit();});
-      ctr.querySelector("[data-turn]").onclick=()=>{state.turn=p.id;commit();};
-      div.appendChild(ctr);
-    }
-    bar.appendChild(div);
+    if(idx===state.turnIndex)cls+=" active";
+    const rank=state.buzz.order.indexOf(pid);
+    if(rank>-1&&state.buzz.phase==="steal")cls+=" buzzed";
+    const div=document.createElement("div");div.className=cls;
+    div.innerHTML=(rank>-1&&state.buzz.phase==="steal"?`<div class="buzz-rank">${rank+1}</div>`:"")+
+      `<div class="pname">${esc(p.name)}</div><div class="pscore">${p.score}</div>`;
+    const ctr=document.createElement("div");ctr.className="ctrls";
+    ctr.innerHTML=`<button data-d="-100">−100</button><button data-d="100">+100</button><button data-turn title="dran setzen">★</button>`;
+    ctr.querySelectorAll("[data-d]").forEach(b=>b.onclick=()=>{p.score+=+b.dataset.d;commit();});
+    ctr.querySelector("[data-turn]").onclick=()=>{state.turnIndex=idx;commit();};
+    div.appendChild(ctr);bar.appendChild(div);
   });
 }
-function esc(s){return (s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
 
-/* =====================================================================
-   QUESTION OVERLAY (Host)
-   ===================================================================== */
-let curCell=null, curAssign=null;
-function openQuestion(cat,val){
-  curCell=key(cat,val); curAssign=null;
-  // Buzzer für dieses Feld öffnen
-  state.buzz={open:true,order:[],cellKey:curCell};
-  commit();
-  renderOverlay();
-  $("#overlay").classList.add("open");
+let revealed=false;
+function getQ(){if(!state.open)return null;const rd=QUIZ_CONTENT[state.open.round];const cat=rd.categories.find(c=>c.name===state.open.cat);return cat?cat.q[state.open.qi]:null;}
+function curVal(){if(!state.open)return 0;return QUIZ_CONTENT[state.open.round].values[state.open.qi];}
+
+function openQuestion(cat,qi){
+  if(!state.order.length){toast("Erst müssen Spieler beitreten.");return;}
+  state.open={round:state.round,cat,qi};
+  state.buzz={phase:"main",open:false,order:[],graded:[]};
+  revealed=false;commit();
+  $("#ovAnswer").classList.remove("show");
+  renderOverlay();$("#overlay").classList.add("open");
 }
 function renderOverlay(){
-  if(!curCell)return;
-  const [cat,val]=curCell.split("|");
-  const qd=state.questions[curCell];
-  $("#ovCat").textContent=cat;
+  if(!state.open)return;
+  const q=getQ(),val=curVal();
+  $("#ovCat").textContent=state.open.cat;
   $("#ovVal").textContent=val+" Punkte";
-  $("#ovText").textContent=qd.q||"(keine Frage hinterlegt – in Einstellungen ausfüllen)";
-  $("#ovAnswer").textContent="Antwort: "+(qd.a||"—");
-
-  // Buzz-Status
-  const ord=state.buzz.order;
-  const bs=$("#ovBuzz");
-  if(state.buzz.open && ord.length===0){
-    bs.innerHTML=`🟢 Buzzer offen – Spieler können drücken…`;
-  } else if(ord.length){
-    const first=state.players.find(p=>p.id===ord[0]);
-    bs.innerHTML=`🔴 <span class="who">${esc(first?.name||"?")}</span> hat zuerst gebuzzert!`;
-  } else {
-    bs.innerHTML=`Buzzer gesperrt.`;
+  const flagEl=$("#ovFlag");
+  if(q&&q.flag){flagEl.style.display="block";flagEl.textContent=q.flag;}else flagEl.style.display="none";
+  $("#ovText").textContent=q?q.q:"(keine Frage)";
+  $("#ovAnswer").textContent="Antwort: "+(q?q.a:"—");
+  if(revealed)$("#ovAnswer").classList.add("show");else $("#ovAnswer").classList.remove("show");
+  const phase=state.buzz.phase,main=turnPlayer();
+  const half=Math.floor(val/2),quarter=Math.floor(val/4);
+  if(phase==="main"){
+    $("#ovPhase").innerHTML=`<span class="main">Hauptrunde</span> · richtig +${val} / falsch −${half}`;
+    $("#ovWhoNow").innerHTML=`Antwortet: <b>${main?esc(main.name):"—"}</b>`;
+    $("#ovBuzz").innerHTML="";$("#btnOpenBuzz").disabled=false;
+    $("#ovHint").textContent="Richtig → Punkte & Frage schließen. Falsch → Buzzer freigeben, damit andere stehlen können.";
+  }else{
+    const ord=state.buzz.order.filter(id=>!state.buzz.graded.includes(id));
+    const current=ord.length?state.players.find(p=>p.id===ord[0]):null;
+    $("#ovPhase").innerHTML=`<span class="steal">Steal-Runde</span> · richtig +${half} / falsch −${quarter}`;
+    if(state.buzz.open&&!current){$("#ovWhoNow").innerHTML="";$("#ovBuzz").innerHTML="🟢 Buzzer offen – wer zuerst drückt, ist dran…";}
+    else if(current){$("#ovWhoNow").innerHTML=`Am Buzzer: <b>${esc(current.name)}</b>`;$("#ovBuzz").innerHTML=`🔴 <span class="who">${esc(current.name)}</span> hat gebuzzert – bewerten!`;}
+    else{$("#ovWhoNow").innerHTML="";$("#ovBuzz").innerHTML="Buzzer gesperrt. Freigeben oder Frage schließen.";}
+    $("#btnOpenBuzz").disabled=false;
+    $("#ovHint").textContent="Jeder Steal-Spieler bekommt +½ / −¼. Bei falsch buzzert der nächste. Niemand bekommt den vollen Minus-Wert.";
   }
-
-  // Zuweisungs-Chips: Reihenfolge der Buzzer zuerst, dann Rest
-  const assign=$("#ovAssign");assign.innerHTML="";
-  const ordered=[...ord, ...state.players.filter(p=>!ord.includes(p.id)).map(p=>p.id)];
-  ordered.forEach(pid=>{
-    const p=state.players.find(x=>x.id===pid);if(!p)return;
-    const chip=document.createElement("button");
-    chip.className="chip"+(curAssign===pid?" sel":"");
-    const r=ord.indexOf(pid);
-    chip.textContent=(r>-1?`${r+1}. `:"")+p.name;
-    chip.onclick=()=>{curAssign=pid;renderOverlay();};
-    assign.appendChild(chip);
-  });
-  if(curAssign===null && ord.length){curAssign=ord[0];}
 }
-
-/* Host-Buttons */
-$("#btnReveal").onclick=()=>$("#ovAnswer").classList.toggle("show");
+$("#btnReveal").onclick=()=>{revealed=!revealed;$("#ovAnswer").classList.toggle("show",revealed);};
 $("#btnCorrect").onclick=()=>grade(true);
 $("#btnWrong").onclick=()=>grade(false);
-$("#btnResetBuzz").onclick=()=>{state.buzz={open:true,order:[],cellKey:curCell};commit();renderOverlay();toast("Buzzer wieder offen");};
+$("#btnOpenBuzz").onclick=()=>{
+  state.buzz.phase="steal";state.buzz.open=true;
+  state.buzz.order=state.buzz.order.filter(id=>!state.buzz.graded.includes(id));
+  commit();renderOverlay();toast("Buzzer frei – Spieler können stehlen");
+};
 $("#btnClose").onclick=()=>closeQuestion();
 
 function grade(correct){
-  if(!curAssign){toast("Erst einen Spieler auswählen.");return;}
-  const [cat,val]=curCell.split("|");
-  const p=state.players.find(x=>x.id===curAssign);
-  if(correct){
-    p.score+=+val;
-    state.turn=p.id;          // wer richtig hat, ist als nächstes dran
-    $("#ovAnswer").classList.add("show");
-    toast(`✓ +${val} an ${p.name}`);
-    state.buzz={open:false,order:[],cellKey:null};
-  } else {
-    p.score-=+val;
-    toast(`✗ −${val} bei ${p.name}. Nächster darf buzzern.`);
-    // diesen Spieler aus der Buzz-Reihenfolge raus, Buzzer wieder offen für die anderen
-    state.buzz.order=state.buzz.order.filter(id=>id!==p.id);
-    state.buzz.open=true;
-    curAssign=state.buzz.order[0]||null;
+  const val=curVal(),half=Math.floor(val/2),quarter=Math.floor(val/4);
+  if(state.buzz.phase==="main"){
+    const p=turnPlayer();if(!p){toast("Kein Spieler am Zug.");return;}
+    if(correct){p.score+=val;revealed=true;$("#ovAnswer").classList.add("show");toast(`✓ +${val} für ${p.name}`);commit();renderOverlay();}
+    else{p.score-=half;toast(`✗ −${half} für ${p.name}. Buzzer frei für Steal.`);state.buzz.phase="steal";state.buzz.open=true;state.buzz.order=[];state.buzz.graded=[];commit();renderOverlay();}
+  }else{
+    const ord=state.buzz.order.filter(id=>!state.buzz.graded.includes(id));
+    const pid=ord[0];if(!pid){toast("Niemand hat gebuzzert.");return;}
+    const p=state.players.find(x=>x.id===pid);
+    if(correct){p.score+=half;revealed=true;$("#ovAnswer").classList.add("show");toast(`✓ +${half} für ${p.name} (Steal)`);state.buzz.open=false;commit();renderOverlay();}
+    else{p.score-=quarter;state.buzz.graded.push(pid);state.buzz.open=true;toast(`✗ −${quarter} für ${p.name}. Nächster darf buzzern.`);commit();renderOverlay();}
   }
-  commit();renderOverlay();
 }
 function closeQuestion(){
-  state.questions[curCell].used=true;
-  state.buzz={open:false,order:[],cellKey:null};
-  $("#overlay").classList.remove("open");
-  $("#ovAnswer").classList.remove("show");
-  curCell=null;curAssign=null;
-  commit();
+  if(!state.open)return;
+  state.used[state.open.round][ckey(state.open.cat,state.open.qi)]=true;
+  state.open=null;state.buzz={phase:"main",open:false,order:[],graded:[]};revealed=false;
+  $("#overlay").classList.remove("open");advanceTurn();commit();
 }
+$("#nextRoundBtn").onclick=()=>{state.round=state.round==="round1"?"round2":"round1";commit();toast("Runde gewechselt");};
 
-/* =====================================================================
-   BUZZER VIEW (Handy)
-   ===================================================================== */
-let myPlayerId = localStorage.getItem("quizduell_myid_"+GAME_ID) || null;
+let myId=localStorage.getItem("qd2_myid_"+GAME_ID)||null;
 function renderBuzz(){
-  // Namensauswahl füllen
-  const sel=$("#buzzNameSelect");
-  if(sel && document.activeElement!==sel){
-    sel.innerHTML='<option value="">— wählen —</option>'+
-      state.players.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join("");
-    if(myPlayerId) sel.value=myPlayerId;
+  const me=state.players.find(p=>p.id===myId);
+  if(!me){$("#buzzSetup").style.display="block";$("#buzzPlay").style.display="none";return;}
+  $("#buzzSetup").style.display="none";$("#buzzPlay").style.display="flex";
+  $("#buzzMyName").textContent=me.name;
+  const bq=$("#buzzQuestion");
+  if(state.open){
+    const rd=QUIZ_CONTENT[state.open.round];const cat=rd.categories.find(c=>c.name===state.open.cat);
+    const q=cat?cat.q[state.open.qi]:null;
+    bq.style.display="block";
+    bq.innerHTML=`<div class="bqcat">${esc(state.open.cat)} · ${rd.values[state.open.qi]}</div>`+
+      (q&&q.flag?`<div class="bqflag">${q.flag}</div>`:"")+`<div>${q?esc(q.q):""}</div>`;
+  }else bq.style.display="none";
+  const btn=$("#buzzBtn"),info=$("#buzzInfo"),phase=state.buzz.phase;
+  if(!state.open){btn.disabled=true;btn.textContent="…";info.textContent="Warte auf eine Frage…";return;}
+  if(phase==="main"){
+    const main=turnPlayer();
+    if(main&&main.id===myId){btn.disabled=true;btn.textContent="DU";info.innerHTML='<b style="color:var(--gold)">Du bist dran – antworte dem Host!</b>';}
+    else{btn.disabled=true;btn.textContent="…";info.innerHTML=`<b>${main?esc(main.name):"?"}</b> ist dran.`;}
+    return;
   }
-  const me=state.players.find(p=>p.id===myPlayerId);
-  if(me){
-    $("#buzzSetup").style.display="none";
-    $("#buzzPlay").style.display="flex";
-    $("#buzzMyName").textContent=me.name;
-    const btn=$("#buzzBtn");
-    const info=$("#buzzInfo");
-    const rank=state.buzz.order.indexOf(myPlayerId);
-    if(rank===0){
-      btn.disabled=true;btn.textContent="✓";
-      info.innerHTML='<span class="buzz-first">Du warst zuerst! 🔥</span>';
-    } else if(rank>0){
-      btn.disabled=true;btn.textContent=(rank+1)+".";
-      info.innerHTML=`<span class="buzz-locked">Platz ${rank+1} – zu spät</span>`;
-    } else if(state.buzz.open){
-      btn.disabled=false;btn.textContent="BUZZ";
-      info.innerHTML='🟢 <b>Jetzt drücken!</b>';
-    } else {
-      btn.disabled=true;btn.textContent="…";
-      info.textContent="Warte auf nächste Frage…";
-    }
-  } else {
-    $("#buzzSetup").style.display="block";
-    $("#buzzPlay").style.display="none";
-  }
+  const rank=state.buzz.order.indexOf(myId),graded=state.buzz.graded.includes(myId);
+  const ungraded=state.buzz.order.filter(id=>!state.buzz.graded.includes(id));
+  if(turnPlayer()&&turnPlayer().id===myId){btn.disabled=true;btn.textContent="—";info.textContent="Stehlen ist für die anderen.";return;}
+  if(rank>-1&&!graded&&ungraded[0]===myId){btn.disabled=true;btn.textContent="✓";info.innerHTML='<span class="buzz-first">Du bist dran! 🔥</span>';}
+  else if(rank>-1&&!graded){btn.disabled=true;btn.textContent=(ungraded.indexOf(myId)+1)+".";info.innerHTML=`<span class="buzz-locked">Warte – Platz ${ungraded.indexOf(myId)+1}</span>`;}
+  else if(graded){btn.disabled=true;btn.textContent="✗";info.textContent="Du bist raus bei dieser Frage.";}
+  else if(state.buzz.open){btn.disabled=false;btn.textContent="BUZZ";info.innerHTML='🟢 <b style="color:#16a34a">Jetzt buzzern!</b>';}
+  else{btn.disabled=true;btn.textContent="…";info.textContent="Buzzer gesperrt.";}
 }
-function setupBuzzView(){
-  $("#buzzNameSelect").onchange=e=>{
-    myPlayerId=e.target.value||null;
-    if(myPlayerId)localStorage.setItem("quizduell_myid_"+GAME_ID,myPlayerId);
-    renderBuzz();
+function setupBuzz(){
+  $("#buzzJoin").onclick=async()=>{
+    const name=$("#buzzNameInput").value.trim();if(!name){toast("Bitte Namen eingeben");return;}
+    if(usingSupabase){const {data}=await sb.from("quiz_state").select("data").eq("id",GAME_ID).maybeSingle();if(data&&data.data){state=data.data;fixState();}}
+    myId=uid();state.players.push({id:myId,name,score:0});if(!state.order.includes(myId))state.order.push(myId);
+    localStorage.setItem("qd2_myid_"+GAME_ID,myId);await saveState();renderBuzz();toast("Beigetreten als "+name);
   };
-  $("#buzzChange").onclick=()=>{myPlayerId=null;localStorage.removeItem("quizduell_myid_"+GAME_ID);renderBuzz();};
+  $("#buzzNameInput").addEventListener("keydown",e=>{if(e.key==="Enter")$("#buzzJoin").click();});
+  $("#buzzChange").onclick=()=>{myId=null;localStorage.removeItem("qd2_myid_"+GAME_ID);renderBuzz();};
   $("#buzzBtn").onclick=async()=>{
-    if(!myPlayerId)return;
-    if(!state.buzz.open)return;
-    if(state.buzz.order.includes(myPlayerId))return;
-    // optimistisch lokal, dann speichern (Realtime synchronisiert den Rest)
-    // WICHTIG: frische Daten holen, um Race-Conditions zu minimieren
-    if(usingSupabase){
-      const {data}=await sb.from("quiz_state").select("data").eq("id",GAME_ID).maybeSingle();
-      if(data&&data.data){state=data.data;ensureDefaults();}
-    }
-    if(state.buzz.open && !state.buzz.order.includes(myPlayerId)){
-      state.buzz.order.push(myPlayerId);
-      await saveState();
-      renderBuzz();
-    }
+    if(!myId||!state.open)return;
+    if(state.buzz.phase!=="steal"||!state.buzz.open)return;
+    if(turnPlayer()&&turnPlayer().id===myId)return;
+    if(state.buzz.order.includes(myId))return;
+    if(usingSupabase){const {data}=await sb.from("quiz_state").select("data").eq("id",GAME_ID).maybeSingle();if(data&&data.data){state=data.data;fixState();}}
+    if(state.buzz.phase==="steal"&&state.buzz.open&&!state.buzz.order.includes(myId)){state.buzz.order.push(myId);await saveState();renderBuzz();}
   };
 }
 
-/* =====================================================================
-   SETTINGS DRAWER
-   ===================================================================== */
 $("#openSettings").onclick=()=>{$("#drawer").classList.add("open");renderEditor();};
 $("#closeDrawer").onclick=()=>$("#drawer").classList.remove("open");
-
 function renderEditor(){
-  // Spieler
-  const pe=$("#playerEditor");pe.innerHTML="";
-  state.players.forEach(p=>{
-    const row=document.createElement("div");
-    row.style.cssText="display:flex;gap:6px;margin-bottom:6px";
-    row.innerHTML=`<input value="${esc(p.name)}" />
-      <button class="toolbtn" style="margin:0" title="löschen">🗑</button>`;
-    const inp=row.querySelector("input");
-    inp.oninput=()=>{p.name=inp.value;commit();};
-    row.querySelector("button").onclick=()=>{
-      state.players=state.players.filter(x=>x.id!==p.id);
-      if(state.turn===p.id)state.turn=state.players[0]?.id||null;
-      commit();renderEditor();
-    };
-    pe.appendChild(row);
+  const oe=$("#orderEditor");oe.innerHTML="";
+  if(!state.order.length)oe.innerHTML='<div class="sub">Noch keine Spieler beigetreten.</div>';
+  state.order.forEach((pid,idx)=>{
+    const p=state.players.find(x=>x.id===pid);if(!p)return;
+    const row=document.createElement("div");row.className="order-row";
+    row.innerHTML=`<span class="nm">${idx+1}. ${esc(p.name)}</span><button data-up>▲</button><button data-down>▼</button><button data-del>🗑</button>`;
+    row.querySelector("[data-up]").onclick=()=>{if(idx>0){[state.order[idx-1],state.order[idx]]=[state.order[idx],state.order[idx-1]];commit();renderEditor();}};
+    row.querySelector("[data-down]").onclick=()=>{if(idx<state.order.length-1){[state.order[idx+1],state.order[idx]]=[state.order[idx],state.order[idx+1]];commit();renderEditor();}};
+    row.querySelector("[data-del]").onclick=()=>{state.players=state.players.filter(x=>x.id!==pid);state.order=state.order.filter(x=>x!==pid);if(state.turnIndex>=state.order.length)state.turnIndex=0;commit();renderEditor();};
+    oe.appendChild(row);
   });
-  // Kategorie-Auswahl + Fragen
-  const cs=$("#catSelect");
-  cs.innerHTML=state.categories.map((c,i)=>`<option value="${i}">${esc(c)}</option>`).join("");
-  cs.onchange=renderQuestionEditor;
-  renderQuestionEditor();
+  $("#roundSelect").value=state.round;
+  $("#roundSelect").onchange=()=>{fillCatSelect();renderQEditor();};
+  fillCatSelect();renderQEditor();
 }
-$("#addPlayer").onclick=()=>{
-  state.players.push({id:uid(),name:"Neuer Spieler",score:0});
-  commit();renderEditor();
-};
-function renderQuestionEditor(){
-  const idx=+$("#catSelect").value||0;
-  const cat=state.categories[idx];
-  const wrap=$("#questionEditor");wrap.innerHTML="";
-  // Kategoriename editierbar
-  const catRow=document.createElement("div");
-  catRow.innerHTML=`<label>Kategorie-Name</label><input id="catName" value="${esc(cat)}"/>`;
-  wrap.appendChild(catRow);
-  catRow.querySelector("input").oninput=e=>{
-    const old=state.categories[idx];const nu=e.target.value;
-    // Fragen-Keys umbenennen
-    VALUES.forEach(v=>{
-      state.questions[key(nu,v)]=state.questions[key(old,v)];
-      if(nu!==old)delete state.questions[key(old,v)];
-    });
-    state.categories[idx]=nu;commit();
-  };
-  VALUES.forEach(v=>{
-    const k=key(cat,v),qd=state.questions[k];
+function fillCatSelect(){
+  const r=$("#roundSelect").value;
+  $("#catSelect").innerHTML=QUIZ_CONTENT[r].categories.map((c,i)=>`<option value="${i}">${esc(c.name)}</option>`).join("");
+  $("#catSelect").onchange=renderQEditor;
+}
+function renderQEditor(){
+  const r=$("#roundSelect").value,ci=+$("#catSelect").value||0;
+  const cat=QUIZ_CONTENT[r].categories[ci],wrap=$("#questionEditor");wrap.innerHTML="";
+  cat.q.forEach((q,qi)=>{
+    const val=QUIZ_CONTENT[r].values[qi];
     const box=document.createElement("div");box.className="q-edit";
-    box.innerHTML=`<div class="qhead"><span>${v} Punkte</span><span>${qd.used?"✓ gespielt":""}</span></div>
-      <label>Frage</label><textarea>${esc(qd.q)}</textarea>
-      <label>Antwort</label><input value="${esc(qd.a)}"/>`;
-    const [ta,inp]=[box.querySelector("textarea"),box.querySelector("input")];
-    ta.oninput=()=>{qd.q=ta.value;commit();};
-    inp.oninput=()=>{qd.a=inp.value;commit();};
+    box.innerHTML=`<div class="qhead"><span>${val} Punkte</span><span>${state.used[r][ckey(cat.name,qi)]?"✓ gespielt":""}</span></div>
+      <label>Frage</label><textarea>${esc(q.q)}</textarea>
+      ${q.flag!==undefined?`<label>Flagge (Emoji)</label><input class="flag" value="${esc(q.flag)}"/>`:""}
+      <label>Antwort</label><input class="ans" value="${esc(q.a)}"/>`;
+    box.querySelector("textarea").oninput=e=>{q.q=e.target.value;};
+    box.querySelector(".ans").oninput=e=>{q.a=e.target.value;};
+    const f=box.querySelector(".flag");if(f)f.oninput=e=>{q.flag=e.target.value;};
     wrap.appendChild(box);
   });
+  const note=document.createElement("div");note.className="hint";
+  note.textContent="Änderungen hier gelten nur in diesem Browser. Für dauerhafte Änderungen die QUIZ_CONTENT-Daten oben in der Datei bearbeiten.";
+  wrap.appendChild(note);
 }
-$("#resetGame").onclick=()=>{
-  state.categories.forEach(c=>VALUES.forEach(v=>state.questions[key(c,v)].used=false));
-  state.buzz={open:false,order:[],cellKey:null};
-  commit();toast("Board zurückgesetzt");
-};
+$("#resetBoard").onclick=()=>{state.used={round1:{},round2:{}};state.open=null;state.buzz={phase:"main",open:false,order:[],graded:[]};state.turnIndex=0;commit();toast("Board zurückgesetzt");};
 $("#resetScores").onclick=()=>{state.players.forEach(p=>p.score=0);commit();toast("Punkte auf 0");};
+$("#kickAll").onclick=()=>{if(confirm("Alle Spieler entfernen?")){state.players=[];state.order=[];state.turnIndex=0;commit();renderEditor();}};
 
-/* =====================================================================
-   INIT
-   ===================================================================== */
 async function init(){
-  if(!VIEW){ $("#gate").style.display="flex"; return; }
+  if(!VIEW){$("#gate").style.display="flex";return;}
   $("#gate").style.display="none";
-  await loadState();
-  subscribeRealtime();
-
-  if(VIEW==="buzz"){
-    $("#buzzView").style.display="flex";
-    setupBuzzView();
-  } else {
-    $("#boardView").style.display="block";
-    if(VIEW==="display"){ $("#openSettings").style.display="none"; }
-  }
+  await loadState();subscribeRealtime();
+  if(VIEW==="buzz"){$("#buzzView").style.display="flex";setupBuzz();}
+  else $("#boardView").style.display="block";
   renderAll();
-
-  // Polling-Fallback, falls Realtime mal hakt (alle 4s nachladen)
   if(usingSupabase){
     setInterval(async()=>{
       const {data}=await sb.from("quiz_state").select("data").eq("id",GAME_ID).maybeSingle();
-      if(data&&data.data){
-        const s=JSON.stringify(data.data);
-        if(s!==JSON.stringify(state)){state=data.data;ensureDefaults();renderAll();}
-      }
-    },4000);
+      if(data&&data.data){const s=JSON.stringify(data.data);if(s!==JSON.stringify(state)){state=data.data;fixState();renderAll();}}
+    },3500);
   }
 }
 init();
