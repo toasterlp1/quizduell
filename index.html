@@ -126,10 +126,9 @@ body{
 <div id="gate">
   <div class="gate-card">
     <h1>QUIZ<span class="bolt">/</span>DUELL</h1>
-    <p>Du streamst das Board über Discord. Die Spieler öffnen nur den Buzzer auf dem Handy.</p>
     <div class="gate-roles">
       <a href="?view=host">Host / Spielleitung</a>
-      <a href="?view=buzz">Buzzer (Handy)</a>
+      <a href="?view=buzz">Buzzer</a>
     </div>
   </div>
 </div>
@@ -189,9 +188,8 @@ body{
 <div class="drawer" id="drawer">
   <button class="closeX" id="closeDrawer">×</button>
   <h2>Einstellungen</h2>
-  <div class="sub">Reihenfolge & Fragen. Wird sofort für alle gespeichert.</div>
+  <div class="sub">Reihenfolge & Fragen.</div>
   <h2 style="font-size:17px">Spieler-Reihenfolge</h2>
-  <div class="sub">Die Reihenfolge bestimmt, wer nach jeder Frage dran ist.</div>
   <div id="orderEditor"></div>
   <h2 style="font-size:17px;margin-top:24px">Fragen bearbeiten</h2>
   <label>Runde</label>
@@ -445,7 +443,7 @@ function renderBoard(){
 }
 function renderScores(){
   const bar=$("#scorebar");bar.innerHTML="";
-  if(!state.order.length){bar.innerHTML='<div class="player empty"><div class="pname">Noch keine Spieler</div><div class="hint">Spieler öffnen den Buzzer-Link</div></div>';return;}
+  if(!state.order.length){bar.innerHTML='<div class="player empty"><div class="pname">Noch keine Spieler</div><div class="hint"></div></div>';return;}
   state.order.forEach((pid,idx)=>{
     const p=state.players.find(x=>x.id===pid);if(!p)return;
     let cls="player";
