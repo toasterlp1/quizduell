@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Quiz Duell</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+/* ============================================================
+   QUIZ DUELL  —  Design-Tokens
+   Stimmung: dunkle Arena, elektrisches Blitz-Rot auf Stahlblau.
+   Display-Font: kantig-kondensiert (Oswald). Body: Inter.
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+
+:root{
+  --bg-0:#0a0e17;          /* tiefster Hintergrund */
+  --bg-1:#111726;          /* Panels */
+  --bg-2:#1a2236;          /* erhöhte Flächen */
+  --steel-1:#1e3a8a;       /* Stahlblau dunkel (gespielte Felder rand) */
+  --steel-2:#2b5bd4;       /* Stahlblau aktiv */
+  --steel-glow:#3b82f6;    /* blaues Leuchten */
+  --bolt:#e01e2b;          /* Blitz-Rot */
+  --bolt-2:#ff3b46;        /* helles Rot */
+  --gold:#f5b942;          /* Akzent für Punkte/Turn */
+  --ink:#eef2fb;           /* Haupttext */
+  --ink-dim:#8a97b4;       /* gedämpft */
+  --line:rgba(120,140,190,.16);
+  --radius:14px;
+  --shadow:0 10px 40px rgba(0,0,0,.5);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:'Inter',system-ui,sans-serif;
+  background:
+    radial-gradient(1200px 700px at 50% -10%, rgba(43,91,212,.18), transparent 60%),
+    radial-gradient(900px 500px at 90% 110%, rgba(224,30,43,.10), transparent 60%),
+    var(--bg-0);
+  color:var(--ink);
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+.display-font{font-family:'Oswald',sans-serif;letter-spacing:.5px}
+
+/* ---------- Loader / Gate ---------- */
+#gate{
+  position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;
+  background:var(--bg-0);
+}
+.gate-card{
+  background:var(--bg-1);border:1px solid var(--line);border-radius:var(--radius);
+  padding:36px;max-width:440px;width:92%;box-shadow:var(--shadow);text-align:center;
+}
+.gate-card h1{font-family:'Oswald';font-size:34px;font-weight:700;margin-bottom:6px}
+.gate-card .bolt{color:var(--bolt)}
+.gate-card p{color:var(--ink-dim);font-size:14px;margin-bottom:22px;line-height:1.5}
+.gate-roles{display:grid;gap:10px}
+.gate-roles a{
+  display:block;text-decoration:none;padding:14px;border-radius:10px;
+  background:var(--bg-2);border:1px solid var(--line);color:var(--ink);
+  font-weight:600;transition:.15s;
+}
+.gate-roles a:hover{border-color:var(--steel-glow);transform:translateY(-1px)}
+.gate-roles a small{display:block;color:var(--ink-dim);font-weight:400;font-size:12px;margin-top:3px}
+
+/* ============================================================
+   TOP BAR (Host + Display)
+   ============================================================ */
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 22px;border-bottom:1px solid var(--line);
+  background:linear-gradient(180deg, rgba(26,34,54,.6), transparent);
+}
+.logo{display:flex;align-items:center;gap:12px;font-family:'Oswald';font-weight:700;font-size:26px}
+.logo .mark{
+  width:38px;height:38px;display:grid;place-items:center;border-radius:9px;
+  background:linear-gradient(135deg,var(--bolt),var(--bolt-2));
+  box-shadow:0 0 22px rgba(224,30,43,.5);font-size:20px;
+}
+.turn-pill{
+  display:flex;align-items:center;gap:10px;padding:9px 18px;border-radius:999px;
+  background:linear-gradient(90deg, rgba(224,30,43,.15), rgba(43,91,212,.15));
+  border:1px solid var(--line);font-family:'Oswald';font-weight:600;font-size:18px;
+}
+.turn-pill .star{color:var(--gold)}
+.turn-name{color:var(--gold)}
+
+/* ============================================================
+   BOARD GRID
+   ============================================================ */
+.board-wrap{padding:22px;max-width:1500px;margin:0 auto}
+.board{
+  display:grid;gap:12px;
+  grid-template-columns:repeat(var(--cols,6),1fr);
+}
+.cat-head{
+  background:linear-gradient(180deg,var(--bolt),#a3121c);
+  border-radius:12px;padding:18px 10px;text-align:center;
+  font-family:'Oswald';font-weight:700;font-size:16px;text-transform:uppercase;
+  letter-spacing:.5px;color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.18);
+  min-height:64px;display:grid;place-items:center;
+}
+.cell{
+  background:linear-gradient(180deg,var(--steel-2),var(--steel-1));
+  border:none;border-radius:12px;padding:24px 10px;cursor:pointer;
+  font-family:'Oswald';font-weight:700;font-size:30px;font-style:italic;color:#dce7ff;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.15), var(--shadow);
+  transition:.15s;text-align:center;
+}
+.cell:hover:not(.used){transform:translateY(-2px);box-shadow:0 0 24px rgba(59,130,246,.45)}
+.cell.used{
+  background:var(--bg-1);color:#2c3650;cursor:default;
+  box-shadow:none;border:1px solid var(--line);
+}
+.cell:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+
+/* ============================================================
+   SCOREBOARD (Spieler-Leiste unten)
+   ============================================================ */
+.scorebar{
+  display:flex;gap:10px;flex-wrap:wrap;justify-content:center;
+  padding:16px 22px 28px;
+}
+.player{
+  position:relative;background:var(--bg-1);border:1px solid var(--line);
+  border-radius:12px;padding:12px 18px;min-width:150px;text-align:center;
+  transition:.2s;
+}
+.player.active{border-color:var(--gold);box-shadow:0 0 18px rgba(245,185,66,.3)}
+.player.buzzed{border-color:var(--bolt-2);box-shadow:0 0 22px rgba(255,59,70,.55);
+  animation:buzzpulse .8s ease infinite}
+@keyframes buzzpulse{50%{box-shadow:0 0 34px rgba(255,59,70,.85)}}
+.player .pname{font-family:'Oswald';font-weight:600;font-size:16px;color:var(--ink);
+  text-transform:uppercase;letter-spacing:.4px;cursor:text}
+.player .pscore{font-family:'Oswald';font-weight:700;font-size:26px;color:var(--gold);margin-top:2px}
+.player .ctrls{display:flex;gap:6px;justify-content:center;margin-top:8px}
+.player .ctrls button{
+  border:1px solid var(--line);background:var(--bg-2);color:var(--ink);
+  border-radius:7px;width:30px;height:28px;cursor:pointer;font-weight:700;font-size:13px;
+}
+.player .ctrls button:hover{border-color:var(--steel-glow)}
+.player .buzz-rank{
+  position:absolute;top:-10px;left:-10px;width:26px;height:26px;border-radius:50%;
+  background:var(--bolt);color:#fff;font-family:'Oswald';font-weight:700;
+  display:grid;place-items:center;font-size:14px;box-shadow:0 0 14px rgba(224,30,43,.7)
+}
+
+/* ============================================================
+   QUESTION OVERLAY
+   ============================================================ */
+.overlay{
+  position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;
+  background:rgba(5,8,14,.86);backdrop-filter:blur(6px);padding:24px;
+}
+.overlay.open{display:flex}
+.qcard{
+  background:linear-gradient(180deg,var(--bg-2),var(--bg-1));
+  border:1px solid var(--line);border-radius:20px;padding:40px;
+  max-width:880px;width:100%;box-shadow:var(--shadow);text-align:center;position:relative;
+}
+.qcat{font-family:'Oswald';color:var(--bolt-2);text-transform:uppercase;letter-spacing:1px;
+  font-size:15px;font-weight:600}
+.qval{font-family:'Oswald';color:var(--gold);font-size:18px;font-weight:700;margin-top:2px}
+.qtext{font-size:30px;font-weight:600;line-height:1.35;margin:26px 0;font-family:'Oswald'}
+.qanswer{
+  margin:20px auto;max-width:640px;padding:18px;border-radius:12px;
+  background:rgba(245,185,66,.08);border:1px dashed rgba(245,185,66,.4);
+  font-size:22px;color:var(--gold);font-weight:600;display:none;font-family:'Oswald'
+}
+.qanswer.show{display:block}
+.buzz-status{
+  margin:16px 0;min-height:30px;font-family:'Oswald';font-size:22px;font-weight:600;
+}
+.buzz-status .who{color:var(--bolt-2)}
+.qbtns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:20px}
+.btn{
+  font-family:'Inter';font-weight:600;font-size:15px;padding:12px 22px;border-radius:10px;
+  border:1px solid var(--line);background:var(--bg-2);color:var(--ink);cursor:pointer;transition:.15s
+}
+.btn:hover{border-color:var(--steel-glow);transform:translateY(-1px)}
+.btn-reveal{border-color:rgba(245,185,66,.5);color:var(--gold)}
+.btn-correct{background:linear-gradient(135deg,#16a34a,#15803d);border:none;color:#fff}
+.btn-wrong{background:linear-gradient(135deg,#b91c1c,#7f1d1d);border:none;color:#fff}
+.btn-close{background:transparent}
+.assign-row{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin:14px 0}
+.assign-row .chip{
+  padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:var(--bg-2);
+  cursor:pointer;font-weight:600;font-size:13px;color:var(--ink)
+}
+.assign-row .chip.sel{border-color:var(--gold);color:var(--gold)}
+.hint{color:var(--ink-dim);font-size:12px;margin-top:6px}
+
+/* ============================================================
+   BUZZER VIEW (Handy)
+   ============================================================ */
+.buzz-screen{
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:24px;gap:24px;text-align:center;
+}
+.buzz-name-setup{width:100%;max-width:360px}
+.buzz-name-setup input{
+  width:100%;padding:16px;border-radius:12px;border:1px solid var(--line);
+  background:var(--bg-1);color:var(--ink);font-size:18px;text-align:center;margin-bottom:12px
+}
+.buzz-btn{
+  width:min(78vw,340px);height:min(78vw,340px);border-radius:50%;border:none;cursor:pointer;
+  background:radial-gradient(circle at 38% 32%, var(--bolt-2), var(--bolt) 55%, #7f0f17);
+  color:#fff;font-family:'Oswald';font-weight:700;font-size:48px;letter-spacing:2px;
+  box-shadow:0 0 0 10px rgba(224,30,43,.15), 0 18px 50px rgba(224,30,43,.45),
+    inset 0 6px 20px rgba(255,255,255,.25);
+  transition:.08s;touch-action:manipulation;
+}
+.buzz-btn:active{transform:scale(.95)}
+.buzz-btn:disabled{
+  background:var(--bg-2);color:#46506b;box-shadow:none;cursor:not-allowed
+}
+.buzz-meta{font-family:'Oswald';font-size:20px;color:var(--ink-dim)}
+.buzz-meta b{color:var(--gold)}
+.buzz-locked{color:var(--bolt-2);font-weight:700}
+.buzz-first{color:#16a34a;font-weight:700;font-size:26px}
+
+/* ---------- Toast ---------- */
+#toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(120%);
+  background:var(--bg-2);border:1px solid var(--line);border-radius:10px;
+  padding:12px 20px;font-weight:600;z-index:200;transition:.3s;box-shadow:var(--shadow)
+}
+#toast.show{transform:translateX(-50%) translateY(0)}
+
+/* ---------- Settings drawer ---------- */
+.toolbtn{
+  background:var(--bg-2);border:1px solid var(--line);color:var(--ink);border-radius:9px;
+  padding:9px 14px;cursor:pointer;font-weight:600;font-size:13px;margin-left:8px
+}
+.toolbtn:hover{border-color:var(--steel-glow)}
+.drawer{
+  position:fixed;top:0;right:0;height:100vh;width:min(440px,92vw);z-index:60;
+  background:var(--bg-1);border-left:1px solid var(--line);box-shadow:var(--shadow);
+  transform:translateX(100%);transition:.25s;overflow-y:auto;padding:22px
+}
+.drawer.open{transform:translateX(0)}
+.drawer h2{font-family:'Oswald';font-size:22px;margin-bottom:4px}
+.drawer .sub{color:var(--ink-dim);font-size:13px;margin-bottom:18px}
+.drawer label{display:block;font-size:13px;color:var(--ink-dim);margin:14px 0 5px;font-weight:600}
+.drawer input,.drawer textarea,.drawer select{
+  width:100%;padding:10px;border-radius:8px;border:1px solid var(--line);
+  background:var(--bg-2);color:var(--ink);font-family:inherit;font-size:14px
+}
+.drawer textarea{min-height:70px;resize:vertical}
+.drawer .closeX{position:absolute;top:16px;right:18px;background:none;border:none;color:var(--ink-dim);
+  font-size:24px;cursor:pointer}
+.q-edit{background:var(--bg-2);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px}
+.q-edit .qhead{display:flex;justify-content:space-between;font-family:'Oswald';font-size:13px;color:var(--gold);margin-bottom:6px}
+
+@media (max-width:760px){
+  .board{gap:6px}
+  .cell{font-size:20px;padding:14px 4px}
+  .cat-head{font-size:11px;padding:10px 4px;min-height:48px}
+  .topbar{flex-direction:column;gap:10px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<!-- ============ ROLE GATE ============ -->
+<div id="gate">
+  <div class="gate-card">
+    <h1>QUIZ <span class="bolt">⚡</span> DUELL</h1>
+    <p>Wähle deine Ansicht. Host steuert das Spiel, Buzzer ist für die Spieler-Handys, Anzeige ist für den Stream/zweiten Bildschirm.</p>
+    <div class="gate-roles">
+      <a href="?view=host">🎛️ Host / Spielleitung<small>Board steuern, Punkte vergeben, Antworten sehen</small></a>
+      <a href="?view=display">📺 Anzeige (Stream)<small>Nur ansehen – kein Eingriff</small></a>
+      <a href="?view=buzz">🔴 Buzzer (Handy)<small>Großer Knopf zum Buzzern</small></a>
+    </div>
+  </div>
+</div>
+
+<!-- ============ HOST / DISPLAY ============ -->
+<div id="boardView" style="display:none">
+  <div class="topbar">
+    <div class="logo"><span class="mark">⚡</span> QUIZ DUELL</div>
+    <div style="display:flex;align-items:center">
+      <div class="turn-pill"><span class="star">★</span> <span id="turnLabel">Am Zug:</span> <span class="turn-name" id="turnName">—</span> <span class="star">★</span></div>
+      <button class="toolbtn" id="openSettings">⚙️ Einstellungen</button>
+    </div>
+  </div>
+
+  <div class="board-wrap">
+    <div class="board" id="board"></div>
+  </div>
+
+  <div class="scorebar" id="scorebar"></div>
+</div>
+
+<!-- ============ BUZZER (Handy) ============ -->
+<div id="buzzView" class="buzz-screen" style="display:none">
+  <div class="logo" style="font-size:30px"><span class="mark">⚡</span> QUIZ DUELL</div>
+  <div id="buzzSetup" class="buzz-name-setup">
+    <label style="color:var(--ink-dim);font-size:14px;display:block;margin-bottom:8px">Wähle deinen Namen</label>
+    <select id="buzzNameSelect"></select>
+    <div class="hint">Die Namen legt der Host in den Einstellungen fest.</div>
+  </div>
+  <div id="buzzPlay" style="display:none;flex-direction:column;align-items:center;gap:24px">
+    <div class="buzz-meta">Du bist: <b id="buzzMyName">—</b></div>
+    <button class="buzz-btn" id="buzzBtn">BUZZ</button>
+    <div class="buzz-meta" id="buzzInfo">Warte auf Freigabe…</div>
+    <button class="btn btn-close" id="buzzChange" style="margin-top:8px">Name ändern</button>
+  </div>
+</div>
+
+<!-- ============ QUESTION OVERLAY ============ -->
+<div class="overlay" id="overlay">
+  <div class="qcard">
+    <div class="qcat" id="ovCat">KATEGORIE</div>
+    <div class="qval" id="ovVal">100</div>
+    <div class="qtext" id="ovText">Frage…</div>
+
+    <div class="buzz-status" id="ovBuzz"></div>
+
+    <div class="qanswer" id="ovAnswer"></div>
+
+    <!-- nur Host -->
+    <div id="hostControls">
+      <div class="hint">Wer hat richtig/falsch geantwortet? Punkte gehen an den gewählten Spieler.</div>
+      <div class="assign-row" id="ovAssign"></div>
+      <div class="qbtns">
+        <button class="btn btn-reveal" id="btnReveal">Antwort aufdecken</button>
+        <button class="btn btn-correct" id="btnCorrect">✓ Richtig (+Punkte)</button>
+        <button class="btn btn-wrong" id="btnWrong">✗ Falsch (−Punkte)</button>
+        <button class="btn" id="btnResetBuzz">↺ Buzzer freigeben</button>
+        <button class="btn btn-close" id="btnClose">Schließen (Feld erledigt)</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SETTINGS DRAWER ============ -->
+<div class="drawer" id="drawer">
+  <button class="closeX" id="closeDrawer">×</button>
+  <h2>Einstellungen</h2>
+  <div class="sub">Spielername & Fragen – wird sofort für alle gespeichert.</div>
+
+  <h2 style="font-size:17px;margin-top:10px">Spieler</h2>
+  <div id="playerEditor"></div>
+  <button class="btn" id="addPlayer" style="margin-top:8px">+ Spieler hinzufügen</button>
+
+  <h2 style="font-size:17px;margin-top:24px">Fragen</h2>
+  <label>Kategorie wählen</label>
+  <select id="catSelect"></select>
+  <div id="questionEditor" style="margin-top:12px"></div>
+
+  <h2 style="font-size:17px;margin-top:24px">Spiel</h2>
+  <button class="btn" id="resetGame" style="margin-top:8px">🔄 Board zurücksetzen (alle Felder offen)</button>
+  <button class="btn btn-wrong" id="resetScores" style="margin-top:8px">Punkte auf 0</button>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* =====================================================================
+   KONFIG  —  HIER deine Supabase-Daten eintragen
+   ===================================================================== */
+const SUPABASE_URL = "DEINE_SUPABASE_URL";        // z.B. https://xxxx.supabase.co
+const SUPABASE_ANON_KEY = "DEIN_ANON_KEY";        // anon public key
+
+/* Standard-Inhalt beim allerersten Start (wird dann in DB gespeichert) */
+const DEFAULT_CATEGORIES = ["WER STREAMT DENN DA?","STIMMEN","SERIEN & FILME","SONGS & LYRICS","BRANDS","WORTSALAT"];
+const VALUES = [100,200,300,500];
+const DEFAULT_PLAYERS = ["Spieler 1","Spieler 2","Spieler 3","Spieler 4"];
+
+/* =====================================================================
+   SETUP
+   ===================================================================== */
+const params = new URLSearchParams(location.search);
+const VIEW = params.get("view"); // host | display | buzz | null
+const GAME_ID = params.get("game") || "main";   // erlaubt mehrere Spiele
+let sb = null;
+let usingSupabase = SUPABASE_URL.startsWith("http");
+
+if(usingSupabase){
+  sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+}
+
+/* ---- lokaler Spielzustand (gespiegelt aus DB) ---- */
+let state = {
+  categories: DEFAULT_CATEGORIES.slice(),
+  players: [],          // {id,name,score}
+  questions: {},        // key "cat|value" -> {q,a,used,answeredBy}
+  turn: null,           // player id am Zug
+  buzz: { open:false, order:[], cellKey:null }  // order = [playerId,...]
+};
+
+/* ---------- Helpers ---------- */
+const $ = s=>document.querySelector(s);
+const $$ = s=>[...document.querySelectorAll(s)];
+function toast(msg){const t=$("#toast");t.textContent=msg;t.classList.add("show");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("show"),2200);}
+function key(cat,val){return cat+"|"+val;}
+function uid(){return Math.random().toString(36).slice(2,9);}
+
+/* =====================================================================
+   PERSISTENZ
+   - Supabase: eine Zeile in Tabelle `quiz_state` (id = GAME_ID, data jsonb)
+   - Fallback: localStorage (nur ein Gerät)
+   ===================================================================== */
+async function loadState(){
+  if(usingSupabase){
+    const {data,error} = await sb.from("quiz_state").select("data").eq("id",GAME_ID).maybeSingle();
+    if(error){console.warn(error);}
+    if(data && data.data){ state = data.data; ensureDefaults(); return; }
+    // neu anlegen
+    ensureDefaults(); await saveState();
+  } else {
+    const raw = localStorage.getItem("quizduell_"+GAME_ID);
+    if(raw){ state = JSON.parse(raw); }
+    ensureDefaults();
+  }
+}
+function ensureDefaults(){
+  if(!state.categories || !state.categories.length) state.categories = DEFAULT_CATEGORIES.slice();
+  if(!state.players || !state.players.length){
+    state.players = DEFAULT_PLAYERS.map(n=>({id:uid(),name:n,score:0}));
+  }
+  if(!state.questions) state.questions = {};
+  state.categories.forEach(cat=>VALUES.forEach(v=>{
+    const k=key(cat,v);
+    if(!state.questions[k]) state.questions[k]={q:"",a:"",used:false};
+  }));
+  if(!state.buzz) state.buzz={open:false,order:[],cellKey:null};
+  if(!state.turn && state.players[0]) state.turn=state.players[0].id;
+}
+let saveTimer=null;
+async function saveState(){
+  if(usingSupabase){
+    const {error}=await sb.from("quiz_state").upsert({id:GAME_ID,data:state});
+    if(error)console.warn("save",error);
+  } else {
+    localStorage.setItem("quizduell_"+GAME_ID, JSON.stringify(state));
+  }
+}
+/* gedrosseltes Speichern + sofort rendern */
+function commit(){ renderAll(); clearTimeout(saveTimer); saveTimer=setTimeout(saveState,150); }
+
+/* =====================================================================
+   REALTIME  — alle Clients hören auf Änderungen der state-Zeile
+   ===================================================================== */
+function subscribeRealtime(){
+  if(!usingSupabase) return;
+  sb.channel("quiz_"+GAME_ID)
+    .on("postgres_changes",
+      {event:"*",schema:"public",table:"quiz_state",filter:"id=eq."+GAME_ID},
+      payload=>{
+        if(payload.new && payload.new.data){
+          state = payload.new.data;
+          ensureDefaults();
+          renderAll();
+        }
+      })
+    .subscribe();
+}
+
+/* =====================================================================
+   RENDER
+   ===================================================================== */
+function renderAll(){
+  if(VIEW==="buzz"){ renderBuzz(); return; }
+  renderBoard(); renderScores(); renderTurn();
+  if($("#overlay").classList.contains("open")) renderOverlay();
+}
+
+function renderTurn(){
+  const p=state.players.find(p=>p.id===state.turn);
+  $("#turnName").textContent = p?p.name.toUpperCase():"—";
+}
+
+function renderBoard(){
+  const board=$("#board");
+  board.style.setProperty("--cols",state.categories.length);
+  board.innerHTML="";
+  state.categories.forEach(cat=>{
+    const h=document.createElement("div");
+    h.className="cat-head display-font";h.textContent=cat;board.appendChild(h);
+  });
+  VALUES.forEach(v=>{
+    state.categories.forEach(cat=>{
+      const k=key(cat,v), qd=state.questions[k];
+      const c=document.createElement("button");
+      c.className="cell display-font"+(qd.used?" used":"");
+      c.textContent=v;
+      if(!qd.used && VIEW==="host"){
+        c.onclick=()=>openQuestion(cat,v);
+      } else if(qd.used){
+        c.disabled=true;
+      } else {
+        c.onclick=()=>toast("Nur der Host kann Felder öffnen.");
+      }
+      board.appendChild(c);
+    });
+  });
+}
+
+function renderScores(){
+  const bar=$("#scorebar");bar.innerHTML="";
+  state.players.forEach(p=>{
+    const div=document.createElement("div");
+    let cls="player";
+    if(p.id===state.turn)cls+=" active";
+    const rank=state.buzz.order.indexOf(p.id);
+    if(rank>-1)cls+=" buzzed";
+    div.className=cls;
+    div.innerHTML=
+      (rank>-1?`<div class="buzz-rank">${rank+1}</div>`:"")+
+      `<div class="pname">${esc(p.name)}</div>
+       <div class="pscore">${p.score}</div>`;
+    if(VIEW==="host"){
+      const ctr=document.createElement("div");ctr.className="ctrls";
+      ctr.innerHTML=`<button data-d="-100">−</button><button data-d="100">+</button><button data-turn>★</button>`;
+      ctr.querySelectorAll("[data-d]").forEach(b=>b.onclick=()=>{p.score+=+b.dataset.d;commit();});
+      ctr.querySelector("[data-turn]").onclick=()=>{state.turn=p.id;commit();};
+      div.appendChild(ctr);
+    }
+    bar.appendChild(div);
+  });
+}
+function esc(s){return (s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+
+/* =====================================================================
+   QUESTION OVERLAY (Host)
+   ===================================================================== */
+let curCell=null, curAssign=null;
+function openQuestion(cat,val){
+  curCell=key(cat,val); curAssign=null;
+  // Buzzer für dieses Feld öffnen
+  state.buzz={open:true,order:[],cellKey:curCell};
+  commit();
+  renderOverlay();
+  $("#overlay").classList.add("open");
+}
+function renderOverlay(){
+  if(!curCell)return;
+  const [cat,val]=curCell.split("|");
+  const qd=state.questions[curCell];
+  $("#ovCat").textContent=cat;
+  $("#ovVal").textContent=val+" Punkte";
+  $("#ovText").textContent=qd.q||"(keine Frage hinterlegt – in Einstellungen ausfüllen)";
+  $("#ovAnswer").textContent="Antwort: "+(qd.a||"—");
+
+  // Buzz-Status
+  const ord=state.buzz.order;
+  const bs=$("#ovBuzz");
+  if(state.buzz.open && ord.length===0){
+    bs.innerHTML=`🟢 Buzzer offen – Spieler können drücken…`;
+  } else if(ord.length){
+    const first=state.players.find(p=>p.id===ord[0]);
+    bs.innerHTML=`🔴 <span class="who">${esc(first?.name||"?")}</span> hat zuerst gebuzzert!`;
+  } else {
+    bs.innerHTML=`Buzzer gesperrt.`;
+  }
+
+  // Zuweisungs-Chips: Reihenfolge der Buzzer zuerst, dann Rest
+  const assign=$("#ovAssign");assign.innerHTML="";
+  const ordered=[...ord, ...state.players.filter(p=>!ord.includes(p.id)).map(p=>p.id)];
+  ordered.forEach(pid=>{
+    const p=state.players.find(x=>x.id===pid);if(!p)return;
+    const chip=document.createElement("button");
+    chip.className="chip"+(curAssign===pid?" sel":"");
+    const r=ord.indexOf(pid);
+    chip.textContent=(r>-1?`${r+1}. `:"")+p.name;
+    chip.onclick=()=>{curAssign=pid;renderOverlay();};
+    assign.appendChild(chip);
+  });
+  if(curAssign===null && ord.length){curAssign=ord[0];}
+}
+
+/* Host-Buttons */
+$("#btnReveal").onclick=()=>$("#ovAnswer").classList.toggle("show");
+$("#btnCorrect").onclick=()=>grade(true);
+$("#btnWrong").onclick=()=>grade(false);
+$("#btnResetBuzz").onclick=()=>{state.buzz={open:true,order:[],cellKey:curCell};commit();renderOverlay();toast("Buzzer wieder offen");};
+$("#btnClose").onclick=()=>closeQuestion();
+
+function grade(correct){
+  if(!curAssign){toast("Erst einen Spieler auswählen.");return;}
+  const [cat,val]=curCell.split("|");
+  const p=state.players.find(x=>x.id===curAssign);
+  if(correct){
+    p.score+=+val;
+    state.turn=p.id;          // wer richtig hat, ist als nächstes dran
+    $("#ovAnswer").classList.add("show");
+    toast(`✓ +${val} an ${p.name}`);
+    state.buzz={open:false,order:[],cellKey:null};
+  } else {
+    p.score-=+val;
+    toast(`✗ −${val} bei ${p.name}. Nächster darf buzzern.`);
+    // diesen Spieler aus der Buzz-Reihenfolge raus, Buzzer wieder offen für die anderen
+    state.buzz.order=state.buzz.order.filter(id=>id!==p.id);
+    state.buzz.open=true;
+    curAssign=state.buzz.order[0]||null;
+  }
+  commit();renderOverlay();
+}
+function closeQuestion(){
+  state.questions[curCell].used=true;
+  state.buzz={open:false,order:[],cellKey:null};
+  $("#overlay").classList.remove("open");
+  $("#ovAnswer").classList.remove("show");
+  curCell=null;curAssign=null;
+  commit();
+}
+
+/* =====================================================================
+   BUZZER VIEW (Handy)
+   ===================================================================== */
+let myPlayerId = localStorage.getItem("quizduell_myid_"+GAME_ID) || null;
+function renderBuzz(){
+  // Namensauswahl füllen
+  const sel=$("#buzzNameSelect");
+  if(sel && document.activeElement!==sel){
+    sel.innerHTML='<option value="">— wählen —</option>'+
+      state.players.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join("");
+    if(myPlayerId) sel.value=myPlayerId;
+  }
+  const me=state.players.find(p=>p.id===myPlayerId);
+  if(me){
+    $("#buzzSetup").style.display="none";
+    $("#buzzPlay").style.display="flex";
+    $("#buzzMyName").textContent=me.name;
+    const btn=$("#buzzBtn");
+    const info=$("#buzzInfo");
+    const rank=state.buzz.order.indexOf(myPlayerId);
+    if(rank===0){
+      btn.disabled=true;btn.textContent="✓";
+      info.innerHTML='<span class="buzz-first">Du warst zuerst! 🔥</span>';
+    } else if(rank>0){
+      btn.disabled=true;btn.textContent=(rank+1)+".";
+      info.innerHTML=`<span class="buzz-locked">Platz ${rank+1} – zu spät</span>`;
+    } else if(state.buzz.open){
+      btn.disabled=false;btn.textContent="BUZZ";
+      info.innerHTML='🟢 <b>Jetzt drücken!</b>';
+    } else {
+      btn.disabled=true;btn.textContent="…";
+      info.textContent="Warte auf nächste Frage…";
+    }
+  } else {
+    $("#buzzSetup").style.display="block";
+    $("#buzzPlay").style.display="none";
+  }
+}
+function setupBuzzView(){
+  $("#buzzNameSelect").onchange=e=>{
+    myPlayerId=e.target.value||null;
+    if(myPlayerId)localStorage.setItem("quizduell_myid_"+GAME_ID,myPlayerId);
+    renderBuzz();
+  };
+  $("#buzzChange").onclick=()=>{myPlayerId=null;localStorage.removeItem("quizduell_myid_"+GAME_ID);renderBuzz();};
+  $("#buzzBtn").onclick=async()=>{
+    if(!myPlayerId)return;
+    if(!state.buzz.open)return;
+    if(state.buzz.order.includes(myPlayerId))return;
+    // optimistisch lokal, dann speichern (Realtime synchronisiert den Rest)
+    // WICHTIG: frische Daten holen, um Race-Conditions zu minimieren
+    if(usingSupabase){
+      const {data}=await sb.from("quiz_state").select("data").eq("id",GAME_ID).maybeSingle();
+      if(data&&data.data){state=data.data;ensureDefaults();}
+    }
+    if(state.buzz.open && !state.buzz.order.includes(myPlayerId)){
+      state.buzz.order.push(myPlayerId);
+      await saveState();
+      renderBuzz();
+    }
+  };
+}
+
+/* =====================================================================
+   SETTINGS DRAWER
+   ===================================================================== */
+$("#openSettings").onclick=()=>{$("#drawer").classList.add("open");renderEditor();};
+$("#closeDrawer").onclick=()=>$("#drawer").classList.remove("open");
+
+function renderEditor(){
+  // Spieler
+  const pe=$("#playerEditor");pe.innerHTML="";
+  state.players.forEach(p=>{
+    const row=document.createElement("div");
+    row.style.cssText="display:flex;gap:6px;margin-bottom:6px";
+    row.innerHTML=`<input value="${esc(p.name)}" />
+      <button class="toolbtn" style="margin:0" title="löschen">🗑</button>`;
+    const inp=row.querySelector("input");
+    inp.oninput=()=>{p.name=inp.value;commit();};
+    row.querySelector("button").onclick=()=>{
+      state.players=state.players.filter(x=>x.id!==p.id);
+      if(state.turn===p.id)state.turn=state.players[0]?.id||null;
+      commit();renderEditor();
+    };
+    pe.appendChild(row);
+  });
+  // Kategorie-Auswahl + Fragen
+  const cs=$("#catSelect");
+  cs.innerHTML=state.categories.map((c,i)=>`<option value="${i}">${esc(c)}</option>`).join("");
+  cs.onchange=renderQuestionEditor;
+  renderQuestionEditor();
+}
+$("#addPlayer").onclick=()=>{
+  state.players.push({id:uid(),name:"Neuer Spieler",score:0});
+  commit();renderEditor();
+};
+function renderQuestionEditor(){
+  const idx=+$("#catSelect").value||0;
+  const cat=state.categories[idx];
+  const wrap=$("#questionEditor");wrap.innerHTML="";
+  // Kategoriename editierbar
+  const catRow=document.createElement("div");
+  catRow.innerHTML=`<label>Kategorie-Name</label><input id="catName" value="${esc(cat)}"/>`;
+  wrap.appendChild(catRow);
+  catRow.querySelector("input").oninput=e=>{
+    const old=state.categories[idx];const nu=e.target.value;
+    // Fragen-Keys umbenennen
+    VALUES.forEach(v=>{
+      state.questions[key(nu,v)]=state.questions[key(old,v)];
+      if(nu!==old)delete state.questions[key(old,v)];
+    });
+    state.categories[idx]=nu;commit();
+  };
+  VALUES.forEach(v=>{
+    const k=key(cat,v),qd=state.questions[k];
+    const box=document.createElement("div");box.className="q-edit";
+    box.innerHTML=`<div class="qhead"><span>${v} Punkte</span><span>${qd.used?"✓ gespielt":""}</span></div>
+      <label>Frage</label><textarea>${esc(qd.q)}</textarea>
+      <label>Antwort</label><input value="${esc(qd.a)}"/>`;
+    const [ta,inp]=[box.querySelector("textarea"),box.querySelector("input")];
+    ta.oninput=()=>{qd.q=ta.value;commit();};
+    inp.oninput=()=>{qd.a=inp.value;commit();};
+    wrap.appendChild(box);
+  });
+}
+$("#resetGame").onclick=()=>{
+  state.categories.forEach(c=>VALUES.forEach(v=>state.questions[key(c,v)].used=false));
+  state.buzz={open:false,order:[],cellKey:null};
+  commit();toast("Board zurückgesetzt");
+};
+$("#resetScores").onclick=()=>{state.players.forEach(p=>p.score=0);commit();toast("Punkte auf 0");};
+
+/* =====================================================================
+   INIT
+   ===================================================================== */
+async function init(){
+  if(!VIEW){ $("#gate").style.display="flex"; return; }
+  $("#gate").style.display="none";
+  await loadState();
+  subscribeRealtime();
+
+  if(VIEW==="buzz"){
+    $("#buzzView").style.display="flex";
+    setupBuzzView();
+  } else {
+    $("#boardView").style.display="block";
+    if(VIEW==="display"){ $("#openSettings").style.display="none"; }
+  }
+  renderAll();
+
+  // Polling-Fallback, falls Realtime mal hakt (alle 4s nachladen)
+  if(usingSupabase){
+    setInterval(async()=>{
+      const {data}=await sb.from("quiz_state").select("data").eq("id",GAME_ID).maybeSingle();
+      if(data&&data.data){
+        const s=JSON.stringify(data.data);
+        if(s!==JSON.stringify(state)){state=data.data;ensureDefaults();renderAll();}
+      }
+    },4000);
+  }
+}
+init();
+</script>
+</body>
+</html>
