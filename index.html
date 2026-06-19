@@ -66,7 +66,8 @@ body{
 .qcard{background:linear-gradient(180deg,var(--bg-2),var(--bg-1));border:1px solid var(--line);border-radius:20px;padding:40px;max-width:880px;width:100%;box-shadow:var(--shadow);text-align:center;position:relative;max-height:92vh;overflow-y:auto}
 .qcat{font-family:'Oswald';color:var(--bolt-2);text-transform:uppercase;letter-spacing:1px;font-size:15px;font-weight:600}
 .qval{font-family:'Oswald';color:var(--gold);font-size:18px;font-weight:700;margin-top:2px}
-.qflag{font-size:90px;line-height:1.1;margin:14px 0}
+.qflag{margin:14px 0}
+.qflag img{width:260px;max-width:80%;border-radius:10px;box-shadow:0 6px 24px rgba(0,0,0,.5);border:1px solid var(--line)}
 .qtext{font-size:30px;font-weight:600;line-height:1.35;margin:22px 0;font-family:'Oswald'}
 .qanswer{margin:20px auto;max-width:640px;padding:18px;border-radius:12px;background:rgba(245,185,66,.08);border:1px dashed rgba(245,185,66,.4);font-size:22px;color:var(--gold);font-weight:600;display:none;font-family:'Oswald'}
 .qanswer.show{display:block}
@@ -98,7 +99,8 @@ body{
 .buzz-first{color:#16a34a;font-weight:700;font-size:26px}
 .buzz-question{background:var(--bg-1);border:1px solid var(--line);border-radius:16px;padding:22px;max-width:520px;width:100%;font-family:'Oswald';font-size:22px;font-weight:600;line-height:1.35}
 .buzz-question .bqcat{color:var(--bolt-2);font-size:13px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
-.buzz-question .bqflag{font-size:72px;margin:6px 0}
+.buzz-question .bqflag{margin:8px 0}
+.buzz-question .bqflag img{width:200px;max-width:80%;border-radius:8px;border:1px solid var(--line)}
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(120%);background:var(--bg-2);border:1px solid var(--line);border-radius:10px;padding:12px 20px;font-weight:600;z-index:200;transition:.3s;box-shadow:var(--shadow)}
 #toast.show{transform:translateX(-50%) translateY(0)}
 .toolbtn{background:var(--bg-2);border:1px solid var(--line);color:var(--ink);border-radius:9px;padding:9px 14px;cursor:pointer;font-weight:600;font-size:13px}
@@ -124,6 +126,7 @@ body{
 <div id="gate">
   <div class="gate-card">
     <h1>QUIZ<span class="bolt">/</span>DUELL</h1>
+    <p>Du streamst das Board über Discord. Die Spieler öffnen nur den Buzzer auf dem Handy.</p>
     <div class="gate-roles">
       <a href="?view=host">Host / Spielleitung</a>
       <a href="?view=buzz">Buzzer (Handy)</a>
@@ -242,11 +245,11 @@ const QUIZ_CONTENT = {
       {
         name: "FLAGGEN",
         q: [
-          { q: "Welches Land hat diese Flagge?", flag: "🇯🇵", a: "Japan" },
-          { q: "Welches Land hat diese Flagge?", flag: "🇧🇷", a: "Brasilien" },
-          { q: "Welches Land hat diese Flagge?", flag: "🇵🇹", a: "Portugal" },
-          { q: "Welches Land hat diese Flagge?", flag: "🇲🇽", a: "Mexiko" },
-          { q: "Welches Land hat diese Flagge?", flag: "🇮🇩", a: "Indonesien" }
+          { q: "Welches Land hat diese Flagge?", cc: "jp", a: "Japan" },
+          { q: "Welches Land hat diese Flagge?", cc: "br", a: "Brasilien" },
+          { q: "Welches Land hat diese Flagge?", cc: "pt", a: "Portugal" },
+          { q: "Welches Land hat diese Flagge?", cc: "mx", a: "Mexiko" },
+          { q: "Welches Land hat diese Flagge?", cc: "id", a: "Indonesien" }
         ]
       },
       {
@@ -360,6 +363,7 @@ function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");cl
 function uid(){return Math.random().toString(36).slice(2,9);}
 function esc(s){return(s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
 function ckey(cat,qi){return cat+"|"+qi;}
+function flagUrl(cc){return "https://flagcdn.com/w320/"+String(cc).toLowerCase()+".png";}
 
 async function loadState(){
   if(usingSupabase){
@@ -469,7 +473,7 @@ function renderOverlay(){
   $("#ovCat").textContent=state.open.cat;
   $("#ovVal").textContent=val+" Punkte";
   const flagEl=$("#ovFlag");
-  if(q&&q.flag){flagEl.style.display="block";flagEl.textContent=q.flag;}else flagEl.style.display="none";
+  if(q&&q.cc){flagEl.style.display="block";flagEl.innerHTML=`<img src="${flagUrl(q.cc)}" alt="Flagge" onerror="this.style.display='none'"/>`;}else{flagEl.style.display="none";flagEl.innerHTML="";}
   $("#ovText").textContent=q?q.q:"(keine Frage)";
   $("#ovAnswer").textContent="Antwort: "+(q?q.a:"—");
   if(revealed)$("#ovAnswer").classList.add("show");else $("#ovAnswer").classList.remove("show");
@@ -535,7 +539,7 @@ function renderBuzz(){
     const q=cat?cat.q[state.open.qi]:null;
     bq.style.display="block";
     bq.innerHTML=`<div class="bqcat">${esc(state.open.cat)} · ${rd.values[state.open.qi]}</div>`+
-      (q&&q.flag?`<div class="bqflag">${q.flag}</div>`:"")+`<div>${q?esc(q.q):""}</div>`;
+      (q&&q.cc?`<div class="bqflag"><img src="${flagUrl(q.cc)}" alt="Flagge" onerror="this.style.display='none'"/></div>`:"")+`<div>${q?esc(q.q):""}</div>`;
   }else bq.style.display="none";
   const btn=$("#buzzBtn"),info=$("#buzzInfo"),phase=state.buzz.phase;
   if(!state.open){btn.disabled=true;btn.textContent="…";info.textContent="Warte auf eine Frage…";return;}
@@ -604,11 +608,11 @@ function renderQEditor(){
     const box=document.createElement("div");box.className="q-edit";
     box.innerHTML=`<div class="qhead"><span>${val} Punkte</span><span>${state.used[r][ckey(cat.name,qi)]?"✓ gespielt":""}</span></div>
       <label>Frage</label><textarea>${esc(q.q)}</textarea>
-      ${q.flag!==undefined?`<label>Flagge (Emoji)</label><input class="flag" value="${esc(q.flag)}"/>`:""}
+      ${q.cc!==undefined?`<label>Ländercode (z.B. ch, de, fr)</label><input class="flag" value="${esc(q.cc)}"/>`:""}
       <label>Antwort</label><input class="ans" value="${esc(q.a)}"/>`;
     box.querySelector("textarea").oninput=e=>{q.q=e.target.value;};
     box.querySelector(".ans").oninput=e=>{q.a=e.target.value;};
-    const f=box.querySelector(".flag");if(f)f.oninput=e=>{q.flag=e.target.value;};
+    const f=box.querySelector(".flag");if(f)f.oninput=e=>{q.cc=e.target.value;};
     wrap.appendChild(box);
   });
   const note=document.createElement("div");note.className="hint";
