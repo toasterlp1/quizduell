@@ -207,7 +207,13 @@ body{
 <div id="toast"></div>
 <script>
 /* ===== FRAGEN-DATENBANK – hier eigene Fragen eintragen ===== */
-const FLAG_IMG = {};
+const FLAG_IMG = {
+  at: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGlkPSJmbGFnLWljb25zLWF0IiB2aWV3Qm94PSIwIDAgNjQwIDQ4MCI+CiAgPHBhdGggZmlsbD0iI2ZmZiIgZD0iTTAgMTYwaDY0MHYxNjBIMHoiLz4KICA8cGF0aCBmaWxsPSIjYzgxMDJlIiBkPSJNMCAwaDY0MHYxNjBIMHptMCAzMjBoNjQwdjE2MEgweiIvPgo8L3N2Zz4K",
+  it: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGlkPSJmbGFnLWljb25zLWl0IiB2aWV3Qm94PSIwIDAgNjQwIDQ4MCI+CiAgPGcgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2Utd2lkdGg9IjFwdCI+CiAgICA8cGF0aCBmaWxsPSIjZmZmIiBkPSJNMCAwaDY0MHY0ODBIMHoiLz4KICAgIDxwYXRoIGZpbGw9IiMwMDkyNDYiIGQ9Ik0wIDBoMjEzLjN2NDgwSDB6Ii8+CiAgICA8cGF0aCBmaWxsPSIjY2UyYjM3IiBkPSJNNDI2LjcgMEg2NDB2NDgwSDQyNi43eiIvPgogIDwvZz4KPC9zdmc+Cg==",
+  gr: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGlkPSJmbGFnLWljb25zLWdyIiB2aWV3Qm94PSIwIDAgNjQwIDQ4MCI+CiAgPHBhdGggZmlsbD0iIzBkNWVhZiIgZmlsbC1ydWxlPSJldmVub2RkIiBkPSJNMCAwaDY0MHY1My4zSDB6Ii8+CiAgPHBhdGggZmlsbD0iI2ZmZiIgZmlsbC1ydWxlPSJldmVub2RkIiBkPSJNMCA1My4zaDY0MHY1My40SDB6Ii8+CiAgPHBhdGggZmlsbD0iIzBkNWVhZiIgZmlsbC1ydWxlPSJldmVub2RkIiBkPSJNMCAxMDYuN2g2NDBWMTYwSDB6Ii8+CiAgPHBhdGggZmlsbD0iI2ZmZiIgZmlsbC1ydWxlPSJldmVub2RkIiBkPSJNMCAxNjBoNjQwdjUzLjNIMHoiLz4KICA8cGF0aCBmaWxsPSIjMGQ1ZWFmIiBkPSJNMCAwaDI2Ni43djI2Ni43SDB6Ii8+CiAgPHBhdGggZmlsbD0iIzBkNWVhZiIgZmlsbC1ydWxlPSJldmVub2RkIiBkPSJNMCAyMTMuM2g2NDB2NTMuNEgweiIvPgogIDxwYXRoIGZpbGw9IiNmZmYiIGZpbGwtcnVsZT0iZXZlbm9kZCIgZD0iTTAgMjY2LjdoNjQwVjMyMEgweiIvPgogIDxwYXRoIGZpbGw9IiMwZDVlYWYiIGZpbGwtcnVsZT0iZXZlbm9kZCIgZD0iTTAgMzIwaDY0MHY1My4zSDB6Ii8+CiAgPHBhdGggZmlsbD0iI2ZmZiIgZmlsbC1ydWxlPSJldmVub2RkIiBkPSJNMCAzNzMuM2g2NDB2NTMuNEgweiIvPgogIDxnIGZpbGw9IiNmZmYiIGZpbGwtcnVsZT0iZXZlbm9kZCIgc3Ryb2tlLXdpZHRoPSIxLjMiPgogICAgPHBhdGggZD0iTTEwNi43IDBIMTYwdjI2Ni43aC01My4zeiIvPgogICAgPHBhdGggZD0iTTAgMTA2LjdoMjY2LjdWMTYwSDB6Ii8+CiAgPC9nPgogIDxwYXRoIGZpbGw9IiMwZDVlYWYiIGQ9Ik0wIDQyNi43aDY0MFY0ODBIMHoiLz4KPC9zdmc+Cg==",
+  be: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGlkPSJmbGFnLWljb25zLWJlIiB2aWV3Qm94PSIwIDAgNjQwIDQ4MCI+CiAgPGcgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2Utd2lkdGg9IjFwdCI+CiAgICA8cGF0aCBmaWxsPSIjMDAwMDAxIiBkPSJNMCAwaDIxMy4zdjQ4MEgweiIvPgogICAgPHBhdGggZmlsbD0iI2ZmZDkwYyIgZD0iTTIxMy4zIDBoMjEzLjR2NDgwSDIxMy4zeiIvPgogICAgPHBhdGggZmlsbD0iI2YzMTgzMCIgZD0iTTQyNi43IDBINjQwdjQ4MEg0MjYuN3oiLz4KICA8L2c+Cjwvc3ZnPgo=",
+  se: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGlkPSJmbGFnLWljb25zLXNlIiB2aWV3Qm94PSIwIDAgNjQwIDQ4MCI+CiAgPHBhdGggZmlsbD0iIzAwNTI5MyIgZD0iTTAgMGg2NDB2NDgwSDB6Ii8+CiAgPHBhdGggZmlsbD0iI2ZlY2IwMCIgZD0iTTE3NiAwdjE5Mkgwdjk2aDE3NnYxOTJoOTZWMjg4aDM2OHYtOTZIMjcyVjB6Ii8+Cjwvc3ZnPgo=",
+};
 
 const QUIZ_CONTENT = {
   round1: {
@@ -217,61 +223,61 @@ const QUIZ_CONTENT = {
       {
         name: "ZURÜCK IN DIE SCHULE",
         q: [
-          { q: "Wie viele Kontinente gibt es auf der Erde?", a: "7" },
-          { q: "Welches Gas atmen Menschen zum Leben ein?", a: "Sauerstoff" },
-          { q: "Wie nennt man das Skelett aussen am Körper, z.B. bei Insekten?", a: "Exoskelett" },
-          { q: "Welches chemische Element hat das Symbol H?", a: "Wasserstoff" },
-          { q: "Wie heisst der Winkel, der genau 90 Grad hat?", a: "Rechter Winkel" }
+          { q: "Wie viele Kantone hat die Schweiz?", a: "26" },
+          { q: "Welches Gas machen Pflanzen bei der Photosynthese?", a: "Sauerstoff" },
+          { q: "Wie heisst der längste Fluss Deutschlands, der komplett in Deutschland liegt?", a: "Die Weser (oder Main, je nach Zählung – Weser ist korrekt)" },
+          { q: "Welches chemische Element hat das Symbol Fe?", a: "Eisen" },
+          { q: "In welchem Jahr wurde die Schweizerische Eidgenossenschaft als Bundesstaat gegründet?", a: "1848" }
         ]
       },
       {
         name: "WER ODER WAS",
         q: [
-          { q: "Welches Tier wird oft 'König der Tiere' genannt?", a: "Der Löwe" },
-          { q: "Welcher Erfinder gilt als Pionier der Glühbirne?", a: "Thomas Edison" },
-          { q: "Wie heisst der grösste Planet, der kein Gasriese ist (also der grösste Gesteinsplanet)?", a: "Die Erde" },
-          { q: "Welche berühmte Krankenschwester gilt als Begründerin der modernen Krankenpflege?", a: "Florence Nightingale" },
-          { q: "Welcher Wissenschaftler entdeckte das Penicillin?", a: "Alexander Fleming" }
+          { q: "Welcher deutsche Dichter schrieb 'Faust'?", a: "Johann Wolfgang von Goethe" },
+          { q: "Wie heisst der höchste Berg der Schweiz?", a: "Dufourspitze" },
+          { q: "Welcher Physiker entwickelte in Bern die spezielle Relativitätstheorie?", a: "Albert Einstein" },
+          { q: "Welcher Schweizer erfand den Klettverschluss, inspiriert von Kletten im Hundefell?", a: "George de Mestral" },
+          { q: "Welcher deutsche Astronom formulierte die Gesetze der Planetenbewegung?", a: "Johannes Kepler" }
         ]
       },
       {
         name: "SERIEN & FILME",
         q: [
-          { q: "In welchem Film rettet ein Clownfisch-Vater seinen Sohn Nemo?", a: "Findet Nemo" },
-          { q: "In welcher Netflix-Serie spielen verschuldete Menschen tödliche Kinderspiele um Geld?", a: "Squid Game" },
-          { q: "Wie heisst der Zauberer-Lehrling mit der Blitznarbe auf der Stirn?", a: "Harry Potter" },
-          { q: "Welcher Film handelt von einem Traum-im-Traum-Konzept und hat einen sich drehenden Kreisel?", a: "Inception" },
-          { q: "In welcher Serie kämpfen Adlige im fiktiven Westeros um den Eisernen Thron?", a: "Game of Thrones" }
+          { q: "In welcher Serie dreht ein Chemielehrer Crystal Meth?", a: "Breaking Bad" },
+          { q: "Welcher deutsche Netflix-Hit dreht sich um eine Zeitreise im Ort Winden?", a: "Dark" },
+          { q: "Welcher Regisseur drehte 'Inglourious Basterds' und 'Django Unchained'?", a: "Quentin Tarantino" },
+          { q: "Wie heisst der österreichische Schauspieler, der den Terminator spielte und Gouverneur wurde?", a: "Arnold Schwarzenegger" },
+          { q: "Welcher Schweizer Schauspieler gewann zwei Oscars unter Tarantino?", a: "Christoph Waltz" }
         ]
       },
       {
         name: "MUSIK",
         q: [
-          { q: "Welcher kanadische Sänger hatte den Welthit 'Shape of You'? (Achtung Falle, er ist Brite)", a: "Ed Sheeran" },
-          { q: "Welche koreanische Boygroup wurde mit Hits wie 'Dynamite' weltberühmt?", a: "BTS" },
-          { q: "Wie nennt man eine Gruppe von vier Sängern oder Musikern?", a: "Quartett" },
-          { q: "Welcher King of Pop sang 'Thriller' und 'Billie Jean'?", a: "Michael Jackson" },
-          { q: "Welches Tasteninstrument wird mit Luft betrieben und steht oft in Kirchen?", a: "Die Orgel" }
+          { q: "Welche deutsche Band ist für 'Du Hast' und martialischen Rock bekannt?", a: "Rammstein" },
+          { q: "Welcher österreichische Sänger gewann 2014 mit 'Rise Like a Phoenix' den ESC?", a: "Conchita Wurst" },
+          { q: "Wie nennt man die tiefste Männergesangsstimme?", a: "Bass" },
+          { q: "Welcher Schweizer Eurodance-Star ist für Hits wie 'Chihuahua' und 'Somebody Dance with Me' bekannt?", a: "DJ Bobo" },
+          { q: "Welches Streichinstrument ist grösser als eine Geige, aber kleiner als ein Cello?", a: "Die Bratsche (Viola)" }
         ]
       },
       {
         name: "ESSEN & TRINKEN",
         q: [
-          { q: "Welches Tier liefert den Honig?", a: "Die Biene" },
-          { q: "Aus welchem Land kommt der Döner Kebab in seiner heutigen Form?", a: "Deutschland (bzw. Türkei)" },
-          { q: "Welche Pasta-Sorte ist röhrenförmig und wird oft überbacken?", a: "Cannelloni (auch Penne/Maccheroni)" },
-          { q: "Welches Getränk entsteht durch das Rösten und Aufbrühen bestimmter Bohnen?", a: "Kaffee" },
-          { q: "Wie heisst die japanische Kunst, bei der man Fisch und Reis kunstvoll zu Häppchen formt?", a: "Sushi" }
+          { q: "Aus welchem Schweizer Kanton stammt das Raclette ursprünglich?", a: "Wallis" },
+          { q: "Wie heisst das geriebene Kartoffelgericht, das als Schweizer Nationalgericht gilt?", a: "Rösti" },
+          { q: "Welche Nuss steckt in einer original Zuger Kirschtorte nicht, aber in der Engadiner Nusstorte schon?", a: "Walnuss" },
+          { q: "Welches Gewürz ist pro Gramm das teuerste der Welt?", a: "Safran" },
+          { q: "Wie heisst der Edelschimmel, der Roquefort und Gorgonzola die blauen Adern gibt?", a: "Penicillium" }
         ]
       },
       {
-        name: "BRANDS",
+        name: "GAME FACTS",
         q: [
-          { q: "Welcher Streamingdienst hat ein rotes 'N' als Logo?", a: "Netflix" },
-          { q: "Welche Automarke baut den Modellnamen 'Mustang'?", a: "Ford" },
-          { q: "Welcher Energydrink wirbt mit dem Spruch 'verleiht Flügel'?", a: "Red Bull" },
-          { q: "Welche Marke hat ein Krokodil als Logo auf ihren Polo-Shirts?", a: "Lacoste" },
-          { q: "Welcher Konzern besitzt die Marken Snickers, M&M's und Whiskas?", a: "Mars" }
+          { q: "Wie heisst der Klempner, der Nintendos berühmtester Charakter ist?", a: "Mario" },
+          { q: "In welchem Spiel baut und zerstört man eine Welt aus Blöcken?", a: "Minecraft" },
+          { q: "Wie heisst die Spielkonsole von Sony?", a: "PlayStation" },
+          { q: "Welches Battle-Royale-Spiel mit Bauen wurde von Epic Games entwickelt?", a: "Fortnite" },
+          { q: "Wie heisst die Hauptfigur in der Zelda-Reihe, die meist das Schwert führt (nicht die Prinzessin)?", a: "Link" }
         ]
       }
     ]
@@ -283,61 +289,62 @@ const QUIZ_CONTENT = {
       {
         name: "HAUPTSTÄDTE",
         q: [
+          { q: "Wie heisst die Hauptstadt von Österreich?", a: "Wien" },
           { q: "Wie heisst die Hauptstadt von Portugal?", a: "Lissabon" },
-          { q: "Wie heisst die Hauptstadt von Griechenland?", a: "Athen" },
-          { q: "Wie heisst die Hauptstadt von Brasilien?", a: "Brasília" },
-          { q: "Wie heisst die Hauptstadt von Ägypten?", a: "Kairo" },
-          { q: "Wie heisst die Hauptstadt von Norwegen?", a: "Oslo" }
+          { q: "Wie heisst die Hauptstadt von Norwegen?", a: "Oslo" },
+          { q: "Wie heisst die Hauptstadt von Kroatien?", a: "Zagreb" },
+          { q: "Wie heisst die Hauptstadt von Slowenien?", a: "Ljubljana" }
         ]
       },
       {
         name: "ANIME",
         q: [
-          { q: "In welchem Anime bekämpft ein Junge mit einer Kettensäge im Körper Dämonen?", a: "Chainsaw Man" },
-          { q: "Wie heisst der Dämonenjäger mit der grün-schwarz karierten Jacke und der Narbe?", a: "Tanjiro (Demon Slayer)" },
-          { q: "In welchem Anime spielt ein Schüler ein Katz-und-Maus-Spiel mit einem Detektiv namens L?", a: "Death Note" },
-          { q: "Wie heisst der coole Schwertkämpfer mit drei Schwertern in One Piece?", a: "Zoro" },
-          { q: "Wie heisst die Energie, mit der Zauberer in Jujutsu Kaisen kämpfen?", a: "Fluchenergie (Cursed Energy)" }
+          { q: "In welchem Anime will ein Junge mit Strohhut König der Piraten werden?", a: "One Piece" },
+          { q: "Wie heisst Narutos meistgenutzte Technik (die Kopien von sich selbst)?", a: "Schattendoppelgänger" },
+          { q: "In welchem Anime kämpfen Menschen hinter Mauern gegen Titanen?", a: "Attack on Titan" },
+          { q: "Wie heisst der stärkste Lehrer mit verbundenen Augen in Jujutsu Kaisen?", a: "Gojo" },
+          { q: "Welches Studio steht hinter 'Chihiros Reise ins Zauberland'?", a: "Studio Ghibli" }
         ]
       },
       {
         name: "GEOGRAPHIE & HERKUNFT",
         q: [
-          { q: "Auf welchem Kontinent liegt Brasilien?", a: "Südamerika" },
-          { q: "Welcher Fluss fliesst durch Paris?", a: "Die Seine" },
-          { q: "Welches Land hat die Form eines Stiefels?", a: "Italien" },
-          { q: "Wie heisst der grösste See Afrikas?", a: "Viktoriasee" },
-          { q: "Welches Land ist sowohl in Europa als auch in Asien und hat Istanbul als grösste Stadt?", a: "Türkei" }
+          { q: "An welche Länder grenzt die Schweiz im Norden?", a: "Deutschland" },
+          { q: "Welcher ist der grösste See, der komplett in der Schweiz liegt?", a: "Neuenburgersee" },
+          { q: "Durch welche drei Länder fliesst der Rhein unter anderem (nenne eins ausser der Schweiz)?", a: "Deutschland / Niederlande / Frankreich" },
+          { q: "Wie heisst der höchste Berg Europas (ausserhalb des Kaukasus)?", a: "Mont Blanc" },
+          { q: "Welcher Schweizer Pass verbindet das Tessin mit der Innerschweiz und ist berühmt für seine Tunnel?", a: "Gotthard" }
         ]
       },
       {
-        name: "EREIGNISSE & GESCHICHTE",
+        name: "UMSCHREIBE-FILM",
         q: [
-          { q: "In welchem Land begann die industrielle Revolution?", a: "Grossbritannien (England)" },
-          { q: "Welcher Seefahrer umsegelte als Erster (mit seiner Crew) die Welt?", a: "Ferdinand Magellan" },
-          { q: "In welchem Jahr endete der Zweite Weltkrieg?", a: "1945" },
-          { q: "Welche ägyptische Königin war für ihre Beziehungen zu Caesar und Marcus Antonius bekannt?", a: "Kleopatra" },
-          { q: "Welches Schriftstück erklärte 1776 die Unabhängigkeit der USA?", a: "Unabhängigkeitserklärung" }
+          { q: "Schmuckstück nervt eine Wandergruppe extrem.", a: "Herr der Ringe" },
+          { q: "Junge merkt, dass er zaubern kann, und geht in ein Internat.", a: "Harry Potter" },
+          { q: "Reiche treffen Arme auf einem Boot, das nicht schwimmt.", a: "Titanic" },
+          { q: "Blauer Fischvater sucht seinen verlorenen Sohn quer durchs Meer.", a: "Findet Nemo" },
+          { q: "Mann träumt in Träumen in Träumen und verliert den Überblick.", a: "Inception" }
         ]
       },
       {
-        name: "TIERWELT",
+        name: "GAME",
+        img: true,
         q: [
-          { q: "Welcher Vogel kann nicht fliegen, aber sehr schnell laufen und ist der grösste Vogel der Welt?", a: "Der Strauss" },
-          { q: "Wie nennt man ein Tier, das nur Pflanzen frisst?", a: "Pflanzenfresser (Herbivore)" },
-          { q: "Welches Insekt kann das Vielfache seines eigenen Körpergewichts tragen?", a: "Die Ameise" },
-          { q: "Welches Tier wechselt seine Farbe, um sich der Umgebung anzupassen?", a: "Das Chamäleon" },
-          { q: "Wie heisst das einzige Säugetier ohne Magen, das stattdessen direkt verdaut (Schnabeltier-Verwandter)?", a: "Schnabeltier (Kloakentiere)" }
+          { q: "Aus welchem Spiel stammt dieser Screenshot?", img: "HIER_RAW_LINK_BILD3_OVERWATCH", a: "Overwatch 2" },
+          { q: "Aus welchem Spiel stammt dieser Screenshot?", img: "HIER_RAW_LINK_BILD2_VALORANT", a: "Valorant" },
+          { q: "Aus welchem Spiel stammt dieser Screenshot?", img: "HIER_RAW_LINK_BILD1_LOL", a: "League of Legends" },
+          { q: "Aus welchem Spiel stammt dieser Screenshot?", img: "HIER_RAW_LINK_BILD5_AEGYPTEN", a: "Assassin's Creed Origins" },
+          { q: "Aus welchem Spiel stammt dieser Screenshot?", img: "HIER_RAW_LINK_BILD4_SCHIFF", a: "Sea of Thieves" }
         ]
       },
       {
-        name: "ABKÜRZUNGEN",
+        name: "FLAGGEN EUROPA",
         q: [
-          { q: "Wofür steht 'DVD'?", a: "Digital Versatile Disc" },
-          { q: "Wofür steht 'PDF' beim Dateiformat?", a: "Portable Document Format" },
-          { q: "Wofür steht 'RAM' beim Computer?", a: "Random Access Memory" },
-          { q: "Wofür steht 'WHO' im Gesundheitsbereich?", a: "World Health Organization" },
-          { q: "Wofür steht 'RADAR'?", a: "Radio Detection and Ranging" }
+          { q: "Welches europäische Land hat diese Flagge?", cc: "at", a: "Österreich" },
+          { q: "Welches europäische Land hat diese Flagge?", cc: "it", a: "Italien" },
+          { q: "Welches europäische Land hat diese Flagge?", cc: "se", a: "Schweden" },
+          { q: "Welches europäische Land hat diese Flagge?", cc: "gr", a: "Griechenland" },
+          { q: "Welches europäische Land hat diese Flagge?", cc: "be", a: "Belgien" }
         ]
       }
     ]
@@ -475,7 +482,9 @@ function renderOverlay(){
   $("#ovCat").textContent=state.open.cat;
   $("#ovVal").textContent=val+" Punkte";
   const flagEl=$("#ovFlag");
-  if(q&&q.cc){flagEl.style.display="block";flagEl.innerHTML=`<img src="${flagUrl(q.cc)}" alt="Flagge" onerror="this.style.display='none'"/>`;}else{flagEl.style.display="none";flagEl.innerHTML="";}
+  if(q&&q.cc){flagEl.style.display="block";flagEl.innerHTML=`<img src="${flagUrl(q.cc)}" alt="Flagge" onerror="this.style.display='none'"/>`;}
+  else if(q&&q.img){flagEl.style.display="block";flagEl.innerHTML=`<img src="${esc(q.img)}" alt="Bild" onerror="this.style.display='none'"/>`;}
+  else{flagEl.style.display="none";flagEl.innerHTML="";}
   $("#ovText").textContent=q?q.q:"(keine Frage)";
   $("#ovAnswer").textContent="Antwort: "+(q?q.a:"—");
   if(revealed)$("#ovAnswer").classList.add("show");else $("#ovAnswer").classList.remove("show");
@@ -541,7 +550,7 @@ function renderBuzz(){
     const q=cat?cat.q[state.open.qi]:null;
     bq.style.display="block";
     bq.innerHTML=`<div class="bqcat">${esc(state.open.cat)} · ${rd.values[state.open.qi]}</div>`+
-      (q&&q.cc?`<div class="bqflag"><img src="${flagUrl(q.cc)}" alt="Flagge" onerror="this.style.display='none'"/></div>`:"")+`<div>${q?esc(q.q):""}</div>`;
+      (q&&q.cc?`<div class="bqflag"><img src="${flagUrl(q.cc)}" alt="Flagge" onerror="this.style.display='none'"/></div>`:(q&&q.img?`<div class="bqflag"><img src="${esc(q.img)}" alt="Bild" onerror="this.style.display='none'"/></div>`:""))+`<div>${q?esc(q.q):""}</div>`;
   }else bq.style.display="none";
   const btn=$("#buzzBtn"),info=$("#buzzInfo"),phase=state.buzz.phase;
   if(!state.open){btn.disabled=true;btn.textContent="…";info.textContent="Warte auf eine Frage…";return;}
@@ -611,10 +620,12 @@ function renderQEditor(){
     box.innerHTML=`<div class="qhead"><span>${val} Punkte</span><span>${state.used[r][ckey(cat.name,qi)]?"✓ gespielt":""}</span></div>
       <label>Frage</label><textarea>${esc(q.q)}</textarea>
       ${q.cc!==undefined?`<label>Ländercode (z.B. ch, de, fr)</label><input class="flag" value="${esc(q.cc)}"/>`:""}
+      ${q.img!==undefined?`<label>Bild-URL (Link zum Screenshot)</label><input class="imgurl" value="${esc(q.img)}" placeholder="https://..."/>`:""}
       <label>Antwort</label><input class="ans" value="${esc(q.a)}"/>`;
     box.querySelector("textarea").oninput=e=>{q.q=e.target.value;};
     box.querySelector(".ans").oninput=e=>{q.a=e.target.value;};
     const f=box.querySelector(".flag");if(f)f.oninput=e=>{q.cc=e.target.value;};
+    const im=box.querySelector(".imgurl");if(im)im.oninput=e=>{q.img=e.target.value;};
     wrap.appendChild(box);
   });
   const note=document.createElement("div");note.className="hint";
