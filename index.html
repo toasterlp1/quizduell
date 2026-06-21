@@ -234,199 +234,445 @@ const FLAG_IMG = {
 const POOL = [
   { name: "ALLGEMEINWISSEN", q: [
     { q: "Wie viele Kontinente gibt es?", a: "7" },
+    { q: "Welche Farbe entsteht aus Blau und Gelb?", a: "Grün" },
     { q: "Welches Element hat das Symbol O?", a: "Sauerstoff" },
-    { q: "Wie nennt man den Vorgang, bei dem ein Feststoff direkt zu Gas wird?", a: "Sublimation" },
-    { q: "Welches Teilchen im Atomkern ist elektrisch neutral?", a: "Neutron" },
-    { q: "Wie heisst die Zellteilung, bei der zwei identische Tochterzellen entstehen?", a: "Mitose" }
+    { q: "Wie viele Minuten hat ein Tag?", a: "1440" },
+    { q: "Wie nennt man den Übergang von fest zu gasförmig ohne flüssige Phase?", a: "Sublimation" },
+    { q: "Was misst man mit einem Barometer?", a: "Luftdruck" },
+    { q: "Welches Teilchen im Atomkern ist neutral?", a: "Neutron" },
+    { q: "Wie heisst die Zellteilung mit zwei identischen Tochterzellen?", a: "Mitose" },
+    { q: "Wie viele Grad hat ein Vollkreis?", a: "360" },
+    { q: "Welche Blutgruppe gilt als universeller Spender?", a: "0 negativ" },
+    { q: "Wie heisst der grösste Teil des menschlichen Gehirns?", a: "Grosshirn" },
+    { q: "Welches Metall ist bei Raumtemperatur flüssig?", a: "Quecksilber" },
+    { q: "Wie nennt man Tiere, die Pflanzen und Fleisch fressen?", a: "Allesfresser (Omnivoren)" },
+    { q: "Welche Einheit misst elektrischen Widerstand?", a: "Ohm" },
+    { q: "Wie heisst das Studienfeld der Lebewesen?", a: "Biologie" }
   ]},
   { name: "BERÜHMTE PERSONEN", q: [
     { q: "Wer malte die Mona Lisa?", a: "Leonardo da Vinci" },
+    { q: "Wer schrieb die Relativitätstheorie?", a: "Albert Einstein" },
+    { q: "Welcher Dichter schrieb 'Faust'?", a: "Goethe" },
+    { q: "Wer war der erste Mensch auf dem Mond?", a: "Neil Armstrong" },
     { q: "Welcher Mönch löste die Reformation aus?", a: "Martin Luther" },
     { q: "Welche Frau erhielt als Erste zwei Nobelpreise?", a: "Marie Curie" },
+    { q: "Welcher Maler schnitt sich ein Ohr ab?", a: "Vincent van Gogh" },
     { q: "Welcher Forscher stellte die Kontinentalverschiebung auf?", a: "Alfred Wegener" },
-    { q: "Welche Mathematikerin gilt als erste Programmiererin?", a: "Ada Lovelace" }
+    { q: "Welche Mathematikerin gilt als erste Programmiererin?", a: "Ada Lovelace" },
+    { q: "Welcher Grieche war der Lehrer Alexanders des Grossen?", a: "Aristoteles" },
+    { q: "Welcher Astronom formulierte die Planetengesetze?", a: "Johannes Kepler" },
+    { q: "Welcher österreichische Arzt begründete die Psychoanalyse?", a: "Sigmund Freud" },
+    { q: "Welcher Maler begründete mit Braque den Kubismus?", a: "Pablo Picasso" },
+    { q: "Welcher Physiker erhielt den Nobelpreis für den Fotoeffekt?", a: "Albert Einstein" },
+    { q: "Welche Pflegerin gilt als Begründerin der modernen Krankenpflege?", a: "Florence Nightingale" }
   ]},
   { name: "SERIEN & FILME", q: [
+    { q: "In welchem Film heisst es 'Möge die Macht mit dir sein'?", a: "Star Wars" },
     { q: "In welcher Serie dreht ein Chemielehrer Crystal Meth?", a: "Breaking Bad" },
-    { q: "Welcher deutsche Netflix-Hit spielt im Ort Winden?", a: "Dark" },
+    { q: "Welcher grüne Oger lebt in einem Sumpf?", a: "Shrek" },
+    { q: "Welche Serie spielt im Ort Winden mit Zeitreisen?", a: "Dark" },
     { q: "Welcher Regisseur drehte Pulp Fiction?", a: "Quentin Tarantino" },
+    { q: "Welcher Regisseur drehte Inception und Interstellar?", a: "Christopher Nolan" },
     { q: "Wie heisst der Bordcomputer-Schurke in '2001: Odyssee im Weltraum'?", a: "HAL 9000" },
-    { q: "Welcher Stummfilm-Klassiker von Fritz Lang aus 1927 zeigt eine düstere Zukunftsstadt?", a: "Metropolis" }
+    { q: "Welche Serie dreht sich um das Haus Targaryen und Drachen?", a: "Game of Thrones" },
+    { q: "Welcher japanische Regisseur drehte 'Die sieben Samurai'?", a: "Akira Kurosawa" },
+    { q: "Welcher Stummfilm von Fritz Lang zeigt eine düstere Zukunftsstadt?", a: "Metropolis" },
+    { q: "Welcher Film gewann 2019 als erster nicht-englischsprachiger den Oscar als bester Film?", a: "Parasite" },
+    { q: "In welcher Stadt spielt 'Peaky Blinders'?", a: "Birmingham" },
+    { q: "Welche Serie spielt auf einer Insel nach einem Flugzeugabsturz?", a: "Lost" },
+    { q: "Welcher Animationsfilm zeigt Gefühle als Figuren im Kopf eines Mädchens?", a: "Alles steht Kopf" },
+    { q: "Welcher Film mit DiCaprio brachte ihm seinen ersten Oscar?", a: "The Revenant" }
   ]},
   { name: "MUSIK", q: [
     { q: "Welche Band sang 'Bohemian Rhapsody'?", a: "Queen" },
     { q: "Welcher King of Pop sang 'Thriller'?", a: "Michael Jackson" },
-    { q: "Wie nennt man die tiefste Männergesangsstimme?", a: "Bass" },
-    { q: "Welcher taube Komponist schrieb die 9. Sinfonie?", a: "Ludwig van Beethoven" },
-    { q: "Welcher Komponist schrieb 'Der Ring des Nibelungen'?", a: "Richard Wagner" }
+    { q: "Wie viele Saiten hat eine normale Gitarre?", a: "6" },
+    { q: "Welche Band aus Liverpool prägte die 60er?", a: "The Beatles" },
+    { q: "Wie nennt man die tiefste Männerstimme?", a: "Bass" },
+    { q: "Welcher taube Komponist schrieb die 9. Sinfonie?", a: "Beethoven" },
+    { q: "Welches Instrument hat schwarze und weisse Tasten?", a: "Klavier" },
+    { q: "Aus welchem Land kommt Reggae?", a: "Jamaika" },
+    { q: "Welcher Komponist schrieb 'Die Zauberflöte'?", a: "Mozart" },
+    { q: "Welcher Komponist schuf 'Der Ring des Nibelungen'?", a: "Richard Wagner" },
+    { q: "Wie nennt man ein Musikstück für ein Soloinstrument und Orchester?", a: "Konzert" },
+    { q: "Welche Sängerin ist für 'Bad Guy' bekannt?", a: "Billie Eilish" },
+    { q: "Welches Tempo bedeutet 'sehr langsam'?", a: "Largo (auch Adagio)" },
+    { q: "Welcher Rapper veröffentlichte 'Astroworld'?", a: "Travis Scott" },
+    { q: "Wie heisst die höchste Frauensingstimme?", a: "Sopran" }
   ]},
   { name: "ESSEN & TRINKEN", q: [
     { q: "Aus welchem Land kommt die Pizza?", a: "Italien" },
+    { q: "Welche Frucht ist gelb und krumm?", a: "Banane" },
     { q: "Welche Frucht steckt in Guacamole?", a: "Avocado" },
-    { q: "Welches Gewürz ist pro Gramm am teuersten?", a: "Safran" },
-    { q: "Aus welcher Pflanzenfamilie stammt die Gewürzvanille?", a: "Orchidee" },
-    { q: "Welche Edelfäule veredelt Trauben für Sauternes-Wein?", a: "Botrytis" }
+    { q: "Welches Tier liefert Honig?", a: "Die Biene" },
+    { q: "Welches Gewürz ist am teuersten pro Gramm?", a: "Safran" },
+    { q: "Welches Getränk wird aus Kakaobohnen gemacht?", a: "Schokolade/Kakao" },
+    { q: "Aus welcher Pflanzenfamilie kommt die Gewürzvanille?", a: "Orchidee" },
+    { q: "Welcher Schimmel macht die blauen Adern in Roquefort?", a: "Penicillium" },
+    { q: "Welche Edelfäule veredelt Sauternes-Trauben?", a: "Botrytis" },
+    { q: "Welches Organ des Kugelfisches ist giftig?", a: "Leber" },
+    { q: "Wie heisst die japanische Grundbrühe aus Algen und Fisch?", a: "Dashi" },
+    { q: "Welcher Reis wird für Risotto verwendet?", a: "Arborio" },
+    { q: "Welches scharfe grüne Paste isst man zu Sushi?", a: "Wasabi" },
+    { q: "Aus welchem Getreide wird Bier hauptsächlich gebraut?", a: "Gerste" },
+    { q: "Welches Land erfand den Tee-Anbau?", a: "China" }
   ]},
   { name: "GEOGRAPHIE", q: [
     { q: "Welcher ist der grösste Ozean?", a: "Pazifik" },
+    { q: "In welchem Land steht der Eiffelturm?", a: "Frankreich" },
     { q: "In welchem Gebirge liegt der Everest?", a: "Himalaya" },
+    { q: "Welcher ist der längste Fluss Afrikas?", a: "Nil" },
     { q: "Welcher See ist der tiefste der Erde?", a: "Baikalsee" },
+    { q: "Welches Land hat die längste Küstenlinie?", a: "Kanada" },
     { q: "Welche Meerenge trennt Europa und Asien bei Istanbul?", a: "Bosporus" },
-    { q: "Welcher Fluss bildet einen Grossteil der Grenze USA–Mexiko?", a: "Rio Grande" }
+    { q: "Wie heisst die trockenste Wüste der Welt?", a: "Atacama" },
+    { q: "Welcher Fluss bildet einen Grossteil der Grenze USA–Mexiko?", a: "Rio Grande" },
+    { q: "Welches Land hat die meisten Zeitzonen?", a: "Frankreich" },
+    { q: "Auf welchem Kontinent liegt die Sahara?", a: "Afrika" },
+    { q: "Welches ist das grösste Land der Welt?", a: "Russland" },
+    { q: "Welcher Kanal verbindet Mittelmeer und Rotes Meer?", a: "Suezkanal" },
+    { q: "Wie heisst der höchste Wasserfall der Welt?", a: "Salto Ángel (Venezuela)" },
+    { q: "Welches Binnenmeer trocknete grösstenteils aus?", a: "Aralsee" }
   ]},
   { name: "HAUPTSTÄDTE", q: [
     { q: "Hauptstadt von Italien?", a: "Rom" },
+    { q: "Hauptstadt von Spanien?", a: "Madrid" },
+    { q: "Hauptstadt von Japan?", a: "Tokio" },
     { q: "Hauptstadt von Kanada?", a: "Ottawa" },
     { q: "Hauptstadt von Australien?", a: "Canberra" },
+    { q: "Hauptstadt von Portugal?", a: "Lissabon" },
+    { q: "Hauptstadt von Norwegen?", a: "Oslo" },
+    { q: "Hauptstadt von Kroatien?", a: "Zagreb" },
     { q: "Hauptstadt von Kasachstan?", a: "Astana" },
-    { q: "Hauptstadt von Bhutan?", a: "Thimphu" }
+    { q: "Hauptstadt von Marokko?", a: "Rabat" },
+    { q: "Hauptstadt von Neuseeland?", a: "Wellington" },
+    { q: "Hauptstadt von Slowenien?", a: "Ljubljana" },
+    { q: "Hauptstadt von Bhutan?", a: "Thimphu" },
+    { q: "Hauptstadt von Mongolei?", a: "Ulaanbaatar" },
+    { q: "Hauptstadt von Mauretanien?", a: "Nouakchott" }
   ]},
   { name: "ANIME", q: [
-    { q: "In welchem Anime will ein Junge mit Strohhut König der Piraten werden?", a: "One Piece" },
-    { q: "Wie heisst Narutos Technik mit den Kopien von sich?", a: "Schattendoppelgänger" },
-    { q: "In welchem Anime gilt das Prinzip des äquivalenten Tauschs?", a: "Fullmetal Alchemist" },
-    { q: "Wie heisst die gesteigerte Augenkraft von Itachi?", a: "Mangekyou Sharingan" },
-    { q: "Welcher 90er-Klassiker handelt von Mechs namens Evas gegen Engel?", a: "Neon Genesis Evangelion" }
+    { q: "In welchem Anime will ein Junge mit Strohhut Piratenkönig werden?", a: "One Piece" },
+    { q: "Wie heisst der gelbe Elektro-Pokémon von Ash?", a: "Pikachu" },
+    { q: "Wie heisst Narutos Technik mit Kopien von sich?", a: "Schattendoppelgänger" },
+    { q: "In welchem Anime kämpfen Menschen gegen Titanen?", a: "Attack on Titan" },
+    { q: "Welches Studio machte 'Chihiros Reise'?", a: "Studio Ghibli" },
+    { q: "In welchem Anime gilt der äquivalente Tausch?", a: "Fullmetal Alchemist" },
+    { q: "Wie heisst der stärkste Lehrer mit verbundenen Augen in JJK?", a: "Gojo" },
+    { q: "In welchem Anime tötet ein Notizbuch?", a: "Death Note" },
+    { q: "Wie heisst Itachis gesteigerte Augenkraft?", a: "Mangekyou Sharingan" },
+    { q: "Welcher Klassiker handelt von Mechs namens Evas?", a: "Neon Genesis Evangelion" },
+    { q: "In welchem Anime werden Kinder an Dämonen verfüttert?", a: "The Promised Neverland" },
+    { q: "Wie heisst der Schwertkämpfer mit drei Schwertern in One Piece?", a: "Zoro" },
+    { q: "Welcher Mangaka schuf Dragon Ball?", a: "Akira Toriyama" },
+    { q: "Wie heisst Tanjiros Schwester, die zum Dämon wurde?", a: "Nezuko" },
+    { q: "Welcher Sport-Anime dreht sich um Volleyball?", a: "Haikyuu" }
   ]},
   { name: "GAME FACTS", q: [
     { q: "Welche Firma machte Mario und Zelda?", a: "Nintendo" },
-    { q: "Welches Klötzchen-Spiel ist das meistverkaufte aller Zeiten?", a: "Minecraft" },
-    { q: "Welches Battle-Royale mit Bauen stammt von Epic Games?", a: "Fortnite" },
+    { q: "In welchem Spiel baut man aus Blöcken?", a: "Minecraft" },
+    { q: "Wie heisst Sonys Konsole?", a: "PlayStation" },
+    { q: "In welchem Spiel fängt man Kreaturen in Bällen?", a: "Pokémon" },
+    { q: "Welches Battle-Royale mit Bauen stammt von Epic?", a: "Fortnite" },
+    { q: "Wie heisst der grüne Held in Zelda?", a: "Link" },
     { q: "Welches Studio machte Dark Souls und Elden Ring?", a: "FromSoftware" },
-    { q: "Welche Firma steht hinter der Plattform Steam?", a: "Valve" }
+    { q: "Welche Firma steht hinter Steam?", a: "Valve" },
+    { q: "In welchem Spiel managt man eine Familie und ihr Haus?", a: "Die Sims" },
+    { q: "Welches Open-World-Spiel spielt in Los Santos?", a: "GTA V" },
+    { q: "Welches Studio machte 'The Witcher 3'?", a: "CD Projekt Red" },
+    { q: "Welches meistverkaufte Game wurde 2009 von Mojang gestartet?", a: "Minecraft" },
+    { q: "In welchem Jahr erschien das erste Super Mario Bros.?", a: "1985" },
+    { q: "Wie heisst die rosa Kugel, die alles einsaugt, von Nintendo?", a: "Kirby" },
+    { q: "Welche Firma entwickelte Counter-Strike und Half-Life?", a: "Valve" }
   ]},
   { name: "UMSCHREIBE-FILM", q: [
     { q: "Schmuckstück nervt eine Wandergruppe extrem.", a: "Herr der Ringe" },
     { q: "Junge merkt, dass er zaubern kann, und geht ins Internat.", a: "Harry Potter" },
+    { q: "Reiche und Arme auf einem Boot, das nicht schwimmt.", a: "Titanic" },
+    { q: "Blauer Fischvater sucht seinen verlorenen Sohn.", a: "Findet Nemo" },
     { q: "Kreisel dreht sich, keiner weiss ob er träumt.", a: "Inception" },
-    { q: "Buchhalter wäscht im Knast Geld und gräbt einen Fluchttunnel.", a: "Die Verurteilten" },
-    { q: "Zwei Männer gründen einen geheimen Prügelclub.", a: "Fight Club" }
+    { q: "Buchhalter wäscht im Knast Geld und gräbt einen Tunnel.", a: "Die Verurteilten" },
+    { q: "Zwei Männer gründen einen geheimen Prügelclub.", a: "Fight Club" },
+    { q: "Mann lebt rückwärts und altert vom Greis zum Baby.", a: "Benjamin Button" },
+    { q: "Tänzerin verliert beim Streben nach Perfektion den Verstand.", a: "Black Swan" },
+    { q: "Spielzeug wird lebendig, wenn keiner hinschaut.", a: "Toy Story" },
+    { q: "Mann mit niedrigem IQ erlebt zufällig die ganze US-Geschichte.", a: "Forrest Gump" },
+    { q: "Clownmaske, Tanz auf der Treppe, alles eskaliert.", a: "Joker" },
+    { q: "Roboter räumt allein eine vermüllte Erde auf.", a: "WALL-E" },
+    { q: "Hobbit und Gefährten reisen, um einen Drachen zu besiegen.", a: "Der Hobbit" },
+    { q: "Dino-Park geht spektakulär schief.", a: "Jurassic Park" }
   ]},
   { name: "SPORT", q: [
-    { q: "Wie viele Spieler hat eine Fussballmannschaft auf dem Feld?", a: "11" },
-    { q: "In welchem Sport gibt es einen 'Slam Dunk'?", a: "Basketball" },
-    { q: "Wie oft finden die Olympischen Sommerspiele statt (in Jahren)?", a: "Alle 4 Jahre" },
-    { q: "Welcher Schwimmer gewann die meisten olympischen Goldmedaillen aller Zeiten?", a: "Michael Phelps" },
-    { q: "In welchem Land wurde die Sportart Curling erfunden?", a: "Schottland" }
+    { q: "Wie viele Spieler hat ein Fussballteam auf dem Feld?", a: "11" },
+    { q: "In welchem Sport gibt es einen Slam Dunk?", a: "Basketball" },
+    { q: "Wie oft sind Sommerolympiade?", a: "Alle 4 Jahre" },
+    { q: "Wie viele Ringe hat das Olympia-Symbol?", a: "5" },
+    { q: "Welcher Schwimmer hat die meisten Olympia-Goldmedaillen?", a: "Michael Phelps" },
+    { q: "In welchem Land wurde Curling erfunden?", a: "Schottland" },
+    { q: "Wie viele Punkte ist ein Touchdown wert?", a: "6" },
+    { q: "In welcher Sportart gibt es Love, Deuce und Ass?", a: "Tennis" },
+    { q: "Welches Land gewann die erste Fussball-WM 1930?", a: "Uruguay" },
+    { q: "Wie lang ist ein Marathon ungefähr?", a: "42 km" },
+    { q: "In welchem Sport nutzt man einen Puck?", a: "Eishockey" },
+    { q: "Welcher Boxer nannte sich 'The Greatest'?", a: "Muhammad Ali" },
+    { q: "Wie viele Löcher hat eine normale Golfrunde?", a: "18" },
+    { q: "In welcher Stadt fanden die Olympischen Spiele 2021 statt?", a: "Tokio" },
+    { q: "Welche Rennserie ist die Königsklasse des Motorsports?", a: "Formel 1" }
   ]},
   { name: "TIERWELT", q: [
     { q: "Welches ist das grösste Tier der Welt?", a: "Blauwal" },
+    { q: "Welches Tier ist das schnellste an Land?", a: "Gepard" },
+    { q: "Wie nennt man ein Baby-Hund?", a: "Welpe" },
+    { q: "Wie viele Beine hat eine Spinne?", a: "8" },
     { q: "Wie viele Herzen hat ein Oktopus?", a: "3" },
     { q: "Welches Säugetier kann aktiv fliegen?", a: "Fledermaus" },
-    { q: "Welches Tier hat den grössten Anteil an REM-Schlaf und schläft mit einer Gehirnhälfte?", a: "Delfin" },
-    { q: "Welche Quallenart gilt als biologisch potenziell unsterblich?", a: "Turritopsis dohrnii" }
+    { q: "Welches Tier wechselt die Farbe zur Tarnung?", a: "Chamäleon" },
+    { q: "Welcher Vogel ist der grösste und kann nicht fliegen?", a: "Strauss" },
+    { q: "Welches Säugetier legt Eier und hat einen Entenschnabel?", a: "Schnabeltier" },
+    { q: "Welches Tier hat das grösste Gehirn?", a: "Pottwal" },
+    { q: "Welche Quallenart gilt als potenziell unsterblich?", a: "Turritopsis dohrnii" },
+    { q: "Wie nennt man eine Gruppe von Löwen?", a: "Rudel" },
+    { q: "Welches Insekt produziert Seide?", a: "Seidenraupe" },
+    { q: "Welches Tier kann seinen Schwanz nachwachsen lassen?", a: "Eidechse/Gecko" },
+    { q: "Welches ist das giftigste Tier der Welt?", a: "Seewespe (Würfelqualle)" }
   ]},
   { name: "WELTRAUM", q: [
     { q: "Welcher Planet ist der Sonne am nächsten?", a: "Merkur" },
+    { q: "Welcher Planet ist der grösste?", a: "Jupiter" },
     { q: "Wie heisst unsere Galaxie?", a: "Milchstrasse" },
+    { q: "Welcher Planet ist der rote Planet?", a: "Mars" },
     { q: "Welcher Planet hat die auffälligsten Ringe?", a: "Saturn" },
-    { q: "Wie heisst der grösste Vulkan im Sonnensystem (auf dem Mars)?", a: "Olympus Mons" },
-    { q: "Wie nennt man einen Stern, der am Ende seines Lebens explodiert?", a: "Supernova" }
+    { q: "Wie heisst der Erdtrabant?", a: "Der Mond" },
+    { q: "Wie heisst der grösste Vulkan im Sonnensystem?", a: "Olympus Mons" },
+    { q: "Wie nennt man einen explodierenden Stern?", a: "Supernova" },
+    { q: "Wie viele Planeten hat unser Sonnensystem?", a: "8" },
+    { q: "Wie heisst das Schwarze Loch im Zentrum unserer Galaxie?", a: "Sagittarius A*" },
+    { q: "Welche Sonde verliess als erste das Sonnensystem?", a: "Voyager 1" },
+    { q: "Wie heisst der Zwergplanet, der früher 9. Planet war?", a: "Pluto" },
+    { q: "Was misst ein Lichtjahr?", a: "Entfernung" },
+    { q: "Wie heisst das Teleskop, das 2021 startete?", a: "James-Webb-Teleskop" },
+    { q: "Wie nennt man den Punkt, ab dem nichts dem Schwarzen Loch entkommt?", a: "Ereignishorizont" }
   ]},
   { name: "GESCHICHTE", q: [
     { q: "In welchem Jahr fiel die Berliner Mauer?", a: "1989" },
     { q: "Wer war der erste Mensch auf dem Mond?", a: "Neil Armstrong" },
-    { q: "Welche Seuche tötete im 14. Jh. ein Drittel Europas?", a: "Die Pest (Schwarzer Tod)" },
+    { q: "Welches Schiff sank 1912 nach Eisberg-Kollision?", a: "Titanic" },
+    { q: "In welchem Jahr begann der Zweite Weltkrieg?", a: "1939" },
+    { q: "Welche Seuche tötete im 14. Jh. ein Drittel Europas?", a: "Die Pest" },
+    { q: "Welcher Feldherr überschritt mit 'Der Würfel ist gefallen' den Rubikon?", a: "Julius Caesar" },
+    { q: "Welcher Seefahrer entdeckte 1492 Amerika für Europa?", a: "Christoph Kolumbus" },
     { q: "Welcher Friedensvertrag beendete 1648 den Dreissigjährigen Krieg?", a: "Westfälischer Friede" },
-    { q: "Welche Königin regierte Grossbritannien über 70 Jahre und starb 2022?", a: "Elizabeth II." }
+    { q: "Welche Königin Englands regierte über 70 Jahre und starb 2022?", a: "Elizabeth II." },
+    { q: "Welche ägyptische Königin liebte Caesar und Antonius?", a: "Kleopatra" },
+    { q: "Welches Dokument erklärte 1776 die US-Unabhängigkeit?", a: "Unabhängigkeitserklärung" },
+    { q: "Wer umsegelte als Erster mit seiner Crew die Welt?", a: "Ferdinand Magellan" },
+    { q: "In welchem Land begann die Industrielle Revolution?", a: "England" },
+    { q: "Welcher Umsturz beendete 1917 das russische Zarenreich?", a: "Russische Revolution" },
+    { q: "In welchem Jahr endete der Zweite Weltkrieg?", a: "1945" }
   ]},
   { name: "TECHNIK & INTERNET", q: [
     { q: "Wofür steht 'WWW'?", a: "World Wide Web" },
     { q: "Welche Firma entwickelte das iPhone?", a: "Apple" },
-    { q: "Wofür steht 'RAM' beim Computer?", a: "Random Access Memory" },
+    { q: "Wofür steht 'PC'?", a: "Personal Computer" },
+    { q: "Wofür steht 'RAM'?", a: "Random Access Memory" },
+    { q: "Wofür steht 'USB'?", a: "Universal Serial Bus" },
     { q: "Wer gilt als Erfinder des World Wide Web?", a: "Tim Berners-Lee" },
-    { q: "Wofür steht die Abkürzung 'HTTP'?", a: "Hypertext Transfer Protocol" }
-  ]},
-  { name: "SPRACHEN", q: [
-    { q: "In welchem Land spricht man Portugiesisch in Südamerika?", a: "Brasilien" },
-    { q: "Wie sagt man 'Danke' auf Französisch?", a: "Merci" },
-    { q: "Welche Sprache hat weltweit die meisten Muttersprachler?", a: "Chinesisch (Mandarin)" },
-    { q: "Aus welcher Sprache stammt das Wort 'Kindergarten', das auch im Englischen genutzt wird?", a: "Deutsch" },
-    { q: "Welches Alphabet nutzt man in Russland?", a: "Kyrillisch" }
+    { q: "Wofür steht 'HTTP'?", a: "Hypertext Transfer Protocol" },
+    { q: "Welches Unternehmen besitzt Android?", a: "Google" },
+    { q: "Wofür steht 'CPU'?", a: "Central Processing Unit" },
+    { q: "Wofür steht 'GIF' beim Bildformat?", a: "Graphics Interchange Format" },
+    { q: "Welche Firma machte Windows?", a: "Microsoft" },
+    { q: "Wofür steht 'KI' / 'AI'?", a: "Künstliche Intelligenz" },
+    { q: "Wofür steht 'URL'?", a: "Uniform Resource Locator" },
+    { q: "Welche Programmiersprache ist nach einer Schlange benannt?", a: "Python" },
+    { q: "Wofür steht 'VPN'?", a: "Virtual Private Network" }
   ]},
   { name: "KÖRPER & MEDIZIN", q: [
-    { q: "Welches Organ pumpt das Blut durch den Körper?", a: "Das Herz" },
-    { q: "Wie viele Knochen hat ein erwachsener Mensch ungefähr?", a: "206" },
+    { q: "Welches Organ pumpt das Blut?", a: "Das Herz" },
+    { q: "Wie viele Knochen hat ein Erwachsener etwa?", a: "206" },
     { q: "Welches Organ produziert Insulin?", a: "Bauchspeicheldrüse" },
-    { q: "Wie heisst der rote Blutfarbstoff, der Sauerstoff transportiert?", a: "Hämoglobin" },
-    { q: "Wie heisst der längste Nerv im menschlichen Körper?", a: "Ischiasnerv" }
+    { q: "Welches ist das grösste Organ des Menschen?", a: "Die Haut" },
+    { q: "Wie heisst der rote Blutfarbstoff?", a: "Hämoglobin" },
+    { q: "Wie heisst der längste Nerv im Körper?", a: "Ischiasnerv" },
+    { q: "Wie viele Kammern hat das Herz?", a: "4" },
+    { q: "Welches Vitamin bildet die Haut bei Sonnenlicht?", a: "Vitamin D" },
+    { q: "Wie heisst der grösste Muskel des Körpers?", a: "Gluteus maximus (Gesäss)" },
+    { q: "Welches Organ filtert das Blut und produziert Urin?", a: "Die Niere" },
+    { q: "Wie nennt man die roten Blutkörperchen fachlich?", a: "Erythrozyten" },
+    { q: "Welcher Teil des Gehirns steuert das Gleichgewicht?", a: "Kleinhirn" },
+    { q: "Wie viele Zähne hat ein erwachsener Mensch (mit Weisheitszähnen)?", a: "32" },
+    { q: "Welches Organ speichert Galle?", a: "Die Gallenblase" },
+    { q: "Wie heisst die Flüssigkeit, die das Gehirn umgibt?", a: "Hirnwasser (Liquor)" }
   ]},
   { name: "KUNST & LITERATUR", q: [
-    { q: "Wer schrieb 'Romeo und Julia'?", a: "William Shakespeare" },
+    { q: "Wer schrieb 'Romeo und Julia'?", a: "Shakespeare" },
     { q: "Wer malte die 'Sternennacht'?", a: "Vincent van Gogh" },
-    { q: "Welcher deutsche Dichter schrieb 'Faust'?", a: "Goethe" },
-    { q: "Welcher Maler gilt als Begründer des Kubismus (zusammen mit Braque)?", a: "Pablo Picasso" },
-    { q: "Welcher russische Autor schrieb 'Schuld und Sühne'?", a: "Fjodor Dostojewski" }
+    { q: "Welcher Dichter schrieb 'Faust'?", a: "Goethe" },
+    { q: "Wer malte die Mona Lisa?", a: "Leonardo da Vinci" },
+    { q: "Welcher Maler begründete mit Braque den Kubismus?", a: "Picasso" },
+    { q: "Welcher russische Autor schrieb 'Schuld und Sühne'?", a: "Dostojewski" },
+    { q: "Wer schrieb 'Die Verwandlung' über einen Mann als Käfer?", a: "Franz Kafka" },
+    { q: "Welcher Maler ist für schmelzende Uhren bekannt?", a: "Salvador Dalí" },
+    { q: "Wer schrieb das Epos 'Die Odyssee'?", a: "Homer" },
+    { q: "Welche Kunstrichtung gründete Andy Warhol mit?", a: "Pop Art" },
+    { q: "Wer schrieb '1984'?", a: "George Orwell" },
+    { q: "Welcher Bildhauer schuf den 'David' aus Marmor?", a: "Michelangelo" },
+    { q: "Wer schrieb die Märchen mit seinem Bruder, z.B. Hänsel und Gretel?", a: "Brüder Grimm" },
+    { q: "Welcher Maler malte 'Der Schrei'?", a: "Edvard Munch" },
+    { q: "Wer schrieb 'Der alte Mann und das Meer'?", a: "Ernest Hemingway" }
   ]},
   { name: "MARKEN & LOGOS", q: [
     { q: "Welche Marke wirbt mit 'Just Do It'?", a: "Nike" },
+    { q: "Welche Fast-Food-Kette hat goldene Bögen?", a: "McDonald's" },
+    { q: "Welche Marke hat einen angebissenen Apfel?", a: "Apple" },
     { q: "Welche Automarke hat vier Ringe?", a: "Audi" },
+    { q: "Welcher Energydrink 'verleiht Flügel'?", a: "Red Bull" },
     { q: "Welcher Konzern besitzt Instagram und WhatsApp?", a: "Meta" },
-    { q: "Welche Firma heisst übersetzt 'drei Sterne' und kommt aus Korea?", a: "Samsung" },
-    { q: "Welcher Konzern besitzt Gucci, Saint Laurent und Balenciaga?", a: "Kering" }
+    { q: "Welche Marke hat ein Krokodil als Logo?", a: "Lacoste" },
+    { q: "Welcher Streamingdienst hat ein rotes N?", a: "Netflix" },
+    { q: "Welche Firma heisst 'drei Sterne' und kommt aus Korea?", a: "Samsung" },
+    { q: "Welcher Konzern besitzt Snickers und M&M's?", a: "Mars" },
+    { q: "Welcher Konzern besitzt Gucci und Balenciaga?", a: "Kering" },
+    { q: "Welcher Konzern besitzt Louis Vuitton und Dior?", a: "LVMH" },
+    { q: "Welche Automarke baut den '911'?", a: "Porsche" },
+    { q: "Welcher Konzern besitzt Nescafé und KitKat?", a: "Nestlé" },
+    { q: "Welche Modemarke hat einen Medusen-Kopf?", a: "Versace" }
   ]},
   { name: "MYTHOLOGIE", q: [
     { q: "Wer ist der griechische Göttervater?", a: "Zeus" },
     { q: "Welcher nordische Gott schwingt einen Hammer?", a: "Thor" },
-    { q: "Wie heisst der griechische Gott des Meeres?", a: "Poseidon" },
-    { q: "Welches Wesen der griechischen Sage hat Schlangen statt Haaren?", a: "Medusa" },
-    { q: "Wie heisst der Fährmann, der in der griechischen Mythologie Tote über den Fluss bringt?", a: "Charon" }
+    { q: "Wer ist der griechische Gott des Meeres?", a: "Poseidon" },
+    { q: "Welches Wesen hat Schlangen statt Haaren?", a: "Medusa" },
+    { q: "Wie heisst der einäugige nordische Hauptgott?", a: "Odin" },
+    { q: "Wie heisst der Fährmann der Toten in der Unterwelt?", a: "Charon" },
+    { q: "Welcher Held tötete den Minotaurus?", a: "Theseus" },
+    { q: "Wie heisst der dreiköpfige Höllenhund der Griechen?", a: "Zerberus (Kerberos)" },
+    { q: "Welcher Titan trägt das Himmelsgewölbe?", a: "Atlas" },
+    { q: "Wie heisst die ägyptische Göttin der Magie und Mutterschaft?", a: "Isis" },
+    { q: "Welcher Gott der Liebe schiesst mit Pfeilen?", a: "Amor/Eros" },
+    { q: "Wie heisst der nordische Trickster-Gott?", a: "Loki" },
+    { q: "Welcher griechische Held hatte eine verwundbare Ferse?", a: "Achilles" },
+    { q: "Wie heisst das geflügelte Pferd der griechischen Sage?", a: "Pegasus" },
+    { q: "Wer öffnete in der Sage die Büchse mit allen Übeln?", a: "Pandora" }
   ]},
-  ,{ name: "NATUR & UMWELT", q: [
-    { q: "Welches Gas ist hauptverantwortlich für den Treibhauseffekt?", a: "Kohlenstoffdioxid (CO2)" },
-    { q: "Wie heisst die Schicht, die uns vor UV-Strahlung schützt?", a: "Ozonschicht" },
-    { q: "Welcher Baum kann am ältesten werden und steht für Langlebigkeit?", a: "Mammutbaum (auch Kiefer Methusalem)" },
-    { q: "Wie nennt man Gestein, das aus erkalteter Lava entsteht?", a: "Vulkanisches/Magmatisches Gestein" },
-    { q: "Wie heisst das Phänomen, bei dem Meeresströmungen das Klima Europas mild halten?", a: "Golfstrom" }
+  { name: "NATUR & UMWELT", q: [
+    { q: "Welches Gas verstärkt den Treibhauseffekt am meisten?", a: "CO2" },
+    { q: "Wie heisst die Schicht, die vor UV-Strahlung schützt?", a: "Ozonschicht" },
+    { q: "Wie nennt man erstarrte Lava als Gestein?", a: "Vulkangestein" },
+    { q: "Welche Meeresströmung hält Europas Klima mild?", a: "Golfstrom" },
+    { q: "Wie heisst der grösste Regenwald der Welt?", a: "Amazonas" },
+    { q: "Wie nennt man den Kreislauf von Verdunstung und Regen?", a: "Wasserkreislauf" },
+    { q: "Welcher Baum kann tausende Jahre alt werden?", a: "Mammutbaum" },
+    { q: "Wie nennt man das Aussterben durch Menschenhand verursacht?", a: "Artensterben" },
+    { q: "Wie heisst das grösste Korallenriff der Welt?", a: "Great Barrier Reef" },
+    { q: "Welches Wetterphänomen erwärmt periodisch den Pazifik?", a: "El Niño" },
+    { q: "Wie nennt man Energie aus Sonne, Wind und Wasser?", a: "Erneuerbare Energie" },
+    { q: "Welches Tier gilt als Bioindikator für sauberes Wasser?", a: "Bachflohkrebs (auch Steinfliege)" },
+    { q: "Wie heisst der Vorgang, bei dem Gletscher schmelzen?", a: "Abschmelzen (Gletscherschmelze)" },
+    { q: "Welches Gas macht den grössten Teil der Luft aus?", a: "Stickstoff" },
+    { q: "Wie nennt man sauren Regen verursachende Gase grob?", a: "Schwefel- und Stickoxide" }
   ]},
   { name: "ERFINDUNGEN", q: [
-    { q: "Wer erfand die Glühbirne in marktreifer Form?", a: "Thomas Edison" },
-    { q: "Welches Verkehrsmittel erfand Carl Benz?", a: "Das Automobil" },
-    { q: "Wer erfand den Buchdruck mit beweglichen Lettern in Europa?", a: "Johannes Gutenberg" },
+    { q: "Wer erfand die marktreife Glühbirne?", a: "Thomas Edison" },
+    { q: "Wer baute das erste Automobil?", a: "Carl Benz" },
+    { q: "Wer erfand den Buchdruck in Europa?", a: "Johannes Gutenberg" },
     { q: "Wer meldete das Telefon zuerst zum Patent an?", a: "Alexander Graham Bell" },
-    { q: "Welches Material erfand Charles Goodyear durch Vulkanisation nutzbar?", a: "Gummi (Kautschuk)" }
+    { q: "Wer entwickelte die Dampfmaschine entscheidend weiter?", a: "James Watt" },
+    { q: "Wer erfand das Dynamit?", a: "Alfred Nobel" },
+    { q: "Welche Brüder erfanden das Flugzeug?", a: "Gebrüder Wright" },
+    { q: "Wer entdeckte das Penicillin?", a: "Alexander Fleming" },
+    { q: "Wer erfand das World Wide Web?", a: "Tim Berners-Lee" },
+    { q: "Wer baute den ersten programmierbaren Computer (Z3)?", a: "Konrad Zuse" },
+    { q: "Wer erfand die Druckerpresse mit beweglichen Lettern?", a: "Gutenberg" },
+    { q: "Welcher Italiener gilt als Funk-Pionier?", a: "Guglielmo Marconi" },
+    { q: "Wer entwickelte die Relativitätstheorie?", a: "Albert Einstein" },
+    { q: "Wer erfand die Glühlampe-Konkurrenz Wechselstrom-System?", a: "Nikola Tesla" },
+    { q: "Welches Material machte Goodyear durch Vulkanisation nutzbar?", a: "Gummi" }
   ]},
   { name: "MATHE & ZAHLEN", q: [
     { q: "Was ergibt 12 mal 12?", a: "144" },
-    { q: "Wie nennt man eine Zahl, die nur durch 1 und sich selbst teilbar ist?", a: "Primzahl" },
-    { q: "Wie heisst die Kreiszahl, die ungefähr 3,14 ist?", a: "Pi" },
+    { q: "Wie viel ist die Hälfte von 50?", a: "25" },
+    { q: "Wie nennt man eine Zahl, nur durch 1 und sich selbst teilbar?", a: "Primzahl" },
+    { q: "Wie heisst die Kreiszahl ~3,14?", a: "Pi" },
     { q: "Wie nennt man das Ergebnis einer Multiplikation?", a: "Produkt" },
-    { q: "Wie heisst die Zahlenfolge, bei der jede Zahl die Summe der zwei vorherigen ist?", a: "Fibonacci-Folge" }
-  ]},
-  { name: "VIDEOSPIEL-WELTEN", q: [
-    { q: "In welchem Spiel fängt man Kreaturen in Bällen?", a: "Pokémon" },
-    { q: "Wie heisst der grüne Held in Tunika aus 'The Legend of Zelda'?", a: "Link" },
-    { q: "In welchem Spiel baut man Städte und managt Sims?", a: "Die Sims" },
-    { q: "Welches Open-World-Spiel spielt im fiktiven Los Santos?", a: "GTA V" },
-    { q: "Welches Studio entwickelte 'The Witcher 3'?", a: "CD Projekt Red" }
+    { q: "Was ist die Quadratwurzel aus 144?", a: "12" },
+    { q: "Wie nennt man ein Dreieck mit drei gleichen Seiten?", a: "Gleichseitig" },
+    { q: "Wie heisst die Folge, in der jede Zahl die Summe der zwei vorherigen ist?", a: "Fibonacci" },
+    { q: "Wie viele Seiten hat ein Dodekaeder-Würfel (Flächen)?", a: "12" },
+    { q: "Wie nennt man den längsten Punkt im rechtwinkligen Dreieck?", a: "Hypotenuse" },
+    { q: "Was ergibt 7 mal 8?", a: "56" },
+    { q: "Wie nennt man Zahlen kleiner als null?", a: "Negative Zahlen" },
+    { q: "Wie heisst der Satz a²+b²=c²?", a: "Satz des Pythagoras" },
+    { q: "Wie nennt man das Ergebnis einer Addition?", a: "Summe" },
+    { q: "Was ist 10 hoch 3?", a: "1000" }
   ]},
   { name: "BERÜHMTE BAUWERKE", q: [
     { q: "In welcher Stadt steht der Eiffelturm?", a: "Paris" },
-    { q: "In welchem Land steht die Chinesische Mauer?", a: "China" },
-    { q: "Wie heisst das weisse Marmor-Mausoleum in Indien?", a: "Taj Mahal" },
+    { q: "In welchem Land ist die Chinesische Mauer?", a: "China" },
     { q: "In welcher Stadt steht das Kolosseum?", a: "Rom" },
-    { q: "Welches antike Bauwerk in Athen krönt die Akropolis?", a: "Parthenon" }
+    { q: "Wie heisst das weisse Marmor-Mausoleum in Indien?", a: "Taj Mahal" },
+    { q: "Welches Bauwerk krönt die Akropolis in Athen?", a: "Parthenon" },
+    { q: "In welcher Stadt steht die Freiheitsstatue?", a: "New York" },
+    { q: "Wie heisst die rote Brücke in San Francisco?", a: "Golden Gate Bridge" },
+    { q: "Welches antike Bauwerk in Gizeh gehört zu den Weltwundern?", a: "Pyramiden" },
+    { q: "In welcher Stadt steht das Opernhaus mit den Segeldächern?", a: "Sydney" },
+    { q: "Welcher schiefe Turm steht in Italien?", a: "Turm von Pisa" },
+    { q: "Welches Schloss in Bayern inspirierte Disney?", a: "Neuschwanstein" },
+    { q: "In welcher Stadt steht der Buckingham-Palast?", a: "London" },
+    { q: "Wie heisst die alte Felsenstadt in Jordanien?", a: "Petra" },
+    { q: "Welche Statue steht über Rio de Janeiro?", a: "Christus-Statue (Cristo Redentor)" },
+    { q: "Wie heisst der Tempelkomplex in Kambodscha?", a: "Angkor Wat" }
   ]},
   { name: "POLITIK & WELT", q: [
-    { q: "Wie viele Sterne hat die Flagge der EU?", a: "12" },
-    { q: "Wie heisst der Hauptsitz der UNO in den USA?", a: "New York" },
+    { q: "Wie viele Sterne hat die EU-Flagge?", a: "12" },
     { q: "Wie nennt man die Regierungsform, in der das Volk wählt?", a: "Demokratie" },
-    { q: "Welche Organisation verleiht den Friedensnobelpreis?", a: "Das norwegische Nobelkomitee" },
-    { q: "In welcher Stadt sitzt der Internationale Gerichtshof?", a: "Den Haag" }
+    { q: "Wo ist der UNO-Hauptsitz in den USA?", a: "New York" },
+    { q: "In welcher Stadt sitzt der Internationale Gerichtshof?", a: "Den Haag" },
+    { q: "Wie viele Mitglieder hat der UN-Sicherheitsrat ständig?", a: "5" },
+    { q: "Welche Organisation verleiht den Friedensnobelpreis?", a: "Norwegisches Nobelkomitee" },
+    { q: "Wie heisst die Währung der meisten EU-Länder?", a: "Euro" },
+    { q: "Wie nennt man die Herrschaft eines Einzelnen mit absoluter Macht?", a: "Diktatur" },
+    { q: "In welcher Stadt steht das Europäische Parlament (Sitz)?", a: "Strassburg" },
+    { q: "Welche fünf Länder haben ein Veto im UN-Sicherheitsrat?", a: "USA, Russland, China, UK, Frankreich" },
+    { q: "Wie heisst das Bündnis westlicher Militärmächte?", a: "NATO" },
+    { q: "Wie nennt man den Zusammenschluss mehrerer Staaten zu einem Bund?", a: "Föderation" },
+    { q: "Welche Stadt ist Sitz der Welthandelsorganisation WTO?", a: "Genf" },
+    { q: "Wie heisst das Parlament Grossbritanniens?", a: "House of Commons / Parlament" },
+    { q: "Welches Land hat die meisten Einwohner?", a: "Indien" }
   ]},
   { name: "CHEMIE", q: [
     { q: "Welches Element hat das Symbol Na?", a: "Natrium" },
-    { q: "Wie lautet die chemische Formel von Wasser?", a: "H2O" },
-    { q: "Welches Gas brennt mit einem lauten Knall (Knallgasprobe)?", a: "Wasserstoff" },
-    { q: "Welches Edelgas wird in roten Leuchtreklamen verwendet?", a: "Neon" },
-    { q: "Wie heisst der pH-neutrale Wert auf der Skala?", a: "7" }
+    { q: "Wie lautet die Formel von Wasser?", a: "H2O" },
+    { q: "Welches Element hat das Symbol O?", a: "Sauerstoff" },
+    { q: "Welches Gas knallt bei der Knallgasprobe?", a: "Wasserstoff" },
+    { q: "Welches Edelgas leuchtet rot in Reklamen?", a: "Neon" },
+    { q: "Welcher pH-Wert ist neutral?", a: "7" },
+    { q: "Welches Element hat das Symbol Au?", a: "Gold" },
+    { q: "Wie heisst die Formel von Kochsalz?", a: "NaCl" },
+    { q: "Welches Element hat die Ordnungszahl 1?", a: "Wasserstoff" },
+    { q: "Welches Gas atmen wir aus?", a: "Kohlenstoffdioxid" },
+    { q: "Wie nennt man die kleinste Einheit eines Elements?", a: "Atom" },
+    { q: "Welches Metall ist flüssig bei Raumtemperatur?", a: "Quecksilber" },
+    { q: "Welche Säure ist in Magensäure enthalten?", a: "Salzsäure" },
+    { q: "Wie heisst der Übergang von flüssig zu gasförmig?", a: "Verdampfen" },
+    { q: "Welches Element hat das Symbol Fe?", a: "Eisen" }
   ]},
   { name: "FERNSEH-KLASSIKER", q: [
-    { q: "In welcher Zeichentrickserie lebt Familie Simpson?", a: "Die Simpsons" },
-    { q: "Welche Sitcom dreht sich um vier Physik-Nerds und eine Kellnerin?", a: "The Big Bang Theory" },
-    { q: "In welcher Serie sind Walter, Jesse und Saul zentrale Figuren?", a: "Breaking Bad" },
-    { q: "Welche Serie spielt im Restaurant-Umfeld und heisst nach einer Bostoner Bar?", a: "Cheers" },
-    { q: "Welche Mystery-Serie spielt auf einer Insel nach einem Flugzeugabsturz?", a: "Lost" }
+    { q: "In welcher Serie lebt Familie Simpson?", a: "Die Simpsons" },
+    { q: "Welche Sitcom dreht sich um Physik-Nerds?", a: "The Big Bang Theory" },
+    { q: "In welcher Serie sind Walter und Jesse zentral?", a: "Breaking Bad" },
+    { q: "Welche Serie spielt auf einer Insel nach Flugzeugabsturz?", a: "Lost" },
+    { q: "Welche Comedy-Serie hat Ross, Rachel und Monica?", a: "Friends" },
+    { q: "Welche Zeichentrickserie hat einen Vater namens Peter Griffin?", a: "Family Guy" },
+    { q: "Welche Serie spielt im fiktiven Westeros?", a: "Game of Thrones" },
+    { q: "In welcher Serie arbeiten Michael Scott und Jim im Büro?", a: "The Office" },
+    { q: "Welche Mystery-Serie spielt in Hawkins mit einem Mädchen 'Eleven'?", a: "Stranger Things" },
+    { q: "Welche Anwaltsserie hat die Figur Harvey Specter?", a: "Suits" },
+    { q: "Welche Serie zeigt das Königshaus über Jahrzehnte (Netflix)?", a: "The Crown" },
+    { q: "Welche koreanische Serie hat tödliche Kinderspiele?", a: "Squid Game" },
+    { q: "Welche Krankenhausserie spielt im Seattle Grace?", a: "Grey's Anatomy" },
+    { q: "Welche Zombie-Serie folgt Rick Grimes?", a: "The Walking Dead" },
+    { q: "In welcher Serie löst ein Chemielehrer Geldprobleme illegal?", a: "Breaking Bad" }
   ]},
   /* ===== BILD-KATEGORIEN (Flaggen) ===== */
   { name: "FLAGGEN EUROPA", img: true, q: [
@@ -434,21 +680,24 @@ const POOL = [
     { q: "Welches Land hat diese Flagge?", cc: "it", a: "Italien" },
     { q: "Welches Land hat diese Flagge?", cc: "se", a: "Schweden" },
     { q: "Welches Land hat diese Flagge?", cc: "gr", a: "Griechenland" },
-    { q: "Welches Land hat diese Flagge?", cc: "be", a: "Belgien" }
+    { q: "Welches Land hat diese Flagge?", cc: "be", a: "Belgien" },
+    { q: "Welches Land hat diese Flagge?", cc: "pt", a: "Portugal" },
+    { q: "Welches Land hat diese Flagge?", cc: "pl", a: "Polen" },
+    { q: "Welches Land hat diese Flagge?", cc: "no", a: "Norwegen" },
+    { q: "Welches Land hat diese Flagge?", cc: "dk", a: "Dänemark" },
+    { q: "Welches Land hat diese Flagge?", cc: "ie", a: "Irland" }
   ]},
   { name: "FLAGGEN WELT", img: true, q: [
     { q: "Welches Land hat diese Flagge?", cc: "jp", a: "Japan" },
     { q: "Welches Land hat diese Flagge?", cc: "br", a: "Brasilien" },
-    { q: "Welches Land hat diese Flagge?", cc: "pt", a: "Portugal" },
     { q: "Welches Land hat diese Flagge?", cc: "tr", a: "Türkei" },
-    { q: "Welches Land hat diese Flagge?", cc: "pl", a: "Polen" }
-  ]},
-  { name: "FLAGGEN NORDEN", img: true, q: [
-    { q: "Welches Land hat diese Flagge?", cc: "no", a: "Norwegen" },
-    { q: "Welches Land hat diese Flagge?", cc: "dk", a: "Dänemark" },
     { q: "Welches Land hat diese Flagge?", cc: "fi", a: "Finnland" },
     { q: "Welches Land hat diese Flagge?", cc: "nl", a: "Niederlande" },
-    { q: "Welches Land hat diese Flagge?", cc: "ie", a: "Irland" }
+    { q: "Welches Land hat diese Flagge?", cc: "at", a: "Österreich" },
+    { q: "Welches Land hat diese Flagge?", cc: "it", a: "Italien" },
+    { q: "Welches Land hat diese Flagge?", cc: "se", a: "Schweden" },
+    { q: "Welches Land hat diese Flagge?", cc: "pt", a: "Portugal" },
+    { q: "Welches Land hat diese Flagge?", cc: "gr", a: "Griechenland" }
   ]}
 ];
 
@@ -531,8 +780,14 @@ function fixState(){
   state.order=state.order.filter(id=>state.players.some(p=>p.id===id));
   state.players.forEach(p=>{if(!state.order.includes(p.id))state.order.push(p.id);});
   if(state.turnIndex>=state.order.length)state.turnIndex=0;
-  if(!state.board||!state.board.length) buildBoard();
+  // Board NUR einmalig beim Host bauen, wenn noch keins existiert.
+  // Buzzer-Geräte bauen NIE ein Board – sie zeigen nur, was gespeichert ist.
+  if((!state.board||!state.board.length) && VIEW!=="buzz"){
+    buildBoard();
+    needInitialSave=true;
+  }
 }
+let needInitialSave=false;
 let saveTimer=null;
 async function saveState(){
   if(usingSupabase){const {error}=await sb.from("quiz_state").upsert({id:GAME_ID,data:state});if(error)console.warn("save",error);}
@@ -778,7 +1033,9 @@ $("#kickAll").onclick=()=>{if(confirm("Alle Spieler entfernen?")){state.players=
 async function init(){
   if(!VIEW){$("#gate").style.display="flex";return;}
   $("#gate").style.display="none";
-  await loadState();subscribeRealtime();
+  await loadState();
+  if(needInitialSave){await saveState();needInitialSave=false;}
+  subscribeRealtime();
   if(VIEW==="buzz"){$("#buzzView").style.display="flex";setupBuzz();}
   else $("#boardView").style.display="block";
   renderAll();
