@@ -97,6 +97,13 @@ input{font-family:inherit}
 .score-card.turn .tag{background:var(--gold);color:#1a1300;display:block}
 .score-card.buzzed .tag{background:var(--red-bright);color:#fff;display:block}
 .score-card .tag{display:none}
+/* Karten + Joker Badges auf Score-Card (Host-Anzeige) */
+.score-badges{display:flex;gap:5px;justify-content:center;align-items:center;margin-top:8px;min-height:16px}
+.cardbadge{width:11px;height:15px;border-radius:2px;display:inline-block}
+.cardbadge.yellow{background:var(--gold);box-shadow:0 0 6px rgba(245,197,66,.6)}
+.cardbadge.red{background:var(--red-bright);box-shadow:0 0 8px rgba(225,29,72,.7)}
+.jokerbadge{font-size:14px;line-height:1;filter:saturate(1.2)}
+.jokerbadge.used{opacity:.25;filter:grayscale(1)}
 
 /* ===================== BOARD ===================== */
 .board-wrap{padding:18px 26px 40px;max-width:1500px;margin:0 auto}
@@ -147,6 +154,7 @@ input{font-family:inherit}
 .resultbar.wrong{background:rgba(225,29,72,.16);border:1px solid var(--red-bright);color:#ff8da3}
 .resultbar.correct{background:rgba(34,197,94,.16);border:1px solid var(--green);color:#86efac}
 .resultbar.reveal{background:rgba(245,197,66,.14);border:1px solid var(--gold);color:var(--gold)}
+.resultbar.joker{background:rgba(59,130,246,.16);border:1px solid var(--blue-bright);color:#bcd4ff}
 .answer-reveal{margin-top:18px;font-size:clamp(22px,3vw,34px);font-weight:900;color:var(--green);animation:pop .3s}
 .answer-reveal .lbl{display:block;font-size:13px;letter-spacing:3px;color:var(--muted);font-weight:700;margin-bottom:4px}
 
@@ -173,6 +181,7 @@ input{font-family:inherit}
 .buzz-name-row b{color:var(--text);font-size:17px}
 .buzz-myscore{font-size:15px;color:var(--muted)}
 .buzz-myscore b{font-size:24px;color:var(--gold)}
+.buzz-cards{display:flex;gap:6px;align-items:center;font-size:13px;color:var(--muted)}
 
 /* ===================== JOIN ===================== */
 .join-box{width:min(420px,92vw);margin:auto;background:linear-gradient(165deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:18px;padding:34px;text-align:center;display:flex;flex-direction:column;gap:18px}
@@ -219,12 +228,24 @@ input{font-family:inherit}
 .master-players{display:flex;flex-direction:column;gap:8px}
 .mp-row{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-radius:10px;background:var(--bg2);border:1px solid var(--line)}
 .mp-row.turn{border-color:var(--gold)}
-.mp-row .mp-name{font-weight:700}
+.mp-row .mp-name{font-weight:700;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .mp-row .mp-sc{font-weight:900;font-variant-numeric:tabular-nums}
 .mp-row .mp-sc.neg{color:var(--red-bright)}
-.mp-actions{display:flex;gap:6px}
+.mp-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
 .mini{padding:5px 9px;font-size:12px;border-radius:7px;background:var(--panel2);border:1px solid var(--line)}
 .mini:hover{background:var(--blue-cell2)}
+.mini.card{border-color:var(--gold);color:var(--gold)}
+.mini.card:hover{background:rgba(245,197,66,.15)}
+.mini.joker{border-color:var(--blue-bright);color:#bcd4ff}
+.mini.joker:hover{background:rgba(59,130,246,.18)}
+.mini.joker:disabled{opacity:.3;cursor:not-allowed;border-color:var(--line);color:var(--muted)}
+/* Inline-Badges in Spielerzeile */
+.mp-cards{display:inline-flex;gap:3px;align-items:center}
+.mp-cardchip{width:9px;height:13px;border-radius:2px;display:inline-block}
+.mp-cardchip.yellow{background:var(--gold)}
+.mp-cardchip.red{background:var(--red-bright)}
+.mp-jokerchip{font-size:12px}
+.mp-jokerchip.used{opacity:.3;filter:grayscale(1)}
 .master-controls{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
 .setup-note{font-size:13px;color:var(--muted);line-height:1.6;background:var(--bg2);padding:14px;border-radius:10px;border:1px solid var(--line)}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--panel2);border:1px solid var(--blue-bright);padding:14px 24px;border-radius:12px;font-weight:700;z-index:200;animation:pop .2s;box-shadow:0 12px 40px -12px rgba(0,0,0,.6)}
@@ -305,7 +326,10 @@ input{font-family:inherit}
             <b>Ablauf:</b> Spieler buzzern sich rein → du wählst wer dran ist (gold markiert).
             Host-Board zeigt nur die Frage. „Richtig" gibt volle Punkte, „Falsch" zieht die Hälfte ab
             und öffnet automatisch den Buzzer für alle anderen. „Antwort aufdecken" zeigt die Lösung
-            im Stream und schließt nach 5 Sek.
+            im Stream und schließt nach 5 Sek.<br><br>
+            <b>Karten:</b> „⚠ Karte" gibt eine gelbe Karte. Zwei gelbe = automatisch rote Karte = −200 Punkte.<br>
+            <b>Joker:</b> Jeder Spieler hat einen Joker pro Runde. Damit überträgst du die offene Frage an ihn.
+            Reset bei „Neue Runde".
           </div>
         </div>
       </div>
@@ -343,6 +367,7 @@ input{font-family:inherit}
     <div class="topbar">
       <div class="buzz-name-row">Spielt als <b id="myName">—</b></div>
       <div class="right">
+        <span class="buzz-cards" id="myCards"></span>
         <span class="buzz-myscore">Punkte: <b id="myScore">0</b></span>
         <span id="buzzLive2" class="pill dead">·</span>
       </div>
@@ -384,6 +409,7 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const BOARD1_POINTS = [100,200,300,400,500];
 const BOARD2_POINTS = [200,400,600,800,1000];
 const REVEAL_AUTOCLOSE_MS = 5000;
+const RED_CARD_PENALTY = 200;   // Strafe bei roter Karte
 
 // =========================================================
 //  STATE
@@ -457,6 +483,8 @@ async function generateAndStoreRound(){
     board_layout:{b1, b2},
     updated_at:new Date().toISOString()
   }).eq('id',1);
+  // Joker für alle Spieler zurücksetzen (Karten bleiben bestehen)
+  await sb.from('quiz_players').update({joker_used:false}).neq('id','00000000-0000-0000-0000-000000000000');
 }
 
 // =========================================================
@@ -505,6 +533,8 @@ async function refreshState(){
 }
 
 function playerById(id){return players.find(p=>p.id===id)}
+function playerCards(p){return (p&&typeof p.cards==='number')?p.cards:0}
+function jokerAvailable(p){return p && !p.joker_used}
 
 // =========================================================
 //  HOST
@@ -535,6 +565,15 @@ function renderHost(){
 // =========================================================
 //  SHARED: SCORES + GRID + OVERLAY
 // =========================================================
+function cardBadgesHtml(p){
+  const c=playerCards(p);
+  if(c<=0) return '';
+  let html='';
+  if(c>=2){ html='<span class="cardbadge red" title="Rote Karte"></span>'; }
+  else { html='<span class="cardbadge yellow" title="Gelbe Karte"></span>'; }
+  return html;
+}
+
 function renderScores(container){
   if(!container) return;
   container.innerHTML='';
@@ -545,9 +584,14 @@ function renderScores(container){
     if(state&&state.buzzed_player_id===p.id) cls+=' buzzed';
     card.className=cls;
     const tag = (state&&state.buzzed_player_id===p.id)?'GEBUZZERT':((state&&state.owner_player_id===p.id&&state.phase!=='board')?'IST DRAN':'');
+    const jokerCls = jokerAvailable(p)?'':' used';
     card.innerHTML=`<span class="tag">${tag}</span>
       <div class="nm">${escapeHtml(p.name)}</div>
-      <div class="sc ${p.score<0?'neg':''}">${p.score}</div>`;
+      <div class="sc ${p.score<0?'neg':''}">${p.score}</div>
+      <div class="score-badges">
+        ${cardBadgesHtml(p)}
+        <span class="jokerbadge${jokerCls}" title="${jokerAvailable(p)?'Joker verfügbar':'Joker benutzt'}">🃏</span>
+      </div>`;
     container.appendChild(card);
   });
 }
@@ -628,6 +672,10 @@ function renderOverlayFooter(){
   const f=$("ovFooter");
   if(!state) {f.innerHTML='';return}
   // result text priority
+  if(state.result_kind==='joker'){
+    const p=playerById(state.owner_player_id);
+    f.innerHTML=`<div class="resultbar joker">🃏 Joker! Frage geht an ${p?escapeHtml(p.name):'…'}</div>`;return;
+  }
   if(state.result_kind==='wrong'){
     f.innerHTML=`<div class="resultbar wrong">Falsch! Andere können jetzt buzzern.</div>`;return;
   }
@@ -663,7 +711,6 @@ async function initMaster(){
 
 function renderMaster(){
   if(!state) return;
-  $("masterLive");
   renderMasterQuestion();
   renderMasterPlayers();
 }
@@ -716,17 +763,30 @@ function renderMasterPlayers(){
   const c=$("masterPlayers");
   c.innerHTML='';
   if(players.length===0){c.innerHTML='<div style="color:var(--muted);text-align:center;padding:20px">Noch keine Spieler.<br>Sie treten über „Buzzer" bei.</div>';return}
-  players.forEach(p=>{
+  const qOpen = state && state.phase==='question' && state.current_question;
+  players.forEach((p,idx)=>{
     const isTurn = state&&state.turn_player_id===p.id;
+    const cards=playerCards(p);
+    const jokerOk=jokerAvailable(p);
+    // Karten-Chips
+    let cardChips='';
+    if(cards>=2){cardChips='<span class="mp-cardchip red" title="Rote Karte"></span>';}
+    else if(cards===1){cardChips='<span class="mp-cardchip yellow" title="Gelbe Karte"></span>';}
+    const jokerChip=`<span class="mp-jokerchip${jokerOk?'':' used'}" title="${jokerOk?'Joker verfügbar':'Joker weg'}">🃏</span>`;
     const row=document.createElement('div');
     row.className='mp-row'+(isTurn?' turn':'');
     row.innerHTML=`
       <div>
-        <div class="mp-name">${escapeHtml(p.name)} ${isTurn?'🎯':''}</div>
+        <div class="mp-name">
+          <span>#${idx+1} ${escapeHtml(p.name)} ${isTurn?'🎯':''}</span>
+          <span class="mp-cards">${cardChips}${jokerChip}</span>
+        </div>
         <div class="mp-sc ${p.score<0?'neg':''}">${p.score} Pkt</div>
       </div>
       <div class="mp-actions">
         <button class="mini" onclick="setTurn('${p.id}')">Dran</button>
+        <button class="mini joker" ${(jokerOk&&qOpen)?'':'disabled'} onclick="useJoker('${p.id}')">🃏 Joker</button>
+        <button class="mini card" onclick="giveCard('${p.id}')">⚠ Karte</button>
         <button class="mini" onclick="adjustScore('${p.id}',-50)">−50</button>
         <button class="mini" onclick="adjustScore('${p.id}',50)">+50</button>
         <button class="mini" onclick="kickPlayer('${p.id}')">✕</button>
@@ -811,20 +871,58 @@ async function setTurn(pid){
   toast("Dran gesetzt");
 }
 
+// ---- KARTEN ----
+async function giveCard(pid){
+  const p=playerById(pid); if(!p)return;
+  const current=playerCards(p);
+  if(current>=2){toast(`${p.name} hat schon Rot`);return}
+  const next=current+1;
+  if(next>=2){
+    // rote Karte -> Strafe abziehen
+    if(!confirm(`Zweite gelbe Karte für ${p.name} → ROTE KARTE und −${RED_CARD_PENALTY} Punkte. Sicher?`))return;
+    await sb.from('quiz_players').update({cards:next,score:p.score-RED_CARD_PENALTY}).eq('id',pid);
+    toast(`🟥 Rote Karte für ${p.name} (−${RED_CARD_PENALTY})`);
+  } else {
+    await sb.from('quiz_players').update({cards:next}).eq('id',pid);
+    toast(`🟨 Gelbe Karte für ${p.name}`);
+  }
+}
+
+// ---- JOKER ----
+async function useJoker(pid){
+  const p=playerById(pid); if(!p)return;
+  if(!jokerAvailable(p)){toast(`${p.name} hat keinen Joker mehr`);return}
+  if(!(state&&state.phase==='question'&&state.current_question)){toast("Keine Frage offen");return}
+  if(!confirm(`Joker von ${p.name} einsetzen? Die Frage wird ihm übertragen.`))return;
+  // Joker verbrauchen
+  await sb.from('quiz_players').update({joker_used:true}).eq('id',pid);
+  // Frage an diesen Spieler übertragen: owner setzen, owner-phase, buzzer zu
+  await sb.from('quiz_state').update({
+    owner_player_id:pid,
+    turn_player_id:pid,
+    is_owner_phase:true,
+    buzzer_open:false,
+    buzzed_player_id:null,
+    result_kind:'joker',
+    updated_at:new Date().toISOString()
+  }).eq('id',1);
+  toast(`🃏 Joker! Frage geht an ${p.name}`);
+}
+
 async function switchBoard(n){
   await sb.from('quiz_state').update({active_board:n,updated_at:new Date().toISOString()}).eq('id',1);
 }
 
 async function newRound(){
-  if(!confirm("Neue Runde? Es werden frische Fragen gezogen (keine Wiederholungen) und das Board geleert.")) return;
+  if(!confirm("Neue Runde? Es werden frische Fragen gezogen (keine Wiederholungen), das Board geleert und alle Joker zurückgesetzt.")) return;
   await generateAndStoreRound();
-  toast("Neue Runde generiert!");
+  toast("Neue Runde – Joker zurückgesetzt!");
 }
 
 async function resetScores(){
-  if(!confirm("Alle Punkte auf 0 zurücksetzen?")) return;
-  await sb.from('quiz_players').update({score:0}).neq('id','00000000-0000-0000-0000-000000000000');
-  toast("Punkte zurückgesetzt");
+  if(!confirm("Alle Punkte auf 0 zurücksetzen? (Karten & Joker werden ebenfalls zurückgesetzt)")) return;
+  await sb.from('quiz_players').update({score:0,cards:0,joker_used:false}).neq('id','00000000-0000-0000-0000-000000000000');
+  toast("Punkte, Karten & Joker zurückgesetzt");
 }
 
 async function changeScore(pid,delta){
@@ -841,7 +939,7 @@ async function kickPlayer(pid){
 async function addManualPlayer(){
   const name=prompt("Name des Spielers:");
   if(!name)return;
-  await sb.from('quiz_players').insert({name:name.trim(),score:0});
+  await sb.from('quiz_players').insert({name:name.trim(),score:0,cards:0,joker_used:false});
 }
 
 // =========================================================
@@ -871,7 +969,7 @@ async function joinGame(){
   let existing=players.find(p=>p.name.toLowerCase()===name.toLowerCase());
   if(existing){myPlayerId=existing.id}
   else{
-    const {data,error}=await sb.from('quiz_players').insert({name,score:0}).select().single();
+    const {data,error}=await sb.from('quiz_players').insert({name,score:0,cards:0,joker_used:false}).select().single();
     if(error){toast("Fehler beim Beitreten");return}
     myPlayerId=data.id;
   }
@@ -902,6 +1000,16 @@ function renderBuzzer(){
   const me=playerById(myPlayerId);
   $("myName").textContent=me?me.name:'—';
   $("myScore").textContent=me?me.score:'0';
+  // Karten + Joker Anzeige
+  const cardsEl=$("myCards");
+  if(me&&cardsEl){
+    const c=playerCards(me);
+    let cardTxt='';
+    if(c>=2)cardTxt='<span style="color:var(--red-bright)">🟥 Rot</span>';
+    else if(c===1)cardTxt='<span style="color:var(--gold)">🟨 Gelb</span>';
+    const jk=jokerAvailable(me)?'🃏':'<span style="opacity:.3">🃏</span>';
+    cardsEl.innerHTML=`${cardTxt} ${jk}`;
+  }
 
   const btn=$("bigBuzz");
   const status=$("buzzStatus");
@@ -918,7 +1026,8 @@ function renderBuzzer(){
     status.textContent='Du hast gebuzzert! Antworte!';status.className='buzz-status mine';
     btn.disabled=true;btn.classList.remove('armed');btn.textContent='DU!';
   } else if(iAmOwner){
-    status.textContent='Du bist dran – beantworte die Frage!';status.className='buzz-status mine';
+    const jokerNote = state.result_kind==='joker' ? '🃏 Joker – du bist dran!' : 'Du bist dran – beantworte die Frage!';
+    status.textContent=jokerNote;status.className='buzz-status mine';
     btn.disabled=true;btn.classList.remove('armed');btn.textContent='DEINE FRAGE';
   } else if(state.buzzer_open && !iAmLocked){
     status.textContent='BUZZER OFFEN – Drück jetzt!';status.className='buzz-status open';
