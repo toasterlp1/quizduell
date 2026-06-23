@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz Duell</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --bg:#0a0e1a;
+  --bg2:#0d1426;
+  --panel:#111a30;
+  --panel2:#16213f;
+  --blue:#1e63d0;
+  --blue-bright:#3b82f6;
+  --blue-cell:#13294e;
+  --blue-cell2:#1a3766;
+  --red:#c41230;
+  --red-bright:#e11d48;
+  --gold:#f5c542;
+  --green:#22c55e;
+  --text:#eaf0ff;
+  --muted:#8294b8;
+  --line:#22324f;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:radial-gradient(ellipse at top,#13203c 0%,var(--bg) 60%);
+  color:var(--text);
+  font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+  overflow-x:hidden;
+}
+.hidden{display:none !important}
+button{font-family:inherit;cursor:pointer;border:none;color:inherit}
+input{font-family:inherit}
+
+/* ===================== ROLLE WÄHLEN ===================== */
+#roleScreen{
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:40px;padding:30px;
+}
+.logo{
+  font-size:clamp(48px,9vw,110px);font-weight:900;font-style:italic;letter-spacing:-2px;
+  display:flex;align-items:center;gap:6px;line-height:.9;
+}
+.logo .q{color:#fff}
+.logo .bolt{color:var(--gold);font-size:1.1em;transform:translateY(-4px);text-shadow:0 0 30px rgba(245,197,66,.6)}
+.logo .d{color:#fff}
+.logo small{display:block;font-size:.16em;letter-spacing:8px;font-style:normal;font-weight:700;color:var(--blue-bright);margin-top:6px}
+.role-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;max-width:920px;width:100%}
+.role-card{
+  background:linear-gradient(160deg,var(--panel2),var(--panel));
+  border:1px solid var(--line);border-radius:18px;padding:34px 26px;text-align:center;
+  transition:.18s;display:flex;flex-direction:column;align-items:center;gap:14px;
+}
+.role-card:hover{transform:translateY(-6px);border-color:var(--blue-bright);box-shadow:0 18px 50px -20px rgba(59,130,246,.5)}
+.role-card .ic{font-size:54px}
+.role-card h3{font-size:24px;font-weight:800;letter-spacing:.5px}
+.role-card p{color:var(--muted);font-size:14px;line-height:1.5}
+.role-card.host:hover{border-color:var(--blue-bright)}
+.role-card.host .ic{filter:drop-shadow(0 0 18px rgba(59,130,246,.6))}
+.role-card.master:hover{border-color:var(--gold);box-shadow:0 18px 50px -20px rgba(245,197,66,.5)}
+.role-card.buzz:hover{border-color:var(--red-bright);box-shadow:0 18px 50px -20px rgba(225,29,72,.5)}
+@media(max-width:760px){.role-grid{grid-template-columns:1fr}}
+
+/* ===================== TOP BAR ===================== */
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 26px;border-bottom:1px solid var(--line);background:rgba(8,12,24,.7);
+  position:sticky;top:0;z-index:50;backdrop-filter:blur(8px);
+}
+.topbar .brand{font-weight:900;font-style:italic;font-size:24px;letter-spacing:-1px}
+.topbar .brand .bolt{color:var(--gold)}
+.topbar .right{display:flex;align-items:center;gap:14px}
+.pill{padding:7px 16px;border-radius:30px;font-size:13px;font-weight:700;background:var(--panel2);border:1px solid var(--line)}
+.pill.live{color:var(--green)}
+.pill.live::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);margin-right:7px;vertical-align:middle;box-shadow:0 0 8px var(--green)}
+.pill.dead{color:var(--red-bright)}
+.pill.dead::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--red-bright);margin-right:7px;vertical-align:middle}
+.btn{padding:9px 18px;border-radius:10px;font-weight:700;font-size:14px;background:var(--panel2);border:1px solid var(--line);transition:.15s}
+.btn:hover{background:var(--blue-cell2)}
+.btn.ghost{background:transparent}
+
+/* ===================== SCORES ===================== */
+.scores{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;padding:16px 20px}
+.score-card{
+  position:relative;min-width:150px;background:linear-gradient(160deg,var(--panel2),var(--panel));
+  border:1px solid var(--line);border-radius:14px;padding:14px 18px;text-align:center;transition:.2s;
+}
+.score-card.turn{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold),0 0 28px -6px rgba(245,197,66,.55)}
+.score-card.buzzed{border-color:var(--red-bright);box-shadow:0 0 0 1px var(--red-bright),0 0 28px -4px rgba(225,29,72,.6);animation:pulse .8s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 1px var(--red-bright),0 0 28px -4px rgba(225,29,72,.6)}50%{box-shadow:0 0 0 1px var(--red-bright),0 0 40px 0 rgba(225,29,72,.9)}}
+.score-card .nm{font-weight:800;font-size:16px;letter-spacing:.3px}
+.score-card .sc{font-size:30px;font-weight:900;margin-top:4px;font-variant-numeric:tabular-nums}
+.score-card .sc.neg{color:var(--red-bright)}
+.score-card .tag{position:absolute;top:-10px;left:50%;transform:translateX(-50%);font-size:10px;font-weight:800;letter-spacing:1px;padding:3px 10px;border-radius:20px;white-space:nowrap}
+.score-card.turn .tag{background:var(--gold);color:#1a1300;display:block}
+.score-card.buzzed .tag{background:var(--red-bright);color:#fff;display:block}
+.score-card .tag{display:none}
+
+/* ===================== BOARD ===================== */
+.board-wrap{padding:18px 26px 40px;max-width:1500px;margin:0 auto}
+.board-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.board-head h2{font-size:18px;letter-spacing:2px;color:var(--muted);font-weight:700}
+.board-tabs{display:flex;gap:8px}
+.board-tab{padding:8px 20px;border-radius:10px;font-weight:800;font-size:14px;background:var(--panel);border:1px solid var(--line);color:var(--muted)}
+.board-tab.active{background:var(--blue);color:#fff;border-color:var(--blue-bright)}
+.grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+.cat-head{
+  background:linear-gradient(160deg,var(--red),var(--red-bright));
+  border-radius:12px;padding:16px 8px;text-align:center;font-weight:900;
+  font-size:15px;letter-spacing:.5px;min-height:64px;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 6px 18px -8px rgba(196,18,48,.7);
+}
+.cell{
+  background:linear-gradient(160deg,var(--blue-cell2),var(--blue-cell));
+  border:1px solid #244680;border-radius:12px;padding:22px 8px;text-align:center;
+  font-size:30px;font-weight:900;font-style:italic;color:var(--gold);
+  transition:.14s;letter-spacing:1px;text-shadow:0 2px 6px rgba(0,0,0,.4);
+}
+.cell:not(.done):hover{transform:scale(1.04);background:linear-gradient(160deg,#23478a,#1b3566);box-shadow:0 0 24px -6px rgba(59,130,246,.6);border-color:var(--blue-bright)}
+.cell.done{background:var(--bg2);color:transparent;border-color:var(--line);cursor:default;opacity:.4}
+.cell.disabled{cursor:default;opacity:.55}
+@media(max-width:900px){.cell{font-size:20px;padding:16px 4px}.cat-head{font-size:11px;padding:10px 4px}}
+
+/* ===================== QUESTION OVERLAY ===================== */
+.overlay{
+  position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:24px;
+  background:rgba(4,7,15,.82);backdrop-filter:blur(6px);
+}
+.qcard{
+  width:min(760px,94vw);background:linear-gradient(165deg,var(--panel2),var(--panel));
+  border:1px solid var(--blue-bright);border-radius:22px;overflow:hidden;
+  box-shadow:0 30px 90px -30px rgba(59,130,246,.7),0 0 0 1px rgba(59,130,246,.25);
+  animation:pop .25s cubic-bezier(.2,.9,.3,1.2);
+}
+@keyframes pop{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
+.qcard .qtitle{text-align:center;padding:16px;font-size:16px;font-weight:800;letter-spacing:3px;color:var(--blue-bright);border-bottom:1px solid var(--line);text-transform:uppercase}
+.qcard .qbody{padding:40px 36px;text-align:center}
+.qcard .qtext{font-size:clamp(24px,3.4vw,40px);font-weight:900;line-height:1.2;margin-bottom:26px}
+.qcard .qimg{max-width:100%;max-height:340px;border-radius:14px;margin:0 auto;display:block;box-shadow:0 16px 40px -16px rgba(0,0,0,.7);background:#fff}
+.qcard .qimg.flag{border:3px solid #fff}
+.qcard .qfooter{padding:18px;text-align:center;border-top:1px solid var(--line)}
+.turnbar{display:inline-flex;align-items:center;gap:10px;background:var(--blue);padding:12px 26px;border-radius:40px;font-weight:800;font-size:18px;letter-spacing:.5px}
+.turnbar .av{width:30px;height:30px;border-radius:50%;background:var(--blue-bright);display:flex;align-items:center;justify-content:center;font-size:15px}
+.resultbar{padding:16px 30px;border-radius:14px;font-weight:800;font-size:20px;animation:pop .2s}
+.resultbar.wrong{background:rgba(225,29,72,.16);border:1px solid var(--red-bright);color:#ff8da3}
+.resultbar.correct{background:rgba(34,197,94,.16);border:1px solid var(--green);color:#86efac}
+.resultbar.reveal{background:rgba(245,197,66,.14);border:1px solid var(--gold);color:var(--gold)}
+.answer-reveal{margin-top:18px;font-size:clamp(22px,3vw,34px);font-weight:900;color:var(--green);animation:pop .3s}
+.answer-reveal .lbl{display:block;font-size:13px;letter-spacing:3px;color:var(--muted);font-weight:700;margin-bottom:4px}
+
+/* ===================== BUZZER (player) ===================== */
+.buzz-screen{min-height:100vh;display:flex;flex-direction:column}
+.buzz-main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:30px;padding:30px;text-align:center}
+.buzz-status{font-size:20px;font-weight:800;letter-spacing:.5px;color:var(--muted);min-height:28px}
+.buzz-status.open{color:var(--green)}
+.buzz-status.locked{color:var(--red-bright)}
+.buzz-status.mine{color:var(--gold)}
+.big-buzz{
+  width:min(320px,72vw);height:min(320px,72vw);border-radius:50%;
+  background:radial-gradient(circle at 38% 32%,#ff556f,var(--red) 60%,#7d0a1f);
+  border:6px solid #ff8095;color:#fff;font-size:42px;font-weight:900;letter-spacing:2px;
+  box-shadow:0 22px 60px -18px rgba(196,18,48,.8),inset 0 -10px 30px rgba(0,0,0,.35);
+  transition:.08s;text-shadow:0 3px 8px rgba(0,0,0,.4);user-select:none;
+}
+.big-buzz:active{transform:scale(.94)}
+.big-buzz:disabled{background:radial-gradient(circle at 38% 32%,#3a4256,#222838 60%,#161a26);border-color:#39414f;color:#6b7488;cursor:not-allowed;box-shadow:none}
+.big-buzz.armed{animation:armedPulse 1s infinite}
+@keyframes armedPulse{0%,100%{box-shadow:0 22px 60px -18px rgba(196,18,48,.8),inset 0 -10px 30px rgba(0,0,0,.35)}50%{box-shadow:0 22px 80px -10px rgba(225,29,72,1),inset 0 -10px 30px rgba(0,0,0,.35)}}
+.buzz-hint{color:var(--muted);font-size:14px}
+.buzz-name-row{display:flex;align-items:center;gap:10px;font-size:15px;color:var(--muted)}
+.buzz-name-row b{color:var(--text);font-size:17px}
+.buzz-myscore{font-size:15px;color:var(--muted)}
+.buzz-myscore b{font-size:24px;color:var(--gold)}
+
+/* ===================== JOIN ===================== */
+.join-box{width:min(420px,92vw);margin:auto;background:linear-gradient(165deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:18px;padding:34px;text-align:center;display:flex;flex-direction:column;gap:18px}
+.join-box h2{font-size:26px;font-weight:900}
+.join-box p{color:var(--muted);font-size:14px}
+.field{display:flex;flex-direction:column;gap:7px;text-align:left}
+.field label{font-size:12px;font-weight:700;letter-spacing:1px;color:var(--muted)}
+.field input{padding:14px 16px;border-radius:11px;background:var(--bg2);border:1px solid var(--line);color:var(--text);font-size:17px;outline:none}
+.field input:focus{border-color:var(--blue-bright)}
+.btn-primary{padding:15px;border-radius:12px;font-weight:800;font-size:16px;background:linear-gradient(160deg,var(--blue-bright),var(--blue));transition:.15s}
+.btn-primary:hover{filter:brightness(1.1)}
+.btn-red{background:linear-gradient(160deg,var(--red-bright),var(--red))}
+
+/* ===================== SPIELLEITER PANEL ===================== */
+.master-wrap{max-width:1100px;margin:0 auto;padding:20px 26px 60px}
+.master-grid{display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start}
+@media(max-width:900px){.master-grid{grid-template-columns:1fr}}
+.panel{background:linear-gradient(165deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:16px;padding:20px}
+.panel h3{font-size:13px;letter-spacing:2px;color:var(--muted);font-weight:700;margin-bottom:14px;text-transform:uppercase}
+.mq{text-align:center;padding:10px 0 18px}
+.mq .mq-cat{font-size:13px;letter-spacing:2px;color:var(--blue-bright);font-weight:800}
+.mq .mq-text{font-size:22px;font-weight:800;margin:10px 0}
+.mq .mq-img{max-height:160px;border-radius:10px;margin:8px auto;display:block;background:#fff;padding:4px}
+.mq .mq-ans{margin-top:14px;padding:14px;border-radius:12px;background:rgba(34,197,94,.12);border:1px solid var(--green)}
+.mq .mq-ans .lbl{font-size:11px;letter-spacing:2px;color:var(--muted);font-weight:700}
+.mq .mq-ans .val{font-size:24px;font-weight:900;color:#86efac;margin-top:3px}
+.master-buttons{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px}
+.mbtn{padding:18px;border-radius:13px;font-weight:800;font-size:17px;transition:.14s;border:1px solid transparent}
+.mbtn:active{transform:scale(.97)}
+.mbtn.correct{background:linear-gradient(160deg,#16a34a,#15803d)}
+.mbtn.wrong{background:linear-gradient(160deg,var(--red-bright),var(--red))}
+.mbtn.reveal{background:linear-gradient(160deg,var(--gold),#d4a017);color:#1a1300;grid-column:1/-1}
+.mbtn.neutral{background:var(--panel);border-color:var(--line);grid-column:1/-1}
+.mbtn:disabled{opacity:.35;cursor:not-allowed;transform:none}
+.who-answers{text-align:center;padding:12px;border-radius:12px;margin-bottom:14px;font-weight:800;font-size:16px}
+.who-answers.owner{background:rgba(30,99,208,.16);border:1px solid var(--blue-bright)}
+.who-answers.buzzer{background:rgba(225,29,72,.16);border:1px solid var(--red-bright);color:#ff8da3}
+.who-answers.nobody{background:var(--panel);border:1px solid var(--line);color:var(--muted)}
+.value-info{display:flex;justify-content:space-around;text-align:center;margin:12px 0;padding:12px;background:var(--bg2);border-radius:12px}
+.value-info div .v{font-size:22px;font-weight:900}
+.value-info div .v.plus{color:var(--green)}
+.value-info div .v.minus{color:var(--red-bright)}
+.value-info div .l{font-size:11px;color:var(--muted);letter-spacing:1px}
+.master-players{display:flex;flex-direction:column;gap:8px}
+.mp-row{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-radius:10px;background:var(--bg2);border:1px solid var(--line)}
+.mp-row.turn{border-color:var(--gold)}
+.mp-row .mp-name{font-weight:700}
+.mp-row .mp-sc{font-weight:900;font-variant-numeric:tabular-nums}
+.mp-row .mp-sc.neg{color:var(--red-bright)}
+.mp-actions{display:flex;gap:6px}
+.mini{padding:5px 9px;font-size:12px;border-radius:7px;background:var(--panel2);border:1px solid var(--line)}
+.mini:hover{background:var(--blue-cell2)}
+.master-controls{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.setup-note{font-size:13px;color:var(--muted);line-height:1.6;background:var(--bg2);padding:14px;border-radius:10px;border:1px solid var(--line)}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--panel2);border:1px solid var(--blue-bright);padding:14px 24px;border-radius:12px;font-weight:700;z-index:200;animation:pop .2s;box-shadow:0 12px 40px -12px rgba(0,0,0,.6)}
+
+/* host buzz button visual */
+.host-buzz{position:fixed;top:90px;right:30px;z-index:40;width:90px;height:90px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#2a3550,#1a2236);border:2px solid #33405e;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:900;color:var(--muted);font-size:13px;letter-spacing:1px}
+.host-buzz.armed{background:radial-gradient(circle at 38% 32%,#ff556f,var(--red) 60%);border-color:#ff8095;color:#fff;animation:armedPulse 1s infinite}
+</style>
+</head>
+<body>
+
+<!-- ============ ROLLE WÄHLEN ============ -->
+<div id="roleScreen">
+  <div class="logo"><span class="q">QUIZ</span><span class="bolt">⚡</span><span class="d">DUELL<small>STREAMER vs QUIZ</small></span></div>
+  <div class="role-grid">
+    <button class="role-card host" onclick="chooseRole('host')">
+      <div class="ic">🖥️</div><h3>HOST</h3>
+      <p>Das Board zum Streamen. Zeigt Fragen, Punkte & Ergebnisse. Hier klickst du die Fragen an.</p>
+    </button>
+    <button class="role-card master" onclick="chooseRole('master')">
+      <div class="ic">🎛️</div><h3>SPIELLEITER</h3>
+      <p>Dein verstecktes Kontroll-Panel. Sieht die Antworten, bewertet richtig/falsch. NICHT streamen!</p>
+    </button>
+    <button class="role-card buzz" onclick="chooseRole('buzzer')">
+      <div class="ic">🔴</div><h3>BUZZER</h3>
+      <p>Für die Mitspieler. Name eingeben, dann buzzern per Knopf oder Leertaste.</p>
+    </button>
+  </div>
+</div>
+
+<!-- ============ HOST ============ -->
+<div id="hostView" class="hidden">
+  <div class="topbar">
+    <div class="brand">QUIZ<span class="bolt">⚡</span>DUELL</div>
+    <div class="right">
+      <span id="hostLive" class="pill dead">Verbinde…</span>
+      <button class="btn ghost" onclick="location.reload()">↻ Neu laden</button>
+    </div>
+  </div>
+  <div class="host-buzz" id="hostBuzzIndicator">BUZZ</div>
+  <div class="scores" id="hostScores"></div>
+  <div class="board-wrap">
+    <div class="board-head">
+      <h2 id="hostBoardLabel">BOARD 1</h2>
+    </div>
+    <div class="grid" id="hostGrid"></div>
+  </div>
+</div>
+
+<!-- ============ SPIELLEITER ============ -->
+<div id="masterView" class="hidden">
+  <div class="topbar">
+    <div class="brand">🎛️ SPIELLEITER</div>
+    <div class="right">
+      <span id="masterLive" class="pill dead">Verbinde…</span>
+      <button class="btn ghost" onclick="location.reload()">↻</button>
+    </div>
+  </div>
+  <div class="master-wrap">
+    <div class="master-grid">
+      <div>
+        <div class="panel" id="masterQPanel">
+          <h3>Aktuelle Frage</h3>
+          <div id="masterQContent" style="color:var(--muted);text-align:center;padding:30px 0">
+            Keine Frage offen.<br>Auf dem Host-Board eine Frage anklicken.
+          </div>
+        </div>
+
+        <div class="panel" style="margin-top:18px">
+          <h3>Board-Steuerung</h3>
+          <div class="master-controls">
+            <button class="btn" onclick="switchBoard(1)">Board 1</button>
+            <button class="btn" onclick="switchBoard(2)">Board 2</button>
+            <button class="btn" onclick="newRound()">🔄 Neue Runde (frische Fragen)</button>
+            <button class="btn btn-red" style="background:var(--red)" onclick="resetScores()">Punkte zurücksetzen</button>
+          </div>
+          <div class="setup-note" style="margin-top:14px">
+            <b>Ablauf:</b> Spieler buzzern sich rein → du wählst wer dran ist (gold markiert).
+            Host-Board zeigt nur die Frage. „Richtig" gibt volle Punkte, „Falsch" zieht die Hälfte ab
+            und öffnet automatisch den Buzzer für alle anderen. „Antwort aufdecken" zeigt die Lösung
+            im Stream und schließt nach 5 Sek.
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Spieler</h3>
+        <div class="master-players" id="masterPlayers"></div>
+        <div style="margin-top:14px">
+          <button class="btn" style="width:100%" onclick="addManualPlayer()">+ Spieler manuell</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ BUZZER ============ -->
+<div id="buzzerView" class="hidden">
+  <div id="joinScreen" class="buzz-screen">
+    <div class="topbar">
+      <div class="brand">QUIZ<span class="bolt">⚡</span>DUELL</div>
+      <span id="buzzLive" class="pill dead">Verbinde…</span>
+    </div>
+    <div class="join-box">
+      <h2>Mitspielen</h2>
+      <p>Gib deinen Namen ein, um dem Quiz beizutreten.</p>
+      <div class="field">
+        <label>DEIN NAME</label>
+        <input id="playerName" maxlength="16" placeholder="z.B. Schegge" autocomplete="off">
+      </div>
+      <button class="btn-primary" onclick="joinGame()">Beitreten & Buzzern</button>
+    </div>
+  </div>
+
+  <div id="buzzPlay" class="buzz-screen hidden">
+    <div class="topbar">
+      <div class="buzz-name-row">Spielt als <b id="myName">—</b></div>
+      <div class="right">
+        <span class="buzz-myscore">Punkte: <b id="myScore">0</b></span>
+        <span id="buzzLive2" class="pill dead">·</span>
+      </div>
+    </div>
+    <div class="buzz-main">
+      <div class="buzz-status" id="buzzStatus">Warte auf Spielstart…</div>
+      <button class="big-buzz" id="bigBuzz" onclick="pressBuzz()" disabled>BUZZ</button>
+      <div class="buzz-hint">Buzzern mit Klick oder <b>Leertaste</b></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ QUESTION OVERLAY (host + buzzer) ============ -->
+<div id="qOverlay" class="overlay hidden">
+  <div class="qcard">
+    <div class="qtitle" id="ovTitle">KATEGORIE 100</div>
+    <div class="qbody">
+      <div class="qtext" id="ovText"></div>
+      <img id="ovImg" class="qimg hidden" alt="">
+      <div class="answer-reveal hidden" id="ovAnswer"><span class="lbl">ANTWORT</span><span id="ovAnswerVal"></span></div>
+    </div>
+    <div class="qfooter" id="ovFooter"></div>
+  </div>
+</div>
+
+<div id="toast" class="toast hidden"></div>
+
+<script src="questions.js"></script>
+<script>
+// =========================================================
+//  CONFIG
+// =========================================================
+const SUPABASE_URL = "https://dazabcxqplkvcyeiesgd.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhemFiY3hxcGxrdmN5ZWllc2dkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4NTQ0NzksImV4cCI6MjA5NzQzMDQ3OX0.N3Dca8Quii4M8nFYLHjzBslby_tBUCyH1-WnPfYW01Y";
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// Punktewerte
+const BOARD1_POINTS = [100,200,300,400,500];
+const BOARD2_POINTS = [200,400,600,800,1000];
+const REVEAL_AUTOCLOSE_MS = 5000;
+
+// =========================================================
+//  STATE
+// =========================================================
+let ROLE = null;
+let myPlayerId = null;       // für Buzzer
+let players = [];
+let state = null;            // quiz_state row
+let boardLayout = {1:null, 2:null};  // generierte Boards (Kategorien+Fragen) für aktuelle Runde
+let revealTimer = null;
+
+// =========================================================
+//  HELPERS
+// =========================================================
+function $(id){return document.getElementById(id)}
+function toast(msg){const t=$("toast");t.textContent=msg;t.classList.remove("hidden");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.add("hidden"),2200)}
+function pointsForBoard(b){return b===1?BOARD1_POINTS:BOARD2_POINTS}
+function qKey(b,c,p){return `${b}-${c}-${p}`}
+function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+
+// =========================================================
+//  RUNDEN-GENERATOR (zieht zufällig, merkt sich Gespieltes)
+// =========================================================
+const USED_KEY = "quizduell_used_questions_v1";
+function loadUsed(){try{return JSON.parse(localStorage.getItem(USED_KEY))||{}}catch{return{}}}
+function saveUsed(u){localStorage.setItem(USED_KEY,JSON.stringify(u))}
+// used = { "KATEGORIE|level": ["antwort1","antwort2", ...] }
+
+function pickQuestion(catName, level){
+  const cat = CATEGORIES.find(c=>c.name===catName);
+  if(!cat) return null;
+  const pool = cat.levels[level] || [];
+  const used = loadUsed();
+  const ukey = `${catName}|${level}`;
+  const usedList = used[ukey] || [];
+  let avail = pool.filter(q=>!usedList.includes(q.antwort));
+  if(avail.length===0){ // alle durch -> reset diese Stufe
+    avail = pool;
+    used[ukey] = [];
+  }
+  const chosen = avail[Math.floor(Math.random()*avail.length)];
+  used[ukey] = [...(used[ukey]||[]), chosen.antwort];
+  saveUsed(used);
+  return chosen;
+}
+
+// Erzeugt Board-Layout: 6 zufällige Kategorien, je 5 Fragen (eine pro Stufe)
+function generateBoard(boardNum){
+  const cats = shuffle(CATEGORIES).slice(0,6);
+  const layout = cats.map(cat=>{
+    const questions = {};
+    for(let lvl=1;lvl<=5;lvl++){
+      questions[lvl] = pickQuestion(cat.name, lvl);
+    }
+    return { name:cat.name, icon:cat.icon, questions };
+  });
+  return layout;
+}
+
+// Board-Layout in Supabase speichern (damit alle dasselbe Board sehen)
+async function generateAndStoreRound(){
+  const b1 = generateBoard(1);
+  const b2 = generateBoard(2);
+  boardLayout = {1:b1, 2:b2};
+  await sb.from('quiz_state').update({
+    current_question:null, phase:'board', active_board:1,
+    owner_player_id:null, current_value:0, buzz_value:0, is_owner_phase:true,
+    buzzer_open:false, buzzed_player_id:null, already_buzzed:[],
+    answer_revealed:false, result_text:null, result_kind:null,
+    played_questions:[],
+    board_layout:{b1, b2},
+    updated_at:new Date().toISOString()
+  }).eq('id',1);
+}
+
+// =========================================================
+//  ROLLENWAHL
+// =========================================================
+function chooseRole(role){
+  ROLE = role;
+  $("roleScreen").classList.add("hidden");
+  if(role==='host'){ $("hostView").classList.remove("hidden"); initHost(); }
+  if(role==='master'){ $("masterView").classList.remove("hidden"); initMaster(); }
+  if(role==='buzzer'){ $("buzzerView").classList.remove("hidden"); initBuzzer(); }
+}
+
+// =========================================================
+//  REALTIME SUBSCRIPTIONS
+// =========================================================
+function subscribeAll(onUpdate){
+  sb.channel('quiz-state-ch')
+    .on('postgres_changes',{event:'*',schema:'public',table:'quiz_state'},payload=>{
+      state = payload.new;
+      if(state.board_layout){boardLayout={1:state.board_layout.b1,2:state.board_layout.b2}}
+      onUpdate();
+    })
+    .subscribe(s=>setLive(s==='SUBSCRIBED'));
+
+  sb.channel('quiz-players-ch')
+    .on('postgres_changes',{event:'*',schema:'public',table:'quiz_players'},async()=>{
+      await refreshPlayers(); onUpdate();
+    })
+    .subscribe();
+}
+
+function setLive(ok){
+  const ids = ["hostLive","masterLive","buzzLive","buzzLive2"];
+  ids.forEach(id=>{const el=$(id);if(!el)return;el.className="pill "+(ok?"live":"dead");el.textContent=ok?"Live":"Getrennt"});
+}
+
+async function refreshPlayers(){
+  const {data}=await sb.from('quiz_players').select('*').order('joined_at');
+  players=data||[];
+}
+async function refreshState(){
+  const {data}=await sb.from('quiz_state').select('*').eq('id',1).single();
+  state=data;
+  if(state&&state.board_layout){boardLayout={1:state.board_layout.b1,2:state.board_layout.b2}}
+}
+
+function playerById(id){return players.find(p=>p.id===id)}
+
+// =========================================================
+//  HOST
+// =========================================================
+async function initHost(){
+  await refreshState(); await refreshPlayers();
+  subscribeAll(renderHost);
+  renderHost();
+  // Fallback: falls nach 2s noch kein Board existiert (kein Spielleiter aktiv), selbst generieren
+  setTimeout(async()=>{
+    await refreshState();
+    if(!boardLayout[1]){ await generateAndStoreRound(); renderHost(); }
+  },2000);
+}
+
+function renderHost(){
+  if(!state) return;
+  renderScores($("hostScores"));
+  $("hostBoardLabel").textContent = `BOARD ${state.active_board}`;
+  renderGrid($("hostGrid"), state.active_board, true);
+  // buzz indicator
+  const hb=$("hostBuzzIndicator");
+  hb.className = "host-buzz"+(state.buzzer_open?" armed":"");
+  // overlay
+  renderOverlay('host');
+}
+
+// =========================================================
+//  SHARED: SCORES + GRID + OVERLAY
+// =========================================================
+function renderScores(container){
+  if(!container) return;
+  container.innerHTML='';
+  players.forEach(p=>{
+    const card=document.createElement('div');
+    let cls='score-card';
+    if(state&&state.owner_player_id===p.id&&state.phase!=='board') cls+=' turn';
+    if(state&&state.buzzed_player_id===p.id) cls+=' buzzed';
+    card.className=cls;
+    const tag = (state&&state.buzzed_player_id===p.id)?'GEBUZZERT':((state&&state.owner_player_id===p.id&&state.phase!=='board')?'IST DRAN':'');
+    card.innerHTML=`<span class="tag">${tag}</span>
+      <div class="nm">${escapeHtml(p.name)}</div>
+      <div class="sc ${p.score<0?'neg':''}">${p.score}</div>`;
+    container.appendChild(card);
+  });
+}
+
+function renderGrid(container, boardNum, clickable){
+  if(!container) return;
+  const layout = boardLayout[boardNum];
+  const pts = pointsForBoard(boardNum);
+  if(!layout){container.innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--muted);padding:40px">Board wird generiert… (Spielleiter: „Neue Runde")</div>';return}
+  container.innerHTML='';
+  // headers
+  layout.forEach(cat=>{
+    const h=document.createElement('div');h.className='cat-head';h.textContent=cat.name;container.appendChild(h);
+  });
+  // cells per level
+  for(let i=0;i<5;i++){
+    layout.forEach((cat,ci)=>{
+      const lvl=i+1; const points=pts[i];
+      const cell=document.createElement('button');
+      const key=qKey(boardNum,cat.name,points);
+      const done=(state.played_questions||[]).includes(key);
+      cell.className='cell'+(done?' done':'');
+      cell.textContent=done?'':points;
+      if(!done && clickable && state.phase==='board'){
+        cell.onclick=()=>openQuestion(boardNum,cat.name,lvl,points,cat.questions[lvl]);
+      } else if(state.phase!=='board'){
+        cell.classList.add('disabled');
+      }
+      container.appendChild(cell);
+    });
+  }
+}
+
+// Host klickt Frage -> öffnet & setzt state (owner = current turn player)
+async function openQuestion(boardNum,catName,lvl,points,q){
+  if(!q){toast("Keine Frage hinterlegt");return}
+  // wer ist owner? -> turn_player_id, sonst erster Spieler
+  let owner = state.turn_player_id || (players[0]&&players[0].id) || null;
+  const buzzVal = Math.floor(points/2);
+  await sb.from('quiz_state').update({
+    phase:'question',
+    current_question:{board:boardNum,category:catName,points,frage:q.frage,bild:q.bild||null,antwort:q.antwort},
+    owner_player_id:owner,
+    current_value:points,
+    buzz_value:buzzVal,
+    is_owner_phase:true,
+    buzzer_open:false,
+    buzzed_player_id:null,
+    already_buzzed:[],
+    answer_revealed:false,
+    result_text:null,result_kind:'turn',
+    updated_at:new Date().toISOString()
+  }).eq('id',1);
+}
+
+function renderOverlay(view){
+  const ov=$("qOverlay");
+  if(!state||state.phase==='board'||!state.current_question){ov.classList.add('hidden');return}
+  ov.classList.remove('hidden');
+  const q=state.current_question;
+  $("ovTitle").textContent=`${q.category} ${q.points}`;
+  // Text
+  const txtEl=$("ovText");
+  if(q.frage){txtEl.textContent=q.frage;txtEl.classList.remove('hidden')}else{txtEl.classList.add('hidden')}
+  // Bild
+  const img=$("ovImg");
+  if(q.bild){img.src=q.bild;img.classList.remove('hidden');img.className='qimg'+(q.category==='FLAGGEN'?' flag':'')}
+  else{img.classList.add('hidden')}
+  // Antwort (nur wenn revealed bzw. correct)
+  const ansEl=$("ovAnswer");
+  if(state.answer_revealed){ansEl.classList.remove('hidden');$("ovAnswerVal").textContent=q.antwort}
+  else{ansEl.classList.add('hidden')}
+  // Footer (status)
+  renderOverlayFooter();
+}
+
+function renderOverlayFooter(){
+  const f=$("ovFooter");
+  if(!state) {f.innerHTML='';return}
+  // result text priority
+  if(state.result_kind==='wrong'){
+    f.innerHTML=`<div class="resultbar wrong">Falsch! Andere können jetzt buzzern.</div>`;return;
+  }
+  if(state.result_kind==='correct'){
+    const p=playerById(state.buzzed_player_id||state.owner_player_id);
+    f.innerHTML=`<div class="resultbar correct">Richtig!${p?' '+escapeHtml(p.name):''} ✓</div>`;return;
+  }
+  if(state.result_kind==='reveal'){
+    f.innerHTML=`<div class="resultbar reveal">Auflösung – schließt automatisch…</div>`;return;
+  }
+  // default: whose turn
+  const owner = state.buzzed_player_id ? playerById(state.buzzed_player_id) : playerById(state.owner_player_id);
+  if(owner){
+    const initial=owner.name.charAt(0).toUpperCase();
+    const verb = state.buzzed_player_id? 'BUZZERTE – ANTWORTET' : 'IST DRAN';
+    f.innerHTML=`<div class="turnbar"><span class="av">${initial}</span> ${escapeHtml(owner.name)} ${verb}</div>`;
+  } else {
+    f.innerHTML=`<div class="turnbar">Wer ist dran?</div>`;
+  }
+}
+
+function escapeHtml(s){return (s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+
+// =========================================================
+//  SPIELLEITER
+// =========================================================
+async function initMaster(){
+  await refreshState(); await refreshPlayers();
+  if(!boardLayout[1]){ await generateAndStoreRound(); }
+  subscribeAll(renderMaster);
+  renderMaster();
+}
+
+function renderMaster(){
+  if(!state) return;
+  $("masterLive");
+  renderMasterQuestion();
+  renderMasterPlayers();
+}
+
+function renderMasterQuestion(){
+  const c=$("masterQContent");
+  if(!state||state.phase==='board'||!state.current_question){
+    c.innerHTML='Keine Frage offen.<br>Auf dem Host-Board eine Frage anklicken.';
+    return;
+  }
+  const q=state.current_question;
+  const owner=playerById(state.owner_player_id);
+  const buzzer=state.buzzed_player_id?playerById(state.buzzed_player_id):null;
+  const answering = buzzer||owner;
+  const isBuzzPhase = !!state.buzzed_player_id;
+
+  // wer beantwortet
+  let whoClass='owner',whoTxt='';
+  if(buzzer){whoClass='buzzer';whoTxt=`🔴 ${escapeHtml(buzzer.name)} hat gebuzzert & antwortet`}
+  else if(state.buzzer_open){whoClass='nobody';whoTxt='Buzzer offen – warte auf Buzz…'}
+  else if(owner){whoClass='owner';whoTxt=`🎯 ${escapeHtml(owner.name)} ist dran`}
+  else{whoClass='nobody';whoTxt='Kein Spieler zugewiesen'}
+
+  // werte
+  const plusVal = isBuzzPhase ? state.buzz_value : state.current_value;
+  const minusVal = Math.floor(plusVal/2);
+
+  c.innerHTML=`
+    <div class="who-answers ${whoClass}">${whoTxt}</div>
+    <div class="mq">
+      <div class="mq-cat">${q.category} · ${q.points}</div>
+      ${q.frage?`<div class="mq-text">${escapeHtml(q.frage)}</div>`:''}
+      ${q.bild?`<img class="mq-img" src="${q.bild}">`:''}
+      <div class="mq-ans"><div class="lbl">RICHTIGE ANTWORT</div><div class="val">${escapeHtml(q.antwort)}</div></div>
+    </div>
+    <div class="value-info">
+      <div><div class="v plus">+${plusVal}</div><div class="l">BEI RICHTIG</div></div>
+      <div><div class="v minus">−${minusVal}</div><div class="l">BEI FALSCH</div></div>
+    </div>
+    <div class="master-buttons">
+      <button class="mbtn correct" ${answering?'':'disabled'} onclick="judge(true)">✓ RICHTIG</button>
+      <button class="mbtn wrong" ${answering?'':'disabled'} onclick="judge(false)">✗ FALSCH</button>
+      <button class="mbtn reveal" onclick="revealAnswer()">👁 ANTWORT AUFDECKEN</button>
+      <button class="mbtn neutral" onclick="closeQuestion()">Frage schließen (ohne Wertung)</button>
+    </div>
+  `;
+}
+
+function renderMasterPlayers(){
+  const c=$("masterPlayers");
+  c.innerHTML='';
+  if(players.length===0){c.innerHTML='<div style="color:var(--muted);text-align:center;padding:20px">Noch keine Spieler.<br>Sie treten über „Buzzer" bei.</div>';return}
+  players.forEach(p=>{
+    const isTurn = state&&state.turn_player_id===p.id;
+    const row=document.createElement('div');
+    row.className='mp-row'+(isTurn?' turn':'');
+    row.innerHTML=`
+      <div>
+        <div class="mp-name">${escapeHtml(p.name)} ${isTurn?'🎯':''}</div>
+        <div class="mp-sc ${p.score<0?'neg':''}">${p.score} Pkt</div>
+      </div>
+      <div class="mp-actions">
+        <button class="mini" onclick="setTurn('${p.id}')">Dran</button>
+        <button class="mini" onclick="adjustScore('${p.id}',-50)">−50</button>
+        <button class="mini" onclick="adjustScore('${p.id}',50)">+50</button>
+        <button class="mini" onclick="kickPlayer('${p.id}')">✕</button>
+      </div>`;
+    c.appendChild(row);
+  });
+}
+
+// ---- Spielleiter Aktionen ----
+async function judge(correct){
+  if(!state||!state.current_question) return;
+  const q=state.current_question;
+  const isBuzzPhase=!!state.buzzed_player_id;
+  const answeringId = state.buzzed_player_id || state.owner_player_id;
+  if(!answeringId){toast("Niemand zugewiesen");return}
+  const val = isBuzzPhase ? state.buzz_value : state.current_value;
+
+  if(correct){
+    // +val für answering, Frage als gespielt markieren, Antwort aufdecken & schließen
+    await changeScore(answeringId, +val);
+    const played=[...(state.played_questions||[]), qKey(q.board,q.category,q.points)];
+    // turn geht an den, der richtig hatte (Jeopardy-Regel)
+    await sb.from('quiz_state').update({
+      answer_revealed:true, result_kind:'correct',
+      buzzer_open:false,
+      turn_player_id: answeringId,
+      played_questions:played,
+      updated_at:new Date().toISOString()
+    }).eq('id',1);
+    // nach kurzer Anzeige schließen
+    scheduleClose(2500);
+  } else {
+    // -floor(val/2), buzzer öffnen für andere
+    await changeScore(answeringId, -Math.floor(val/2));
+    const alreadyBuzzed=[...(state.already_buzzed||[]), answeringId];
+    await sb.from('quiz_state').update({
+      result_kind:'wrong',
+      is_owner_phase:false,
+      buzzer_open:true,
+      buzzed_player_id:null,
+      // ab jetzt spielen Buzzer um buzz_value (Hälfte der Fragenpunkte) – bleibt konstant
+      already_buzzed:alreadyBuzzed,
+      updated_at:new Date().toISOString()
+    }).eq('id',1);
+    toast("Falsch – Buzzer für andere geöffnet");
+  }
+}
+
+async function revealAnswer(){
+  if(!state||!state.current_question) return;
+  const q=state.current_question;
+  const played=[...new Set([...(state.played_questions||[]), qKey(q.board,q.category,q.points)])];
+  await sb.from('quiz_state').update({
+    answer_revealed:true, result_kind:'reveal', buzzer_open:false,
+    played_questions:played, updated_at:new Date().toISOString()
+  }).eq('id',1);
+  scheduleClose(REVEAL_AUTOCLOSE_MS);
+}
+
+function scheduleClose(ms){
+  clearTimeout(revealTimer);
+  revealTimer=setTimeout(()=>closeQuestion(),ms);
+}
+
+async function closeQuestion(){
+  clearTimeout(revealTimer);
+  await sb.from('quiz_state').update({
+    phase:'board', current_question:null,
+    owner_player_id:null, buzzed_player_id:null, buzzer_open:false,
+    is_owner_phase:true, already_buzzed:[],
+    answer_revealed:false, result_text:null, result_kind:null,
+    updated_at:new Date().toISOString()
+  }).eq('id',1);
+}
+
+async function setTurn(pid){
+  await sb.from('quiz_state').update({turn_player_id:pid,updated_at:new Date().toISOString()}).eq('id',1);
+  // wenn Frage offen und noch owner-phase: owner aktualisieren
+  if(state&&state.phase==='question'&&!state.buzzed_player_id&&state.is_owner_phase){
+    await sb.from('quiz_state').update({owner_player_id:pid}).eq('id',1);
+  }
+  toast("Dran gesetzt");
+}
+
+async function switchBoard(n){
+  await sb.from('quiz_state').update({active_board:n,updated_at:new Date().toISOString()}).eq('id',1);
+}
+
+async function newRound(){
+  if(!confirm("Neue Runde? Es werden frische Fragen gezogen (keine Wiederholungen) und das Board geleert.")) return;
+  await generateAndStoreRound();
+  toast("Neue Runde generiert!");
+}
+
+async function resetScores(){
+  if(!confirm("Alle Punkte auf 0 zurücksetzen?")) return;
+  await sb.from('quiz_players').update({score:0}).neq('id','00000000-0000-0000-0000-000000000000');
+  toast("Punkte zurückgesetzt");
+}
+
+async function changeScore(pid,delta){
+  const p=playerById(pid); if(!p)return;
+  await sb.from('quiz_players').update({score:p.score+delta}).eq('id',pid);
+}
+async function adjustScore(pid,delta){ await changeScore(pid,delta); }
+
+async function kickPlayer(pid){
+  if(!confirm("Spieler entfernen?"))return;
+  await sb.from('quiz_players').delete().eq('id',pid);
+}
+
+async function addManualPlayer(){
+  const name=prompt("Name des Spielers:");
+  if(!name)return;
+  await sb.from('quiz_players').insert({name:name.trim(),score:0});
+}
+
+// =========================================================
+//  BUZZER (Spieler)
+// =========================================================
+async function initBuzzer(){
+  await refreshState(); await refreshPlayers();
+  subscribeAll(renderBuzzer);
+  // restore from session
+  const saved=sessionStorage.getItem("quizduell_pid");
+  if(saved && players.find(p=>p.id===saved)){
+    myPlayerId=saved;
+    showBuzzPlay();
+  }
+  renderBuzzer();
+  // keyboard
+  document.addEventListener('keydown',e=>{
+    if(e.code==='Space' && ROLE==='buzzer' && myPlayerId){e.preventDefault();pressBuzz()}
+  });
+  $("playerName").addEventListener('keydown',e=>{if(e.key==='Enter')joinGame()});
+}
+
+async function joinGame(){
+  const name=$("playerName").value.trim();
+  if(!name){toast("Bitte Namen eingeben");return}
+  // existiert schon?
+  let existing=players.find(p=>p.name.toLowerCase()===name.toLowerCase());
+  if(existing){myPlayerId=existing.id}
+  else{
+    const {data,error}=await sb.from('quiz_players').insert({name,score:0}).select().single();
+    if(error){toast("Fehler beim Beitreten");return}
+    myPlayerId=data.id;
+  }
+  sessionStorage.setItem("quizduell_pid",myPlayerId);
+  await refreshPlayers();
+  showBuzzPlay();
+  renderBuzzer();
+}
+
+function showBuzzPlay(){
+  $("joinScreen").classList.add("hidden");
+  $("buzzPlay").classList.remove("hidden");
+}
+
+async function pressBuzz(){
+  if(!state||!state.buzzer_open||!myPlayerId)return;
+  if((state.already_buzzed||[]).includes(myPlayerId)){toast("Du hattest diese Frage schon");return}
+  if(state.buzzed_player_id){return} // schon jemand
+  // versuche zu buzzern (erster gewinnt)
+  const {data,error}=await sb.from('quiz_state')
+    .update({buzzed_player_id:myPlayerId,buzz_ts:new Date().toISOString(),buzzer_open:false,result_kind:null,updated_at:new Date().toISOString()})
+    .eq('id',1).is('buzzed_player_id',null).eq('buzzer_open',true).select();
+  if(data&&data.length){navigator.vibrate&&navigator.vibrate(80)}
+}
+
+function renderBuzzer(){
+  if(!myPlayerId){return}
+  const me=playerById(myPlayerId);
+  $("myName").textContent=me?me.name:'—';
+  $("myScore").textContent=me?me.score:'0';
+
+  const btn=$("bigBuzz");
+  const status=$("buzzStatus");
+  if(!state){status.textContent='Verbinde…';btn.disabled=true;return}
+
+  const iAmOwner = state.owner_player_id===myPlayerId && state.is_owner_phase && state.phase==='question';
+  const iBuzzed = state.buzzed_player_id===myPlayerId;
+  const iAmLocked = (state.already_buzzed||[]).includes(myPlayerId);
+
+  if(state.phase==='board'){
+    status.textContent='Warte auf nächste Frage…';status.className='buzz-status';
+    btn.disabled=true;btn.classList.remove('armed');btn.textContent='BUZZ';
+  } else if(iBuzzed){
+    status.textContent='Du hast gebuzzert! Antworte!';status.className='buzz-status mine';
+    btn.disabled=true;btn.classList.remove('armed');btn.textContent='DU!';
+  } else if(iAmOwner){
+    status.textContent='Du bist dran – beantworte die Frage!';status.className='buzz-status mine';
+    btn.disabled=true;btn.classList.remove('armed');btn.textContent='DEINE FRAGE';
+  } else if(state.buzzer_open && !iAmLocked){
+    status.textContent='BUZZER OFFEN – Drück jetzt!';status.className='buzz-status open';
+    btn.disabled=false;btn.classList.add('armed');btn.textContent='BUZZ!';
+  } else if(state.buzzer_open && iAmLocked){
+    status.textContent='Du hattest diese Frage schon.';status.className='buzz-status locked';
+    btn.disabled=true;btn.classList.remove('armed');btn.textContent='✕';
+  } else if(state.buzzed_player_id){
+    const b=playerById(state.buzzed_player_id);
+    status.textContent=(b?b.name:'Jemand')+' hat gebuzzert…';status.className='buzz-status locked';
+    btn.disabled=true;btn.classList.remove('armed');btn.textContent='—';
+  } else {
+    status.textContent='Buzzer gesperrt – warte…';status.className='buzz-status locked';
+    btn.disabled=true;btn.classList.remove('armed');btn.textContent='BUZZ';
+  }
+}
+
+// Host: Klick auf Buzz-Indikator macht nichts (nur Anzeige)
+</script>
+</body>
+</html>
