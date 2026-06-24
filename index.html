@@ -453,41 +453,68 @@ function loadUsed(){try{return JSON.parse(localStorage.getItem(USED_KEY))||{}}ca
 function saveUsed(u){localStorage.setItem(USED_KEY,JSON.stringify(u))}
 // used = { "KATEGORIE|level": ["antwort1","antwort2", ...] }
 
-function pickQuestion(catName, level){
+// Zieht eine Frage aus Kategorie+Stufe.
+// roundUsed = Set von "KATEGORIE|level|antwort", die in DIESER Runde schon
+//             vergeben wurden (verhindert Doppelte über beide Boards).
+function pickQuestion(catName, level, roundUsed){
   const cat = CATEGORIES.find(c=>c.name===catName);
   if(!cat) return null;
   const pool = cat.levels[level] || [];
+  if(pool.length===0) return null;
   const used = loadUsed();
   const ukey = `${catName}|${level}`;
   const usedList = used[ukey] || [];
-  let avail = pool.filter(q=>!usedList.includes(q.antwort));
-  if(avail.length===0){ // alle durch -> reset diese Stufe
-    avail = pool;
+  const inRound = (q)=> roundUsed && roundUsed.has(`${ukey}|${q.antwort}`);
+  // 1. Wahl: weder langfristig benutzt noch in dieser Runde schon dran
+  let avail = pool.filter(q=>!usedList.includes(q.antwort) && !inRound(q));
+  // 2. Wahl: langfristig-Liste ignorieren, aber Runden-Doppel weiter vermeiden
+  if(avail.length===0){
+    avail = pool.filter(q=>!inRound(q));
     used[ukey] = [];
   }
+  // 3. Notnagel: alles erlaubt (sollte praktisch nie passieren)
+  if(avail.length===0){ avail = pool; }
   const chosen = avail[Math.floor(Math.random()*avail.length)];
   used[ukey] = [...(used[ukey]||[]), chosen.antwort];
   saveUsed(used);
+  if(roundUsed) roundUsed.add(`${ukey}|${chosen.antwort}`);
   return chosen;
 }
 
-// Erzeugt Board-Layout: 6 zufällige Kategorien, je 5 Fragen (eine pro Stufe)
-function generateBoard(boardNum){
-  const cats = shuffle(CATEGORIES).slice(0,6);
-  const layout = cats.map(cat=>{
+// Erzeugt EIN Board aus einer fest vorgegebenen Kategorienliste.
+function buildBoardFromCats(cats, roundUsed){
+  return cats.map(cat=>{
     const questions = {};
     for(let lvl=1;lvl<=5;lvl++){
-      questions[lvl] = pickQuestion(cat.name, lvl);
+      questions[lvl] = pickQuestion(cat.name, lvl, roundUsed);
     }
     return { name:cat.name, icon:cat.icon, questions };
   });
-  return layout;
+}
+
+// Erzeugt BEIDE Boards gemeinsam:
+//  - 12 verschiedene Kategorien (6 für Board 1, 6 für Board 2), keine doppelt
+//  - keine Frage erscheint auf beiden Boards (roundUsed-Set)
+function generateBothBoards(){
+  const roundUsed = new Set();
+  const shuffled = shuffle(CATEGORIES);
+  const need = Math.min(12, shuffled.length);
+  const chosenCats = shuffled.slice(0, need);
+  const cats1 = chosenCats.slice(0, 6);
+  let cats2 = chosenCats.slice(6, 12);
+  // Falls weniger als 12 Kategorien existieren: Board 2 mit weiteren auffüllen
+  if(cats2.length<6){
+    const rest = shuffled.filter(c=>!cats1.includes(c) && !cats2.includes(c));
+    cats2 = cats2.concat(rest.slice(0, 6-cats2.length));
+  }
+  const b1 = buildBoardFromCats(cats1.slice(0,6), roundUsed);
+  const b2 = buildBoardFromCats(cats2.slice(0,6), roundUsed);
+  return {b1, b2};
 }
 
 // Board-Layout in Supabase speichern (damit alle dasselbe Board sehen)
 async function generateAndStoreRound(){
-  const b1 = generateBoard(1);
-  const b2 = generateBoard(2);
+  const {b1, b2} = generateBothBoards();
   boardLayout = {1:b1, 2:b2};
   await sb.from('quiz_state').update({
     current_question:null, phase:'board', active_board:1,
@@ -949,16 +976,18 @@ function useJoker(pid){
 function closeJokerPicker(){ $("jokerOverlay").classList.add('hidden'); }
 
 // Schritt 2: Frage an Ziel B übertragen. A's Joker verbraucht, B bekommt bei Richtig die Punkte.
+// WICHTIG: Es bleibt A's Zug (turn_player_id = A). Nach der Joker-Frage rückt
+// die Reihenfolge ganz normal hinter A weiter – B wird nicht zum Bezugspunkt.
 async function assignJoker(fromId,targetId){
   closeJokerPicker();
   const from=playerById(fromId), target=playerById(targetId);
   if(!from||!target)return;
   // A's Joker verbrauchen
   await sb.from('quiz_players').update({joker_used:true}).eq('id',fromId);
-  // Frage an B übertragen: B wird owner & ist dran, Buzzer zu
+  // Frage an B übertragen: B antwortet (owner), aber turn_player_id bleibt A
   await sb.from('quiz_state').update({
     owner_player_id:targetId,
-    turn_player_id:targetId,
+    turn_player_id:fromId,
     is_owner_phase:true,
     buzzer_open:false,
     buzzed_player_id:null,
