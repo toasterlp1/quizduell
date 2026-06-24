@@ -395,6 +395,20 @@ input{font-family:inherit}
 
 <div id="toast" class="toast hidden"></div>
 
+<!-- ============ JOKER ZIELAUSWAHL (Spielleiter) ============ -->
+<div id="jokerOverlay" class="overlay hidden">
+  <div class="qcard" style="width:min(460px,94vw)">
+    <div class="qtitle" style="color:#bcd4ff">🃏 JOKER – WER MUSS ANTWORTEN?</div>
+    <div class="qbody" style="padding:26px">
+      <div id="jokerFrom" style="color:var(--muted);font-size:14px;margin-bottom:16px"></div>
+      <div id="jokerTargets" style="display:flex;flex-direction:column;gap:10px"></div>
+    </div>
+    <div class="qfooter">
+      <button class="btn" onclick="closeJokerPicker()">Abbrechen</button>
+    </div>
+  </div>
+</div>
+
 <script src="questions.js"></script>
 <script>
 // =========================================================
@@ -625,16 +639,28 @@ function renderGrid(container, boardNum, clickable){
   }
 }
 
-// Host klickt Frage -> öffnet & setzt state (owner = current turn player)
+// Reihenfolge = Join-Reihenfolge (players ist bereits nach joined_at sortiert).
+// Liefert die Id des nächsten Spielers nach der aktuellen turn_player_id.
+function nextPlayerId(afterId){
+  if(players.length===0) return null;
+  if(!afterId) return players[0].id;
+  const idx = players.findIndex(p=>p.id===afterId);
+  if(idx===-1) return players[0].id;
+  return players[(idx+1)%players.length].id;
+}
+
+// Host klickt Frage -> öffnet & setzt state.
+// Owner ist automatisch der NÄCHSTE Spieler in der Join-Reihenfolge.
 async function openQuestion(boardNum,catName,lvl,points,q){
   if(!q){toast("Keine Frage hinterlegt");return}
-  // wer ist owner? -> turn_player_id, sonst erster Spieler
-  let owner = state.turn_player_id || (players[0]&&players[0].id) || null;
+  // automatisch weiterrücken: der Nächste nach dem letzten Owner ist dran
+  const owner = nextPlayerId(state.turn_player_id);
   const buzzVal = Math.floor(points/2);
   await sb.from('quiz_state').update({
     phase:'question',
     current_question:{board:boardNum,category:catName,points,frage:q.frage,bild:q.bild||null,antwort:q.antwort},
     owner_player_id:owner,
+    turn_player_id:owner,
     current_value:points,
     buzz_value:buzzVal,
     is_owner_phase:true,
@@ -643,6 +669,7 @@ async function openQuestion(boardNum,catName,lvl,points,q){
     already_buzzed:[],
     answer_revealed:false,
     result_text:null,result_kind:'turn',
+    joker_from_id:null,
     updated_at:new Date().toISOString()
   }).eq('id',1);
 }
@@ -673,8 +700,10 @@ function renderOverlayFooter(){
   if(!state) {f.innerHTML='';return}
   // result text priority
   if(state.result_kind==='joker'){
-    const p=playerById(state.owner_player_id);
-    f.innerHTML=`<div class="resultbar joker">🃏 Joker! Frage geht an ${p?escapeHtml(p.name):'…'}</div>`;return;
+    const target=playerById(state.owner_player_id);
+    const from=state.joker_from_id?playerById(state.joker_from_id):null;
+    const fromTxt=from?`${escapeHtml(from.name)} → `:'';
+    f.innerHTML=`<div class="resultbar joker">🃏 Joker! ${fromTxt}${target?escapeHtml(target.name):'…'} muss antworten</div>`;return;
   }
   if(state.result_kind==='wrong'){
     f.innerHTML=`<div class="resultbar wrong">Falsch! Andere können jetzt buzzern.</div>`;return;
@@ -808,11 +837,10 @@ async function judge(correct){
     // +val für answering, Frage als gespielt markieren, Antwort aufdecken & schließen
     await changeScore(answeringId, +val);
     const played=[...(state.played_questions||[]), qKey(q.board,q.category,q.points)];
-    // turn geht an den, der richtig hatte (Jeopardy-Regel)
+    // turn_player_id NICHT ändern – die nächste Frage rückt automatisch zum Nächsten weiter
     await sb.from('quiz_state').update({
       answer_revealed:true, result_kind:'correct',
       buzzer_open:false,
-      turn_player_id: answeringId,
       played_questions:played,
       updated_at:new Date().toISOString()
     }).eq('id',1);
@@ -858,6 +886,7 @@ async function closeQuestion(){
     owner_player_id:null, buzzed_player_id:null, buzzer_open:false,
     is_owner_phase:true, already_buzzed:[],
     answer_revealed:false, result_text:null, result_kind:null,
+    joker_from_id:null,
     updated_at:new Date().toISOString()
   }).eq('id',1);
 }
@@ -875,10 +904,16 @@ async function setTurn(pid){
 async function giveCard(pid){
   const p=playerById(pid); if(!p)return;
   const current=playerCards(p);
-  if(current>=2){toast(`${p.name} hat schon Rot`);return}
+  if(current>=2){
+    // schon Rot -> jeder weitere Klick zieht erneut die Strafe ab
+    if(!confirm(`${p.name} hat bereits Rot. Nochmal −${RED_CARD_PENALTY} Punkte? Sicher?`))return;
+    await sb.from('quiz_players').update({score:p.score-RED_CARD_PENALTY}).eq('id',pid);
+    toast(`🟥 ${p.name}: erneut −${RED_CARD_PENALTY}`);
+    return;
+  }
   const next=current+1;
   if(next>=2){
-    // rote Karte -> Strafe abziehen
+    // erste rote Karte -> Strafe abziehen
     if(!confirm(`Zweite gelbe Karte für ${p.name} → ROTE KARTE und −${RED_CARD_PENALTY} Punkte. Sicher?`))return;
     await sb.from('quiz_players').update({cards:next,score:p.score-RED_CARD_PENALTY}).eq('id',pid);
     toast(`🟥 Rote Karte für ${p.name} (−${RED_CARD_PENALTY})`);
@@ -889,24 +924,48 @@ async function giveCard(pid){
 }
 
 // ---- JOKER ----
-async function useJoker(pid){
+// Schritt 1: A drückt Joker -> Auswahl-Overlay mit allen ANDEREN Spielern
+function useJoker(pid){
   const p=playerById(pid); if(!p)return;
   if(!jokerAvailable(p)){toast(`${p.name} hat keinen Joker mehr`);return}
   if(!(state&&state.phase==='question'&&state.current_question)){toast("Keine Frage offen");return}
-  if(!confirm(`Joker von ${p.name} einsetzen? Die Frage wird ihm übertragen.`))return;
-  // Joker verbrauchen
-  await sb.from('quiz_players').update({joker_used:true}).eq('id',pid);
-  // Frage an diesen Spieler übertragen: owner setzen, owner-phase, buzzer zu
+  const targets=players.filter(x=>x.id!==pid);
+  if(targets.length===0){toast("Keine andere Person verfügbar");return}
+  $("jokerFrom").innerHTML=`Joker von <b style="color:var(--gold)">${escapeHtml(p.name)}</b> · wähle, wer antworten muss:`;
+  const box=$("jokerTargets");
+  box.innerHTML='';
+  targets.forEach(t=>{
+    const b=document.createElement('button');
+    b.className='btn-primary';
+    b.style.cssText='padding:14px;font-size:16px';
+    b.textContent=t.name;
+    b.onclick=()=>assignJoker(pid,t.id);
+    box.appendChild(b);
+  });
+  $("jokerOverlay").classList.remove('hidden');
+}
+
+function closeJokerPicker(){ $("jokerOverlay").classList.add('hidden'); }
+
+// Schritt 2: Frage an Ziel B übertragen. A's Joker verbraucht, B bekommt bei Richtig die Punkte.
+async function assignJoker(fromId,targetId){
+  closeJokerPicker();
+  const from=playerById(fromId), target=playerById(targetId);
+  if(!from||!target)return;
+  // A's Joker verbrauchen
+  await sb.from('quiz_players').update({joker_used:true}).eq('id',fromId);
+  // Frage an B übertragen: B wird owner & ist dran, Buzzer zu
   await sb.from('quiz_state').update({
-    owner_player_id:pid,
-    turn_player_id:pid,
+    owner_player_id:targetId,
+    turn_player_id:targetId,
     is_owner_phase:true,
     buzzer_open:false,
     buzzed_player_id:null,
+    joker_from_id:fromId,
     result_kind:'joker',
     updated_at:new Date().toISOString()
   }).eq('id',1);
-  toast(`🃏 Joker! Frage geht an ${p.name}`);
+  toast(`🃏 ${from.name} schickt die Frage an ${target.name}`);
 }
 
 async function switchBoard(n){
@@ -1026,7 +1085,7 @@ function renderBuzzer(){
     status.textContent='Du hast gebuzzert! Antworte!';status.className='buzz-status mine';
     btn.disabled=true;btn.classList.remove('armed');btn.textContent='DU!';
   } else if(iAmOwner){
-    const jokerNote = state.result_kind==='joker' ? '🃏 Joker – du bist dran!' : 'Du bist dran – beantworte die Frage!';
+    const jokerNote = state.result_kind==='joker' ? '🃏 Joker! Du wurdest drangenommen – antworte!' : 'Du bist dran – beantworte die Frage!';
     status.textContent=jokerNote;status.className='buzz-status mine';
     btn.disabled=true;btn.classList.remove('armed');btn.textContent='DEINE FRAGE';
   } else if(state.buzzer_open && !iAmLocked){
