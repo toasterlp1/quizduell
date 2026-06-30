@@ -22,6 +22,8 @@
   --text:#eaf0ff;
   --muted:#8294b8;
   --line:#22324f;
+  --ease:cubic-bezier(.22,.9,.24,1);
+  --ease-out:cubic-bezier(.16,1,.3,1);
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
@@ -34,6 +36,9 @@ body{
 .hidden{display:none !important}
 button{font-family:inherit;cursor:pointer;border:none;color:inherit}
 input{font-family:inherit}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important;scroll-behavior:auto !important}
+}
 
 /* ===================== ROLLE WÄHLEN ===================== */
 #roleScreen{
@@ -42,6 +47,7 @@ input{font-family:inherit}
 .logo{
   font-size:clamp(48px,9vw,110px);font-weight:900;font-style:italic;letter-spacing:-2px;
   display:flex;align-items:center;gap:6px;line-height:.9;
+  animation:riseIn .6s var(--ease-out) both;
 }
 .logo .q{color:#fff}
 .logo .bolt{color:var(--gold);font-size:1.1em;transform:translateY(-4px);text-shadow:0 0 30px rgba(245,197,66,.6)}
@@ -51,9 +57,15 @@ input{font-family:inherit}
 .role-card{
   background:linear-gradient(160deg,var(--panel2),var(--panel));
   border:1px solid var(--line);border-radius:18px;padding:34px 26px;text-align:center;
-  transition:.18s;display:flex;flex-direction:column;align-items:center;gap:14px;
+  transition:transform .4s var(--ease-out),border-color .4s var(--ease),box-shadow .4s var(--ease);
+  display:flex;flex-direction:column;align-items:center;gap:14px;
+  animation:riseIn .6s var(--ease-out) both;
 }
+.role-card:nth-child(1){animation-delay:.08s}
+.role-card:nth-child(2){animation-delay:.16s}
+.role-card:nth-child(3){animation-delay:.24s}
 .role-card:hover{transform:translateY(-6px);border-color:var(--blue-bright);box-shadow:0 18px 50px -20px rgba(59,130,246,.5)}
+.role-card:active{transform:translateY(-3px) scale(.98);transition-duration:.12s}
 .role-card .ic{font-size:54px}
 .role-card h3{font-size:24px;font-weight:800;letter-spacing:.5px}
 .role-card p{color:var(--muted);font-size:14px;line-height:1.5}
@@ -62,6 +74,7 @@ input{font-family:inherit}
 .role-card.master:hover{border-color:var(--gold);box-shadow:0 18px 50px -20px rgba(245,197,66,.5)}
 .role-card.buzz:hover{border-color:var(--red-bright);box-shadow:0 18px 50px -20px rgba(225,29,72,.5)}
 @media(max-width:760px){.role-grid{grid-template-columns:1fr}}
+@keyframes riseIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 
 /* ===================== TOP BAR ===================== */
 .topbar{
@@ -72,27 +85,34 @@ input{font-family:inherit}
 .topbar .brand{font-weight:900;font-style:italic;font-size:24px;letter-spacing:-1px}
 .topbar .brand .bolt{color:var(--gold)}
 .topbar .right{display:flex;align-items:center;gap:14px}
-.pill{padding:7px 16px;border-radius:30px;font-size:13px;font-weight:700;background:var(--panel2);border:1px solid var(--line)}
+.pill{padding:7px 16px;border-radius:30px;font-size:13px;font-weight:700;background:var(--panel2);border:1px solid var(--line);transition:color .3s var(--ease)}
 .pill.live{color:var(--green)}
-.pill.live::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);margin-right:7px;vertical-align:middle;box-shadow:0 0 8px var(--green)}
+.pill.live::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);margin-right:7px;vertical-align:middle;box-shadow:0 0 8px var(--green);animation:liveDot 2.2s var(--ease) infinite}
 .pill.dead{color:var(--red-bright)}
 .pill.dead::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--red-bright);margin-right:7px;vertical-align:middle}
-.btn{padding:9px 18px;border-radius:10px;font-weight:700;font-size:14px;background:var(--panel2);border:1px solid var(--line);transition:.15s}
+.btn{padding:9px 18px;border-radius:10px;font-weight:700;font-size:14px;background:var(--panel2);border:1px solid var(--line);transition:background .25s var(--ease-out),transform .15s var(--ease-out),border-color .25s var(--ease-out)}
 .btn:hover{background:var(--blue-cell2)}
+.btn:active{transform:scale(.96)}
 .btn.ghost{background:transparent}
+@keyframes liveDot{0%,100%{opacity:1}50%{opacity:.45}}
 
 /* ===================== SCORES ===================== */
 .scores{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;padding:16px 20px}
 .score-card{
   position:relative;min-width:150px;background:linear-gradient(160deg,var(--panel2),var(--panel));
-  border:1px solid var(--line);border-radius:14px;padding:14px 18px;text-align:center;transition:.2s;
+  border:1px solid var(--line);border-radius:14px;padding:14px 18px;text-align:center;
+  transition:border-color .35s var(--ease),box-shadow .35s var(--ease),transform .35s var(--ease-out);
 }
 .score-card.turn{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold),0 0 28px -6px rgba(245,197,66,.55)}
 .score-card.buzzed{border-color:var(--red-bright);box-shadow:0 0 0 1px var(--red-bright),0 0 28px -4px rgba(225,29,72,.6);animation:pulse .8s infinite}
 @keyframes pulse{0%,100%{box-shadow:0 0 0 1px var(--red-bright),0 0 28px -4px rgba(225,29,72,.6)}50%{box-shadow:0 0 0 1px var(--red-bright),0 0 40px 0 rgba(225,29,72,.9)}}
 .score-card .nm{font-weight:800;font-size:16px;letter-spacing:.3px}
-.score-card .sc{font-size:30px;font-weight:900;margin-top:4px;font-variant-numeric:tabular-nums}
+.score-card .sc{font-size:30px;font-weight:900;margin-top:4px;font-variant-numeric:tabular-nums;display:inline-block}
 .score-card .sc.neg{color:var(--red-bright)}
+.bump-up{animation:bumpUp .55s var(--ease-out)}
+.bump-down{animation:bumpDown .55s var(--ease-out)}
+@keyframes bumpUp{0%{transform:scale(1)}30%{transform:scale(1.22);color:var(--green)}100%{transform:scale(1)}}
+@keyframes bumpDown{0%{transform:scale(1)}30%{transform:scale(1.15);color:var(--red-bright)}100%{transform:scale(1)}}
 .score-card .tag{position:absolute;top:-10px;left:50%;transform:translateX(-50%);font-size:10px;font-weight:800;letter-spacing:1px;padding:3px 10px;border-radius:20px;white-space:nowrap}
 .score-card.turn .tag{background:var(--gold);color:#1a1300;display:block}
 .score-card.buzzed .tag{background:var(--red-bright);color:#fff;display:block}
@@ -102,7 +122,7 @@ input{font-family:inherit}
 .cardbadge{width:11px;height:15px;border-radius:2px;display:inline-block}
 .cardbadge.yellow{background:var(--gold);box-shadow:0 0 6px rgba(245,197,66,.6)}
 .cardbadge.red{background:var(--red-bright);box-shadow:0 0 8px rgba(225,29,72,.7)}
-.jokerbadge{font-size:14px;line-height:1;filter:saturate(1.2)}
+.jokerbadge{font-size:14px;line-height:1;filter:saturate(1.2);transition:opacity .3s var(--ease),filter .3s var(--ease)}
 .jokerbadge.used{opacity:.25;filter:grayscale(1)}
 
 /* ===================== BOARD ===================== */
@@ -123,25 +143,35 @@ input{font-family:inherit}
   background:linear-gradient(160deg,var(--blue-cell2),var(--blue-cell));
   border:1px solid #244680;border-radius:12px;padding:22px 8px;text-align:center;
   font-size:30px;font-weight:900;font-style:italic;color:var(--gold);
-  transition:.14s;letter-spacing:1px;text-shadow:0 2px 6px rgba(0,0,0,.4);
+  transition:transform .22s var(--ease-out),background .22s var(--ease-out),box-shadow .22s var(--ease-out),border-color .22s var(--ease-out),opacity .4s var(--ease);
+  letter-spacing:1px;text-shadow:0 2px 6px rgba(0,0,0,.4);
 }
 .cell:not(.done):hover{transform:scale(1.04);background:linear-gradient(160deg,#23478a,#1b3566);box-shadow:0 0 24px -6px rgba(59,130,246,.6);border-color:var(--blue-bright)}
+.cell:not(.done):active{transform:scale(.97);transition-duration:.1s}
 .cell.done{background:var(--bg2);color:transparent;border-color:var(--line);cursor:default;opacity:.4}
 .cell.disabled{cursor:default;opacity:.55}
+.cell.enter,.cat-head.enter{animation:gridIn .42s var(--ease-out) both}
+@keyframes gridIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 @media(max-width:900px){.cell{font-size:20px;padding:16px 4px}.cat-head{font-size:11px;padding:10px 4px}}
 
 /* ===================== QUESTION OVERLAY ===================== */
 .overlay{
   position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:24px;
   background:rgba(4,7,15,.82);backdrop-filter:blur(6px);
+  animation:overlayFade .25s var(--ease) both;
 }
+.overlay.closing{animation:overlayFadeOut .18s var(--ease) both}
+.overlay.closing .qcard{animation:popOut .18s var(--ease) both}
+@keyframes overlayFade{from{opacity:0}to{opacity:1}}
+@keyframes overlayFadeOut{from{opacity:1}to{opacity:0}}
+@keyframes popOut{from{transform:scale(1);opacity:1}to{transform:scale(.93);opacity:0}}
 .qcard{
   width:min(760px,94vw);background:linear-gradient(165deg,var(--panel2),var(--panel));
   border:1px solid var(--blue-bright);border-radius:22px;overflow:hidden;
   box-shadow:0 30px 90px -30px rgba(59,130,246,.7),0 0 0 1px rgba(59,130,246,.25);
-  animation:pop .25s cubic-bezier(.2,.9,.3,1.2);
+  animation:pop .3s var(--ease-out);
 }
-@keyframes pop{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes pop{from{transform:scale(.92);opacity:0}to{transform:scale(1);opacity:1}}
 .qcard .qtitle{text-align:center;padding:16px;font-size:16px;font-weight:800;letter-spacing:3px;color:var(--blue-bright);border-bottom:1px solid var(--line);text-transform:uppercase}
 .qcard .qbody{padding:40px 36px;text-align:center}
 .qcard .qtext{font-size:clamp(24px,3.4vw,40px);font-weight:900;line-height:1.2;margin-bottom:26px}
@@ -160,7 +190,7 @@ input{font-family:inherit}
 
 /* ===================== BUZZER (player) ===================== */
 .buzz-screen{min-height:100vh;display:flex;flex-direction:column}
-.buzz-main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:30px;padding:30px;text-align:center}
+.buzz-main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:30px;padding:30px;text-align:center;animation:riseIn .5s var(--ease-out) both}
 .buzz-status{font-size:20px;font-weight:800;letter-spacing:.5px;color:var(--muted);min-height:28px}
 .buzz-status.open{color:var(--green)}
 .buzz-status.locked{color:var(--red-bright)}
@@ -184,22 +214,23 @@ input{font-family:inherit}
 .buzz-cards{display:flex;gap:6px;align-items:center;font-size:13px;color:var(--muted)}
 
 /* ===================== JOIN ===================== */
-.join-box{width:min(420px,92vw);margin:auto;background:linear-gradient(165deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:18px;padding:34px;text-align:center;display:flex;flex-direction:column;gap:18px}
+.join-box{width:min(420px,92vw);margin:auto;background:linear-gradient(165deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:18px;padding:34px;text-align:center;display:flex;flex-direction:column;gap:18px;animation:riseIn .5s var(--ease-out) both}
 .join-box h2{font-size:26px;font-weight:900}
 .join-box p{color:var(--muted);font-size:14px}
 .field{display:flex;flex-direction:column;gap:7px;text-align:left}
 .field label{font-size:12px;font-weight:700;letter-spacing:1px;color:var(--muted)}
-.field input{padding:14px 16px;border-radius:11px;background:var(--bg2);border:1px solid var(--line);color:var(--text);font-size:17px;outline:none}
-.field input:focus{border-color:var(--blue-bright)}
-.btn-primary{padding:15px;border-radius:12px;font-weight:800;font-size:16px;background:linear-gradient(160deg,var(--blue-bright),var(--blue));transition:.15s}
+.field input{padding:14px 16px;border-radius:11px;background:var(--bg2);border:1px solid var(--line);color:var(--text);font-size:17px;outline:none;transition:border-color .25s var(--ease),box-shadow .25s var(--ease)}
+.field input:focus{border-color:var(--blue-bright);box-shadow:0 0 0 3px rgba(59,130,246,.18)}
+.btn-primary{padding:15px;border-radius:12px;font-weight:800;font-size:16px;background:linear-gradient(160deg,var(--blue-bright),var(--blue));transition:filter .2s var(--ease-out),transform .15s var(--ease-out)}
 .btn-primary:hover{filter:brightness(1.1)}
+.btn-primary:active{transform:scale(.97)}
 .btn-red{background:linear-gradient(160deg,var(--red-bright),var(--red))}
 
 /* ===================== SPIELLEITER PANEL ===================== */
 .master-wrap{max-width:1100px;margin:0 auto;padding:20px 26px 60px}
 .master-grid{display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start}
 @media(max-width:900px){.master-grid{grid-template-columns:1fr}}
-.panel{background:linear-gradient(165deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:16px;padding:20px}
+.panel{background:linear-gradient(165deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:16px;padding:20px;animation:riseIn .5s var(--ease-out) both}
 .panel h3{font-size:13px;letter-spacing:2px;color:var(--muted);font-weight:700;margin-bottom:14px;text-transform:uppercase}
 .mq{text-align:center;padding:10px 0 18px}
 .mq .mq-cat{font-size:13px;letter-spacing:2px;color:var(--blue-bright);font-weight:800}
@@ -209,14 +240,15 @@ input{font-family:inherit}
 .mq .mq-ans .lbl{font-size:11px;letter-spacing:2px;color:var(--muted);font-weight:700}
 .mq .mq-ans .val{font-size:24px;font-weight:900;color:#86efac;margin-top:3px}
 .master-buttons{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px}
-.mbtn{padding:18px;border-radius:13px;font-weight:800;font-size:17px;transition:.14s;border:1px solid transparent}
-.mbtn:active{transform:scale(.97)}
+.mbtn{padding:18px;border-radius:13px;font-weight:800;font-size:17px;border:1px solid transparent;transition:transform .22s var(--ease-out),filter .22s var(--ease-out)}
+.mbtn:hover:not(:disabled){transform:translateY(-2px);filter:brightness(1.08)}
+.mbtn:active:not(:disabled){transform:scale(.97);transition-duration:.1s}
 .mbtn.correct{background:linear-gradient(160deg,#16a34a,#15803d)}
 .mbtn.wrong{background:linear-gradient(160deg,var(--red-bright),var(--red))}
 .mbtn.reveal{background:linear-gradient(160deg,var(--gold),#d4a017);color:#1a1300;grid-column:1/-1}
 .mbtn.neutral{background:var(--panel);border-color:var(--line);grid-column:1/-1}
 .mbtn:disabled{opacity:.35;cursor:not-allowed;transform:none}
-.who-answers{text-align:center;padding:12px;border-radius:12px;margin-bottom:14px;font-weight:800;font-size:16px}
+.who-answers{text-align:center;padding:12px;border-radius:12px;margin-bottom:14px;font-weight:800;font-size:16px;transition:background .3s var(--ease),border-color .3s var(--ease),color .3s var(--ease)}
 .who-answers.owner{background:rgba(30,99,208,.16);border:1px solid var(--blue-bright)}
 .who-answers.buzzer{background:rgba(225,29,72,.16);border:1px solid var(--red-bright);color:#ff8da3}
 .who-answers.nobody{background:var(--panel);border:1px solid var(--line);color:var(--muted)}
@@ -226,14 +258,15 @@ input{font-family:inherit}
 .value-info div .v.minus{color:var(--red-bright)}
 .value-info div .l{font-size:11px;color:var(--muted);letter-spacing:1px}
 .master-players{display:flex;flex-direction:column;gap:8px}
-.mp-row{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-radius:10px;background:var(--bg2);border:1px solid var(--line)}
+.mp-row{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-radius:10px;background:var(--bg2);border:1px solid var(--line);transition:border-color .3s var(--ease)}
 .mp-row.turn{border-color:var(--gold)}
 .mp-row .mp-name{font-weight:700;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .mp-row .mp-sc{font-weight:900;font-variant-numeric:tabular-nums}
 .mp-row .mp-sc.neg{color:var(--red-bright)}
 .mp-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
-.mini{padding:5px 9px;font-size:12px;border-radius:7px;background:var(--panel2);border:1px solid var(--line)}
+.mini{padding:5px 9px;font-size:12px;border-radius:7px;background:var(--panel2);border:1px solid var(--line);transition:background .2s var(--ease-out),transform .15s var(--ease-out)}
 .mini:hover{background:var(--blue-cell2)}
+.mini:active{transform:scale(.93)}
 .mini.card{border-color:var(--gold);color:var(--gold)}
 .mini.card:hover{background:rgba(245,197,66,.15)}
 .mini.joker{border-color:var(--blue-bright);color:#bcd4ff}
@@ -248,7 +281,10 @@ input{font-family:inherit}
 .mp-jokerchip.used{opacity:.3;filter:grayscale(1)}
 .master-controls{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
 .setup-note{font-size:13px;color:var(--muted);line-height:1.6;background:var(--bg2);padding:14px;border-radius:10px;border:1px solid var(--line)}
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--panel2);border:1px solid var(--blue-bright);padding:14px 24px;border-radius:12px;font-weight:700;z-index:200;animation:pop .2s;box-shadow:0 12px 40px -12px rgba(0,0,0,.6)}
+.toast{position:fixed;bottom:24px;left:50%;background:var(--panel2);border:1px solid var(--blue-bright);padding:14px 24px;border-radius:12px;font-weight:700;z-index:200;box-shadow:0 12px 40px -12px rgba(0,0,0,.6);animation:toastIn .32s var(--ease-out) both}
+.toast.closing{animation:toastOut .22s var(--ease) both}
+@keyframes toastIn{from{opacity:0;transform:translate(-50%,14px)}to{opacity:1;transform:translate(-50%,0)}}
+@keyframes toastOut{from{opacity:1;transform:translate(-50%,0)}to{opacity:0;transform:translate(-50%,10px)}}
 
 /* host buzz button visual */
 .host-buzz{position:fixed;top:90px;right:30px;z-index:40;width:90px;height:90px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#2a3550,#1a2236);border:2px solid #33405e;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:900;color:var(--muted);font-size:13px;letter-spacing:1px}
@@ -421,12 +457,24 @@ let players = [];
 let state = null;            // quiz_state row
 let boardLayout = {1:null, 2:null};  // generierte Boards (Kategorien+Fragen) für aktuelle Runde
 let revealTimer = null;
+let prevScores = {};   // merkt sich den letzten bekannten Punktestand pro Spieler (für Bump-Animation)
+let lastGridKey = {1:null, 2:null};   // merkt sich, ob sich das Board seit dem letzten Render inhaltlich geändert hat
 
 // =========================================================
 //  HELPERS
 // =========================================================
 function $(id){return document.getElementById(id)}
-function toast(msg){const t=$("toast");t.textContent=msg;t.classList.remove("hidden");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.add("hidden"),2200)}
+function toast(msg){
+  const t=$("toast");
+  t.textContent=msg;
+  t.classList.remove("hidden","closing");
+  void t.offsetWidth; // Reflow, damit die Eingangsanimation bei schnellem erneutem Aufruf neu startet
+  clearTimeout(t._t); clearTimeout(t._t2);
+  t._t=setTimeout(()=>{
+    t.classList.add("closing");
+    t._t2=setTimeout(()=>{ t.classList.add("hidden"); t.classList.remove("closing"); }, 220);
+  },2200);
+}
 function pointsForBoard(b){return b===1?BOARD1_POINTS:BOARD2_POINTS}
 function qKey(b,c,p){return `${b}-${c}-${p}`}
 function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
@@ -613,9 +661,13 @@ function renderScores(container){
     card.className=cls;
     const tag = (state&&state.buzzed_player_id===p.id)?'GEBUZZERT':((state&&state.owner_player_id===p.id&&state.phase!=='board')?'IST DRAN':'');
     const jokerCls = jokerAvailable(p)?'':' used';
+    const prev = prevScores[p.id];
+    let bumpCls = '';
+    if(prev!==undefined && prev!==p.score){ bumpCls = p.score>prev ? ' bump-up' : ' bump-down'; }
+    prevScores[p.id] = p.score;
     card.innerHTML=`<span class="tag">${tag}</span>
       <div class="nm">${escapeHtml(p.name)}</div>
-      <div class="sc ${p.score<0?'neg':''}">${p.score}</div>
+      <div class="sc ${p.score<0?'neg':''}${bumpCls}">${p.score}</div>
       <div class="score-badges">
         ${cardBadgesHtml(p)}
         <span class="jokerbadge${jokerCls}" title="${jokerAvailable(p)?'Joker verfügbar':'Joker benutzt'}">🃏</span>
@@ -629,10 +681,17 @@ function renderGrid(container, boardNum, clickable){
   const layout = boardLayout[boardNum];
   const pts = pointsForBoard(boardNum);
   if(!layout){container.innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--muted);padding:40px">Board wird generiert… (Spielleiter: „Neue Runde")</div>';return}
+  // Nur animieren, wenn sich der Boardinhalt seit dem letzten Render tatsächlich geändert hat
+  // (verhindert, dass bei jedem Status-Update wie Buzzern/Punkten die ganze Animation neu abspielt)
+  const gridKey = layout.map(c=>c.name).join('|');
+  const shouldAnimate = lastGridKey[boardNum] !== gridKey;
+  lastGridKey[boardNum] = gridKey;
   container.innerHTML='';
   // headers
-  layout.forEach(cat=>{
-    const h=document.createElement('div');h.className='cat-head';h.textContent=cat.name;container.appendChild(h);
+  layout.forEach((cat,ci)=>{
+    const h=document.createElement('div');h.className='cat-head'+(shouldAnimate?' enter':'');h.textContent=cat.name;
+    if(shouldAnimate) h.style.animationDelay=(ci*18)+'ms';
+    container.appendChild(h);
   });
   // cells per level
   for(let i=0;i<5;i++){
@@ -641,7 +700,8 @@ function renderGrid(container, boardNum, clickable){
       const cell=document.createElement('button');
       const key=qKey(boardNum,cat.name,points);
       const done=(state.played_questions||[]).includes(key);
-      cell.className='cell'+(done?' done':'');
+      cell.className='cell'+(done?' done':'')+(shouldAnimate?' enter':'');
+      if(shouldAnimate) cell.style.animationDelay=(90+(i*layout.length+ci)*14)+'ms';
       cell.textContent=done?'':points;
       if(!done && clickable && state.phase==='board'){
         cell.onclick=()=>openQuestion(boardNum,cat.name,lvl,points,cat.questions[lvl]);
@@ -690,8 +750,16 @@ async function openQuestion(boardNum,catName,lvl,points,q){
 
 function renderOverlay(view){
   const ov=$("qOverlay");
-  if(!state||state.phase==='board'||!state.current_question){ov.classList.add('hidden');return}
-  ov.classList.remove('hidden');
+  const shouldShow = !!(state && state.phase!=='board' && state.current_question);
+  if(!shouldShow){
+    // sanft ausblenden statt abrupt zu verschwinden (nur einmal pro Schließvorgang auslösen)
+    if(!ov.classList.contains('hidden') && !ov.classList.contains('closing')){
+      ov.classList.add('closing');
+      setTimeout(()=>{ ov.classList.add('hidden'); ov.classList.remove('closing'); }, 180);
+    }
+    return;
+  }
+  ov.classList.remove('hidden','closing');
   const q=state.current_question;
   $("ovTitle").textContent=`${q.category} ${q.points}`;
   // Text
@@ -816,6 +884,10 @@ function renderMasterPlayers(){
     if(cards>=2){cardChips='<span class="mp-cardchip red" title="Rote Karte"></span>';}
     else if(cards===1){cardChips='<span class="mp-cardchip yellow" title="Gelbe Karte"></span>';}
     const jokerChip=`<span class="mp-jokerchip${jokerOk?'':' used'}" title="${jokerOk?'Joker verfügbar':'Joker weg'}">🃏</span>`;
+    const prev=prevScores[p.id];
+    let bumpCls='';
+    if(prev!==undefined && prev!==p.score){ bumpCls = p.score>prev ? ' bump-up' : ' bump-down'; }
+    prevScores[p.id]=p.score;
     const row=document.createElement('div');
     row.className='mp-row'+(isTurn?' turn':'');
     row.innerHTML=`
@@ -824,7 +896,7 @@ function renderMasterPlayers(){
           <span>#${idx+1} ${escapeHtml(p.name)} ${isTurn?'🎯':''}</span>
           <span class="mp-cards">${cardChips}${jokerChip}</span>
         </div>
-        <div class="mp-sc ${p.score<0?'neg':''}">${p.score} Pkt</div>
+        <div class="mp-sc ${p.score<0?'neg':''}${bumpCls}">${p.score} Pkt</div>
       </div>
       <div class="mp-actions">
         <button class="mini" onclick="setTurn('${p.id}')">Dran</button>
@@ -1074,7 +1146,18 @@ function renderBuzzer(){
   if(!myPlayerId){return}
   const me=playerById(myPlayerId);
   $("myName").textContent=me?me.name:'—';
-  $("myScore").textContent=me?me.score:'0';
+  const scoreEl=$("myScore");
+  if(me){
+    const prev=prevScores[me.id];
+    if(prev!==undefined && prev!==me.score){
+      const bumpCls = me.score>prev ? 'bump-up' : 'bump-down';
+      scoreEl.classList.remove('bump-up','bump-down');
+      void scoreEl.offsetWidth; // Reflow, damit die Animation bei erneutem Hinzufügen neu startet
+      scoreEl.classList.add(bumpCls);
+    }
+    prevScores[me.id]=me.score;
+  }
+  scoreEl.textContent=me?me.score:'0';
   // Karten + Joker Anzeige
   const cardsEl=$("myCards");
   if(me&&cardsEl){
