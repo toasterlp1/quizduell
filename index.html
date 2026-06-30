@@ -259,19 +259,16 @@ input{font-family:inherit}
 
 <!-- ============ ROLLE WÄHLEN ============ -->
 <div id="roleScreen">
-  <div class="logo"><span class="q">QUIZ</span><span class="bolt">⚡</span><span class="d">DUELL<small>STREAMER vs QUIZ</small></span></div>
+  <div class="logo"><span class="q">QUIZ</span><span class="d">DUELL</span></div>
   <div class="role-grid">
     <button class="role-card host" onclick="chooseRole('host')">
-      <div class="ic">🖥️</div><h3>HOST</h3>
-      <p>Das Board zum Streamen. Zeigt Fragen, Punkte & Ergebnisse. Hier klickst du die Fragen an.</p>
+      <h3>HOST</h3>
     </button>
     <button class="role-card master" onclick="chooseRole('master')">
-      <div class="ic">🎛️</div><h3>SPIELLEITER</h3>
-      <p>Dein verstecktes Kontroll-Panel. Sieht die Antworten, bewertet richtig/falsch. NICHT streamen!</p>
+      <h3>SPIELLEITER</h3>
     </button>
     <button class="role-card buzz" onclick="chooseRole('buzzer')">
-      <div class="ic">🔴</div><h3>BUZZER</h3>
-      <p>Für die Mitspieler. Name eingeben, dann buzzern per Knopf oder Leertaste.</p>
+      <h3>BUZZER</h3>
     </button>
   </div>
 </div>
@@ -279,7 +276,7 @@ input{font-family:inherit}
 <!-- ============ HOST ============ -->
 <div id="hostView" class="hidden">
   <div class="topbar">
-    <div class="brand">QUIZ<span class="bolt">⚡</span>DUELL</div>
+    <div class="brand">QUIZ DUELL</div>
     <div class="right">
       <span id="hostLive" class="pill dead">Verbinde…</span>
       <button class="btn ghost" onclick="location.reload()">↻ Neu laden</button>
@@ -298,7 +295,7 @@ input{font-family:inherit}
 <!-- ============ SPIELLEITER ============ -->
 <div id="masterView" class="hidden">
   <div class="topbar">
-    <div class="brand">🎛️ SPIELLEITER</div>
+    <div class="brand">SPIELLEITER</div>
     <div class="right">
       <span id="masterLive" class="pill dead">Verbinde…</span>
       <button class="btn ghost" onclick="location.reload()">↻</button>
@@ -310,7 +307,6 @@ input{font-family:inherit}
         <div class="panel" id="masterQPanel">
           <h3>Aktuelle Frage</h3>
           <div id="masterQContent" style="color:var(--muted);text-align:center;padding:30px 0">
-            Keine Frage offen.<br>Auf dem Host-Board eine Frage anklicken.
           </div>
         </div>
 
@@ -319,17 +315,8 @@ input{font-family:inherit}
           <div class="master-controls">
             <button class="btn" onclick="switchBoard(1)">Board 1</button>
             <button class="btn" onclick="switchBoard(2)">Board 2</button>
-            <button class="btn" onclick="newRound()">🔄 Neue Runde (frische Fragen)</button>
+            <button class="btn" onclick="newRound()">Neue Runde</button>
             <button class="btn btn-red" style="background:var(--red)" onclick="resetScores()">Punkte zurücksetzen</button>
-          </div>
-          <div class="setup-note" style="margin-top:14px">
-            <b>Ablauf:</b> Spieler buzzern sich rein → du wählst wer dran ist (gold markiert).
-            Host-Board zeigt nur die Frage. „Richtig" gibt volle Punkte, „Falsch" zieht die Hälfte ab
-            und öffnet automatisch den Buzzer für alle anderen. „Antwort aufdecken" zeigt die Lösung
-            im Stream und schließt nach 5 Sek.<br><br>
-            <b>Karten:</b> „⚠ Karte" gibt eine gelbe Karte. Zwei gelbe = automatisch rote Karte = −200 Punkte.<br>
-            <b>Joker:</b> Jeder Spieler hat einen Joker pro Runde. Damit überträgst du die offene Frage an ihn.
-            Reset bei „Neue Runde".
           </div>
         </div>
       </div>
@@ -349,17 +336,16 @@ input{font-family:inherit}
 <div id="buzzerView" class="hidden">
   <div id="joinScreen" class="buzz-screen">
     <div class="topbar">
-      <div class="brand">QUIZ<span class="bolt">⚡</span>DUELL</div>
+      <div class="brand">QUIZ DUELL</div>
       <span id="buzzLive" class="pill dead">Verbinde…</span>
     </div>
     <div class="join-box">
       <h2>Mitspielen</h2>
-      <p>Gib deinen Namen ein, um dem Quiz beizutreten.</p>
       <div class="field">
         <label>DEIN NAME</label>
         <input id="playerName" maxlength="16" placeholder="z.B. Schegge" autocomplete="off">
       </div>
-      <button class="btn-primary" onclick="joinGame()">Beitreten & Buzzern</button>
+      <button class="btn-primary" onclick="joinGame()">Beitreten</button>
     </div>
   </div>
 
@@ -775,7 +761,7 @@ function renderMaster(){
 function renderMasterQuestion(){
   const c=$("masterQContent");
   if(!state||state.phase==='board'||!state.current_question){
-    c.innerHTML='Keine Frage offen.<br>Auf dem Host-Board eine Frage anklicken.';
+    c.innerHTML='';
     return;
   }
   const q=state.current_question;
@@ -810,8 +796,8 @@ function renderMasterQuestion(){
     <div class="master-buttons">
       <button class="mbtn correct" ${answering?'':'disabled'} onclick="judge(true)">✓ RICHTIG</button>
       <button class="mbtn wrong" ${answering?'':'disabled'} onclick="judge(false)">✗ FALSCH</button>
-      <button class="mbtn reveal" onclick="revealAnswer()">👁 ANTWORT AUFDECKEN</button>
-      <button class="mbtn neutral" onclick="closeQuestion()">Frage schließen (ohne Wertung)</button>
+      <button class="mbtn reveal" onclick="revealAnswer()">ANTWORT AUFDECKEN</button>
+      <button class="mbtn neutral" onclick="closeQuestion()">Frage schließen</button>
     </div>
   `;
 }
@@ -819,7 +805,7 @@ function renderMasterQuestion(){
 function renderMasterPlayers(){
   const c=$("masterPlayers");
   c.innerHTML='';
-  if(players.length===0){c.innerHTML='<div style="color:var(--muted);text-align:center;padding:20px">Noch keine Spieler.<br>Sie treten über „Buzzer" bei.</div>';return}
+  if(players.length===0){return}
   const qOpen = state && state.phase==='question' && state.current_question;
   players.forEach((p,idx)=>{
     const isTurn = state&&state.turn_player_id===p.id;
@@ -1003,13 +989,13 @@ async function switchBoard(n){
 }
 
 async function newRound(){
-  if(!confirm("Neue Runde? Es werden frische Fragen gezogen (keine Wiederholungen), das Board geleert und alle Joker zurückgesetzt.")) return;
+  if(!confirm("Neue Runde starten?")) return;
   await generateAndStoreRound();
   toast("Neue Runde – Joker zurückgesetzt!");
 }
 
 async function resetScores(){
-  if(!confirm("Alle Punkte auf 0 zurücksetzen? (Karten & Joker werden ebenfalls zurückgesetzt)")) return;
+  if(!confirm("Alle Punkte auf 0 zurücksetzen?")) return;
   await sb.from('quiz_players').update({score:0,cards:0,joker_used:false}).neq('id','00000000-0000-0000-0000-000000000000');
   toast("Punkte, Karten & Joker zurückgesetzt");
 }
