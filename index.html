@@ -66,6 +66,14 @@ body{
   50%{transform:translate(-50%,-80px) scale(1.25)}
   100%{transform:translate(-50%,60px) scale(.9)}
 }
+.particles{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
+.particles .p{position:absolute;bottom:-20px;border-radius:50%;animation:floatUp linear infinite}
+@keyframes floatUp{
+  0%{transform:translate(0,0);opacity:0}
+  8%{opacity:var(--op,.8)}
+  92%{opacity:var(--op,.8)}
+  100%{transform:translate(var(--dx,40px),-115vh);opacity:0}
+}
 .hidden{display:none !important}
 button{font-family:inherit;cursor:pointer;border:none;color:inherit}
 input{font-family:inherit}
@@ -327,6 +335,33 @@ input{font-family:inherit}
 <body>
 
 <div class="bg-fx" aria-hidden="true"><span class="b1"></span><span class="b2"></span><span class="b3"></span></div>
+<div class="particles" id="bgParticles" aria-hidden="true"></div>
+<script>
+(function(){
+  var colors = ['59,130,246','245,197,66','225,29,72','255,255,255'];
+  var weights = [0.35,0.3,0.2,0.15];
+  function pickColor(){
+    var r = Math.random(), acc = 0;
+    for(var i=0;i<colors.length;i++){ acc += weights[i]; if(r<=acc) return colors[i]; }
+    return colors[0];
+  }
+  var box = document.getElementById('bgParticles');
+  var N = 40;
+  for(var i=0;i<N;i++){
+    var el = document.createElement('div');
+    el.className = 'p';
+    var size = 2 + Math.random()*4;
+    var left = Math.random()*100;
+    var dur = 14 + Math.random()*20;
+    var delay = -Math.random()*dur;
+    var dx = (Math.random()*120-60).toFixed(0)+'px';
+    var op = (0.35 + Math.random()*0.45).toFixed(2);
+    var c = pickColor();
+    el.style.cssText = 'left:'+left+'%;width:'+size+'px;height:'+size+'px;background:rgba('+c+',1);box-shadow:0 0 '+(size*3)+'px rgba('+c+',.9);animation-duration:'+dur+'s;animation-delay:'+delay+'s;--dx:'+dx+';--op:'+op;
+    box.appendChild(el);
+  }
+})();
+</script>
 
 <!-- ============ ROLLE WÄHLEN ============ -->
 <div id="roleScreen">
